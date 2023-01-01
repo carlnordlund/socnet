@@ -1,19 +1,37 @@
 ﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Socnet - Network analysis in C#");
+//Console.WriteLine("socnet.exe " + String.Join(" ", args));
 
+Console.WriteLine("Socnet - Network analysis in C#");
+Console.WriteLine("===============================");
+Console.WriteLine("Developed by Carl Nordlund - carl.nordlund@liu.se");
+Console.WriteLine("Part of the Nordint.net project: https://nordint.net");
+Console.WriteLine();
+
+// Start (empty) engine instance
 Socnet.SocnetEngine engine = new Socnet.SocnetEngine();
 
-// If there are no arguments or if argument is  -i or --interactive
-Console.WriteLine("socnet.exe " + String.Join(" ", args));
 
-
-string mode = "interactive";
 bool verbose = false;
 
 if (args == null || args.Length == 0 || args[0].Equals("-i") || args[0].Equals("--interactive"))
 {
-    // Running the engine in interactive mode
-    mode = "interactive";
+    Console.WriteLine("Interactive mode (type 'quit' to quit, 'help' for help):");
+    while (true)
+    {
+        Console.Write("> ");
+        string? input = Console.ReadLine();
+        if (input != null)
+        {
+            if (input.Equals("quit"))
+            {
+                Console.WriteLine("Exiting...");
+                break;
+            }
+            List<string> responseLines = engine.executeCommand(input);
+            foreach (string line in responseLines)
+                Console.WriteLine(line);
+        }
+    }
 }
 else
 {
@@ -27,6 +45,9 @@ else
         }
         else
         {
+            // Alternative solution: just do an executeCommand with "loadscript file=scriptfile.txt" or similar
+            // i.e. this --file argument is then just a shortcut for executing the command for loading and running
+            // an external script file
             string filepath = args[1];
             Console.WriteLine("Starting socnet.exe with script file: " + filepath);
             if (args.Length == 3 && (args[2].Equals("-v") || args[2].Equals("--verbose")))
