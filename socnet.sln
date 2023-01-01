@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "socnet", "socnet.csproj", "{028BF2D2-2B42-422B-8B0E-D1890BE7B636}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Socnet", "Socnet.csproj", "{028BF2D2-2B42-422B-8B0E-D1890BE7B636}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
