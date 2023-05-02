@@ -2,7 +2,7 @@
   "profiles": {
     "socnet": {
       "commandName": "Project",
-      "commandLineArgs": "--interactive"
+      "commandLineArgs": "-i"
     }
   }
 }

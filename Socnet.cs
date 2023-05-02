@@ -1,81 +1,119 @@
 ﻿// See https://aka.ms/new-console-template for more information
-//Console.WriteLine("socnet.exe " + String.Join(" ", args));
+Console.WriteLine("socnet.exe " + String.Join(" ", args));
 
+// Welcome message
 Console.WriteLine("Socnet - Network analysis in C#");
 Console.WriteLine("===============================");
+Console.WriteLine("Version 1.0 (April 2023)");
 Console.WriteLine("Developed by Carl Nordlund - carl.nordlund@liu.se");
 Console.WriteLine("Part of the Nordint.net project: https://nordint.net");
 Console.WriteLine();
 
-// Start (empty) engine instance
+
+// Create SocnetEngine instance and responseLines
 Socnet.SocnetEngine engine = new Socnet.SocnetEngine();
 
 
-bool verbose = false;
-
-if (args == null || args.Length == 0 || args[0].Equals("-i") || args[0].Equals("--interactive"))
+// Parse arguments and prepare
+string mode = "interactive", file = "", commands = "", args_error = "";
+bool verbose = true;
+if (args != null && args.Length > 0)
 {
+    int nbr_args = args.Length;
+    int aindex = 0;
+    while (aindex < nbr_args && args_error.Equals(""))
+    {
+        switch (args[aindex])
+        {
+            case "-i":
+            case "--interactive":
+                mode = "interactive";
+                break;
+            case "-f":
+            case "--file":
+                if (aindex + 1 < nbr_args)
+                {
+                    mode = "file";
+                    file = args[aindex + 1];
+                }
+                else
+                    args_error = "Error: No script file provided";
+                break;
+            case "-c":
+            case "--commands":
+                if (aindex + 1 < nbr_args)
+                {
+                    mode = "commands";
+                    commands = args[aindex + 1];
+                }
+                else
+                    args_error = "Error: No commands specified";
+                break;
+            case "-v":
+            case "--verbose":
+                verbose = true;
+                break;
+        }
+        aindex++;
+    }
+}
+if (args_error != "")
+{
+    // Error when parsing arguments - display errors and show arguments details
+    Console.WriteLine(args_error);
+    Console.WriteLine("Arguments:");
+    Console.WriteLine("-i : Enter interactive mode");
+    Console.WriteLine("-f <filepath> : Load script <filepath> and execute commands");
+    Console.WriteLine("-c <commands> : Execute semicolon-separated commands in <commands> string");
+    Console.WriteLine("-v : Verbose output (when executing script file or commands; always verbose in interactive mode)");
+}
+else
+{
+    // Start socnet in different modes
+    if (mode.Equals("interactive"))
+        startInteractiveMode();
+    else if (mode.Equals("file"))
+        startLoadScript(file);
+    else if (mode.Equals("commands"))
+        startExecuteCommands(commands);
+}
+
+void startInteractiveMode()
+{
+//    List<string> responses;
     Console.WriteLine("Interactive mode (type 'quit' to quit, 'help' for help):");
+    Console.WriteLine("functions and parameter names: case-insensitive; data structure names: case-sensitive!");
+    displayResponse(engine.executeCommand("load(type=matrix,file=data/galtung.txt)"));
     while (true)
     {
         Console.Write("> ");
         string? input = Console.ReadLine();
         if (input != null)
         {
-            if (input.Equals("quit"))
+            if (input.Substring(0,4).Equals("quit"))
             {
                 Console.WriteLine("Exiting...");
                 break;
             }
-            List<string> responseLines = engine.executeCommand(input);
-            foreach (string line in responseLines)
-                Console.WriteLine(line);
+            displayResponse(engine.executeCommand(input));
         }
     }
 }
-else
+
+void startLoadScript(string filepath)
 {
-    if (args[0].Equals("-f") || args[0].Equals("--file"))
-    {
-        // Running the engine executable with a provided script file
-        if (args.Length == 1)
-        {
-            Console.WriteLine("Error: script <file> missing");
-            return;
-        }
-        else
-        {
-            // Alternative solution: just do an executeCommand with "loadscript file=scriptfile.txt" or similar
-            // i.e. this --file argument is then just a shortcut for executing the command for loading and running
-            // an external script file
-            string filepath = args[1];
-            Console.WriteLine("Starting socnet.exe with script file: " + filepath);
-            if (args.Length == 3 && (args[2].Equals("-v") || args[2].Equals("--verbose")))
-            {
-                Console.WriteLine("Verbose output");
-                verbose = true;
-            }
-            Console.WriteLine("Running script (could take a while)...");
-            List<string> response = engine.loadAndExecuteScript(filepath);
-            Console.WriteLine("Done!");
-            if (verbose)
-            {
-                Console.WriteLine("Output:");
-                foreach (string line in response)
-                    Console.WriteLine(line);
-            }
-        }
-    }
+    displayResponse(engine.executeCommand("loadscript(file=\"" + filepath + "\")"));
 }
 
-//if (args == null || args.Length == 0)
-//    engine.startInteractiveMode();
-//else
-//{
-//    int index = 0;
-//    while (index < args.Length - 1)
-//    {
-//        Console.WriteLine(args[index]);
-//    }
-//}
+void startExecuteCommands(string commands)
+{
+    displayResponse(engine.executeCommandString(commands));
+}
 
+void displayResponse(List<string> lines)
+{
+    if (verbose)
+        foreach (string line in lines)
+            if (line.Length > 0)
+                Console.WriteLine(line);
+}
