@@ -12,19 +12,21 @@ namespace Socnet
     public class SocnetEngine
     {
         Dataset dataset;
-        
-        
+        char[] trimChars = new Char[] { ' ', '"', '\'' };
 
-        List<string> response = new List<string>();
-        Dictionary<string, string> args = new Dictionary<string, string>();
+        public List<string> response = new List<string>();
 
-        Dictionary<string, string[]> args_must = new Dictionary<string, string[]>()
+        Dictionary<string, string> args_input = new Dictionary<string, string>();
+
+        Dictionary<string, string[]> args_required = new Dictionary<string, string[]>()
         {
-            {"load", new string[] {"file","type"} },
-            {"loadmatrix", new string[] {"file"} },
-            {"setwd", new string[] {"dir"} },
-            {"view", new string[] {"name"} },
-            {"delete", new string[] {"name"} }
+            {"load", new string[] {"file","type" } },
+            {"loadscript", new string[] {"file" } },
+            {"loadmatrix", new string[] {"file" } },
+            {"setwd", new string[] {"dir" } },
+            {"view", new string[] {"name" } },
+            {"delete", new string[] {"name" } },
+            {"rename", new string[] {"name", "newname" } }
         };
 
         public SocnetEngine()
@@ -34,131 +36,134 @@ namespace Socnet
             dataset.Name = "Untitled";
         }
 
-        // Execute a command line (single function)
-        internal List<string> executeCommand(string input)
+        public List<string> executeCommand(string command, bool clearResponse=false)
         {
-            response.Clear();
-            CommandBlob cb = parseCommand(input);
-            if (cb.error)
-            {
-                response.Add("!Error parsing: " + input);
-                return response;
-            }
-
-            // Set current argument disctionary
-            args = cb.arguments;
-
-            // Does this function exist in the engine? (Note additional _ in the method name
-            System.Reflection.MethodInfo? methodInfo = typeof(SocnetEngine).GetMethod("f_" + cb.function);
-            if (methodInfo == null)
-                // No, doesn't exist - send an error back
-                response.Add("!Error: function '" + cb.function + "' doesn't exist!");
-            else
-            {
-                if (args_must.ContainsKey(cb.function))
-                {
-                    foreach (string arg_key in args_must[cb.function])
-                    {
-                        if (!args.ContainsKey(arg_key) || args[arg_key].Length == 0)
-                        {
-                            response.Add("!Error: Argument '" + arg_key + "' missing");
-                            return response;
-                        }
-                    }
-                }
-                // Yes, function exist. All necessary arguments there?
-                // Yes, execute this function
-                methodInfo.Invoke(this, null);
-                // Why do I get a return value here? The functions will store stuff in response anyway
-                // and structures will be stored immediately etc.
-            }
-
-            return response;
-        }
-
-        // Takes a function-style command, tries parsing it, and returns a CommandBlob
-        // which is a struct containing the function name and parsed/trimmed argument dictionary
-        private CommandBlob parseCommand(string input)
-        {
-            CommandBlob cb = new CommandBlob();
-            Match match = Regex.Match(input.TrimEnd(';'), @"^(\w+)(\((.*?)\))?$");
+            if (clearResponse)
+                response.Clear();
+            string pattern = @"^(([\w]+)\s*?=\s*?)?(\w+)(\((.*?)\))?$";
+            Match match = Regex.Match(command.Trim(), pattern);
             if (match.Success)
             {
-                cb.function = match.Groups[1].Value.ToLower();
-                Dictionary<string, string> args = new Dictionary<string, string>();
-                string arg_string = match.Groups[3].Value.Trim();
-                if (arg_string.Length>0)
+                // Get assigner, function, argstring
+                string assigner = match.Groups[2].Value;
+                string function = match.Groups[3].Value;
+                string argstring = match.Groups[5].Value.Trim();
+
+                args_input.Clear();
+                if (argstring.Length > 0 && args_required.ContainsKey(function))
                 {
-                    // Ok - there is something in the argument, so parse this
-                    string[] arg_pairs = arg_string.Split(',');
-                    foreach (string arg_pair in arg_pairs)
+                    string[] args = argstring.Split(',');
+                    string key, value;
+                    for (int i = 0; i < args.Length; i++)
                     {
-                        string[] kv_pair = arg_pair.Trim().Split('=');
-                        if (kv_pair.Length==2)
+                        string[] kv = args[i].Split('=', 2);
+                        if (kv.Length == 1)
                         {
-                            string key = kv_pair[0].Trim().ToLower();
-                            string value = kv_pair[1].Trim(new Char[] { ' ', '"', '\'' });
-                            if (key.Length > 0 && value.Length > 0)
-                            {
-                                if (!cb.arguments.ContainsKey(key))
-                                    cb.arguments.Add(key, value);
-                            }
+                            if (i < args_required[function].Length)
+                                key = args_required[function][i];
                             else
                             {
-                                cb.error = true;
-                                return cb;
+                                response.Add("!Error - Argument index out of range");
+                                return response;
                             }
+                            value = kv[0];
+                        }
+                        else if (kv.Length == 2)
+                        {
+                            key = kv[0].Trim();
+                            value = kv[1];
                         }
                         else
                         {
-                            cb.error = true;
-                            return cb;
+                            response.Add("Something went wrong: " + kv.Length);
+                            return response;
+                        }
+
+                        if (args_input.ContainsKey(key))
+                        {
+                            response.Add("!Error: Argument '" + key + "' declared twice");
+                            return response;
+                        }
+                        args_input[key] = value.Trim(trimChars);
+                    }
+
+                    // Ok - now check if I got all necessary arguments
+                    foreach (string arg in args_required[function])
+                        if (!args_input.ContainsKey(arg))
+                        {
+                            response.Add("!Error: Argument '" + arg + "' missing");
+                            return response;
+                        }
+                }
+
+                DataStructure? returnStructure = null;
+                System.Reflection.MethodInfo? methodInfo = typeof(SocnetEngine).GetMethod("f_" + function);
+                if (methodInfo != null)
+                {
+                    object? obj = methodInfo.Invoke(this, null);
+                    if (obj != null && obj is DataStructure)
+                    {
+                        returnStructure = (DataStructure)obj;
+
+                        if (assigner.Length > 0)
+                        {
+                            returnStructure.Name = assigner;
+                            response.Add(dataset.StoreStructure(returnStructure));
+                            return response;
                         }
                     }
+                    else if (assigner.Length > 0)
+                    {
+                        response.Add("!Error: Function '" + function + "' returns null, can't be assigned");
+                        return response;
+                    }
                 }
+                else
+                {
+                    returnStructure = dataset.GetStructureByName(function);
+                    if (returnStructure == null)
+                    {
+                        response.Add("!Error: '" + function + "' neither function nor structure");
+                        return response;
+                    }
+                    if (assigner.Length > 0)
+                    {
+                        response.Add("!Error: Use 'rename()' function to rename, 'duplicate() function to duplicate");
+                        return response;
+                    }
+                }
+
+                if (returnStructure != null)
+                    response.AddRange(returnStructure.View);
+                return response;
             }
-            return cb;
+            response.Add("!Error: Syntax error!");
+            return response;
         }
 
-        internal List<string> executeCommandString(string commands)
+        internal List<string> executeCommandString(string commandString)
         {
-            return new List<string>();
-        }
-
-        public struct CommandBlob
-        {
-            public string assigner = "";
-            public string function = "";
-            public Dictionary<string, string> arguments;
-            public bool error = false;
-
-            public CommandBlob()
+            string[] commands = commandString.Split('\n');
+            response.Clear();
+            foreach (string command in commands)
             {
-                this.arguments = new Dictionary<string, string>();
+                response.Add("> " + command);
+                response.AddRange(executeCommand(command));
             }
-        }
-        
-        // If an error is encountered while doing a function, this prepares a custom message and returns false
-        private bool errorResponse(string errorMessage)
-        {
-            response.Add(errorMessage);
-            return false;
+            return response;
         }
 
         // This is a lookup for checking if a particular argument key exists - if so, returns the value; otherwise null
-        // Good for checking in functions
         private string getArgument(string key)
         {
-            if (args.ContainsKey(key) && args[key].Length > 0)
-                return args[key];
+            if (args_input.ContainsKey(key) && args_input[key].Length > 0)
+                return args_input[key];
             return "";
         }
 
 
 
-
         // METHODS for FUNCTIONS
-
         public void f_getwd()
         {
             response.Add(Directory.GetCurrentDirectory());
@@ -174,7 +179,7 @@ namespace Socnet
             }
             catch (Exception e)
             {
-                response.Add(e.Message);
+                response.Add("!Error: " + e.Message);
             }
         }
 
@@ -186,11 +191,38 @@ namespace Socnet
         public void f_load()
         {
             response.Add(SocnetIO.LoadDataStructure(response, dataset, getArgument("file"), getArgument("type"), getArgument("name")));
-            //string type = getArgument("type");
-            //if (type.Equals("matrix"))
-            //    f_loadmatrix();
-            //else
-            //    errorResponse("!Error: type '" + type + "' not recognized");
+        }
+
+        public void f_loadscript()
+        {
+            string[]? commands = SocnetIO.readAllLines(getArgument("file"), response);
+            if (commands != null)
+                foreach (string command in commands)
+                {
+                    response.Add("> " + command);
+                    executeCommand(command);
+                }
+        }
+
+        public void f_rename()
+        {
+            string oldName = getArgument("name"), newName = getArgument("newname");
+            DataStructure? structure = dataset.GetStructureByName(oldName);
+            
+            if (structure == null)
+                response.Add("!Error: Structure '" + oldName + "' not found");
+            else
+            {
+                if (dataset.StructureExists(newName))
+                    response.Add("!Error: Structure named '" + newName + "' already exists");
+                else
+                {
+                    dataset.structures.Remove(structure.Name);
+                    structure.Name = newName;
+                    dataset.structures.Add(newName, structure);
+                    response.Add("Renamed structure '" + oldName + "' (" + structure.DataType + ") to '" + newName + "'");
+                }
+            }
         }
 
         public void f_delete()
@@ -199,22 +231,21 @@ namespace Socnet
             if (structure != null)
                 response.Add(dataset.DeleteStructure(structure));
             else
-                errorResponse("!Error: Structure '" + getArgument("name") + " not found");
-
-
+                response.Add("!Error: Structure '" + getArgument("name") + "' not found");
         }
 
         public void f_structures()
         {
             response.Add("DataType" + "\t" + "Name" + "\t" + "Size");
+            response.Add("========" + "\t" + "====" + "\t" + "====");
             string type = getArgument("type");
             if (type == "")
-                foreach (DataStructure structure in dataset.structures)
-                    response.Add(structure.DataType + "\t" + structure.Name + "\t" + structure.Size);
+                foreach (KeyValuePair<string,DataStructure> obj in dataset.structures)
+                    response.Add(obj.Value.DataType + "\t" + obj.Value.Name + "\t" + obj.Value.Size);
             else
-                foreach (DataStructure structure in dataset.structures)
-                    if (structure.GetType().Name == type)
-                        response.Add(structure.DataType + "\t" + structure.Name + "\t" + structure.Size);
+                foreach (KeyValuePair<string, DataStructure> obj in dataset.structures)
+                    if (obj.Value.GetType().Name == type)
+                        response.Add(obj.Value.DataType + "\t" + obj.Value.Name + "\t" + obj.Value.Size);
         }
 
         public void f_view()

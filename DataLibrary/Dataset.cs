@@ -8,11 +8,13 @@ namespace Socnet.DataLibrary
 {
     public class Dataset : DataStructure
     {
-        public List<DataStructure> structures;
+        //public List<DataStructure> structures;
+        public Dictionary<string, DataStructure> structures;
 
         public Dataset()
         {
-            structures = new List<DataStructure>();
+            //structures = new List<DataStructure>();
+            structures = new Dictionary<string, DataStructure>();
         }
 
         internal override string GetSize()
@@ -29,8 +31,11 @@ namespace Socnet.DataLibrary
         {
             if (labels == null || labels.Length == 0)
                 return null;
-            foreach (DataStructure structure in structures)
+            DataStructure structure;
+            foreach (KeyValuePair<string,DataStructure> obj in structures)
+            //foreach (DataStructure structure in structures)
             {
+                structure = obj.Value;
                 if (structure is Actorset)
                 {
                     // Check if this (Actorset)structure has same Actor labels as those provided, if so: return this; otherwise: return null
@@ -80,7 +85,7 @@ namespace Socnet.DataLibrary
                 return "!Error - Can't store a null structure";
             if (structure.Name.Length == 0) {
                 // Ok - has no name, give a new unique one. No need to check if already exists: doesn't
-                structure.Name = GetAutoName(structure.GetType().Name);
+                structure.Name = GetAutoName(structure.GetType().Name.ToLower());
             }
             else
             {
@@ -94,10 +99,8 @@ namespace Socnet.DataLibrary
                     else if (existing.GetType() == structure.GetType())
                     {
                         // Already exists, and old is same DS as new, so simply overwrite
-                        // First remove the old one:
-                        structures.Remove(existing);
-                        // ...and then store new one and return
-                        structures.Add(structure);
+                        // Just overwrite this structure in Dictionary
+                        structures[structure.Name] = structure;
                         return "Updated structure '" + structure.Name + "' (" + structure.GetType().Name + ")";
                     }
                     else
@@ -107,58 +110,53 @@ namespace Socnet.DataLibrary
             }
             // If I have reached here, then either an autoname has been given (proof)
             // or There is other DS with same name. So just store.
-            structures.Add(structure);
+            structures[structure.Name] = structure;
             return "Stored structure '" + structure.Name + "' (" + structure.GetType().Name + ")";
+        }
+
+        public bool StructureExists(string name)
+        {
+            return structures.ContainsKey(name);
         }
 
         public DataStructure? GetStructureByName(string name, Type? type = null)
         {
-            if (type == null)
-            {
-                foreach (DataStructure structure in structures)
-                    if (structure.Name.Equals(name))
-                        return structure;
-            }
+            // If 'name' exists in structures and (type either null or same as that found), return structure
+            if (structures.ContainsKey(name) && (type == null || structures[name].GetType() == type))
+                return structures[name];
             else
-                foreach (DataStructure structure in structures)
-                    if (structure.GetType() == type && structure.Name.Equals(name))
-                        return structure;
-            return null;
+                // Otherwise return null: nothing found
+                return null;
         }
 
         private string GetAutoName(string basename)
         {
-            if (!ContainsName(basename))
+            if (!structures.ContainsKey(basename))
                 return basename;
             int c = 0;
-            while (ContainsName(basename + "_" + c))
+            while (structures.ContainsKey(basename + "_" + c))
                 c++;
             return basename + "_" + c;
-        }
-
-        private bool ContainsName(string name)
-        {
-            foreach (DataStructure structure in structures)
-                if (structure.Name == name)
-                    return true;
-            return false;
         }
 
         internal string DeleteStructure(DataStructure structure)
         {
             if (structure is Actorset && getStructuresByActorset((Actorset)structure).Count > 0)
                 return "!Error: Can't delete actorset '" + structure.Name + "', used by other data structures";
-                
-            structures.Remove(structure);
+
+            if (!structures.ContainsKey(structure.Name))
+                return "!Error: Structure '" + structure.Name + "' not found";
+            structures.Remove(structure.Name);
             return "Deleted structure '" + structure.Name + "' (" + structure.DataType + ")";
         }
 
         private List<DataStructure> getStructuresByActorset(Actorset actorset)
         {
             List<DataStructure> dependents = new List<DataStructure>();
-            foreach (DataStructure structure in structures)
-                if (structure is Matrix && ((Matrix)structure).actorset == actorset)
-                    dependents.Add(structure);
+            foreach (KeyValuePair<string,DataStructure> obj in structures)
+            //foreach (DataStructure structure in structures)
+                if (obj.Value is Matrix && ((Matrix)obj.Value).actorset == actorset)
+                    dependents.Add(obj.Value);
             return dependents;
         }
     }

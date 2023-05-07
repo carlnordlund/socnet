@@ -10,6 +10,7 @@ namespace Socnet
 {
     public static class SocnetIO
     {
+
         internal static string LoadDataStructure(List<string> response, Dataset dataset, string filepath, string type, string name)
         {
             if (!File.Exists(filepath))
@@ -17,7 +18,8 @@ namespace Socnet
             string[]? lines = readAllLines(filepath, response);
             if (lines == null)
                 return "!Error: File '" + filepath + "' seems empty";
-            string filename = Path.GetFileNameWithoutExtension(filepath);
+            //string filename = Path.GetFileNameWithoutExtension(filepath);
+            string dsname = (name.Length == 0) ? Path.GetFileNameWithoutExtension(filepath) : name;
             if (type.Equals("matrix"))
             {
                 ActorsAndData aod = parseActorsAndData(lines, response);
@@ -36,7 +38,7 @@ namespace Socnet
                         return "!Error: Couldn't create Actorset from labels";
                     response.Add(dataset.StoreStructure(actorset));
                 }
-                Matrix matrix = new Matrix(actorset, filename, "F2");
+                Matrix matrix = new Matrix(actorset, dsname, "F2");
                 matrix.installData(aod.rowLabels, aod.data);
                 response.Add(dataset.StoreStructure(matrix));
             }
@@ -46,18 +48,52 @@ namespace Socnet
                 if (aod.error)
                     return aod.errorMsg;
                 Actorset? rowActorset = dataset.GetActorsetByLabels(aod.rowLabels);
-                if (rowActorset == null)
-                    rowActorset = dataset.CreateActorsetByLabels(aod.rowLabels);
-                if (rowActorset == null)
-                    return "!Error: Couldn't create Actorset from row labels";
-                response.Add(dataset.StoreStructure(rowActorset));
                 Actorset? colActorset = dataset.GetActorsetByLabels(aod.colLabels);
+                //bool addRowActorset = false, addColActorset = false;
+                if (rowActorset == null)
+                {
+                    // Doesn't exist, so try creating
+                    rowActorset = dataset.CreateActorsetByLabels(aod.rowLabels);
+                    if (rowActorset == null)
+                        // Nope, didn't work - give error and abort
+                        return "!Error: Couldn't create Actorset from row labels";
+                    // If I am here, this means I got a rowActorset, which might or might not already be stored
+                    response.Add(dataset.StoreStructure(rowActorset));
+                    //addRowActorset = true;
+                }
                 if (colActorset == null)
+                {
+                    // Doesn't exist, so try creating
                     colActorset = dataset.CreateActorsetByLabels(aod.colLabels);
-                if (colActorset == null)
-                    return "!Error: Couldn't create Actorset from column labels";
-                response.Add(dataset.StoreStructure(colActorset));
-                Table table = new Table(rowActorset, colActorset, filename, "F2");
+                    if (colActorset == null)
+                        // Nope, didn't work - give error and abort
+                        return "!Error: Couldn't create Actorset from column labels";
+                    // If I am here, this means I got a colActorset, which might or might not already be stored
+                    response.Add(dataset.StoreStructure(colActorset));
+                    //addColActorset = true;
+                }
+                //if (addRowActorset)
+                //    response.Add(dataset.StoreStructure(rowActorset));
+                //if (addColActorset)
+                //    response.Add(dataset.StoreStructure(colActorset));
+                
+
+
+
+
+                //Actorset? rowActorset = dataset.GetActorsetByLabels(aod.rowLabels);
+                //if (rowActorset == null)
+                //    rowActorset = dataset.CreateActorsetByLabels(aod.rowLabels);
+                //if (rowActorset == null)
+                //    return "!Error: Couldn't create Actorset from row labels";
+                //response.Add(dataset.StoreStructure(rowActorset));
+                //Actorset? colActorset = dataset.GetActorsetByLabels(aod.colLabels);
+                //if (colActorset == null)
+                //    colActorset = dataset.CreateActorsetByLabels(aod.colLabels);
+                //if (colActorset == null)
+                //    return "!Error: Couldn't create Actorset from column labels";
+                //response.Add(dataset.StoreStructure(colActorset));
+                Table table = new Table(rowActorset, colActorset, dsname, "F2");
                 table.installData(aod.rowLabels, aod.colLabels, aod.data);
                 response.Add(dataset.StoreStructure(table));
             }
@@ -95,7 +131,7 @@ namespace Socnet
             return actorsAndData;
         }
 
-        private static string[]? readAllLines(string filename, List<string> response)
+        public static string[]? readAllLines(string filename, List<string> response)
         {
             try
             {
@@ -107,6 +143,7 @@ namespace Socnet
                 return null;
             }
         }
+
     }
 
     public struct ActorsAndData

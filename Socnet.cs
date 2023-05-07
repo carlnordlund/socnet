@@ -16,7 +16,7 @@ Socnet.SocnetEngine engine = new Socnet.SocnetEngine();
 
 // Parse arguments and prepare
 string mode = "interactive", file = "", commands = "", args_error = "";
-bool verbose = true;
+bool verbose = true, echo = false;
 if (args != null && args.Length > 0)
 {
     int nbr_args = args.Length;
@@ -53,6 +53,10 @@ if (args != null && args.Length > 0)
             case "--verbose":
                 verbose = true;
                 break;
+            case "-e":
+            case "--echo":
+                echo = true;
+                break;
         }
         aindex++;
     }
@@ -64,8 +68,9 @@ if (args_error != "")
     Console.WriteLine("Arguments:");
     Console.WriteLine("-i : Enter interactive mode");
     Console.WriteLine("-f <filepath> : Load script <filepath> and execute commands");
-    Console.WriteLine("-c <commands> : Execute semicolon-separated commands in <commands> string");
+    Console.WriteLine("-c <commands> : Execute \n-separated commands in <commands> string");
     Console.WriteLine("-v : Verbose output (when executing script file or commands; always verbose in interactive mode)");
+    Console.WriteLine("-e : Echo commands (suitable for viewing STDIN when using in interactive mode from Python/R)");
 }
 else
 {
@@ -83,19 +88,24 @@ void startInteractiveMode()
 //    List<string> responses;
     Console.WriteLine("Interactive mode (type 'quit' to quit, 'help' for help):");
     Console.WriteLine("functions and parameter names: case-insensitive; data structure names: case-sensitive!");
-    displayResponse(engine.executeCommand("load(type=matrix,file=data/galtung.txt)"));
+    //displayResponse(engine.executeCommand("load(type=matrix,file=data/galtung.txt)"));
     while (true)
     {
-        Console.Write("> ");
+        if (!echo)
+            Console.Write("> ");
         string? input = Console.ReadLine();
+        //while ((input = Console.ReadLine()) != null)
         if (input != null)
         {
-            if (input.Substring(0,4).Equals("quit"))
+            if (echo)
+                Console.WriteLine("> " + input);
+            if (input.Equals("quit"))
             {
                 Console.WriteLine("Exiting...");
+                System.Environment.Exit(0);
                 break;
             }
-            displayResponse(engine.executeCommand(input));
+            displayResponse(engine.executeCommand(input, true));
         }
     }
 }
