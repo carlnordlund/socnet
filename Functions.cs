@@ -11,6 +11,7 @@ namespace Socnet
     public static class Functions
     {
         public static List<string> idealBlockNames = new List<string>() { "dnc", "nul", "com" };
+        public static List<string> searchTypes = new List<string>() { "localopt", "exhaustive", "testpartition" };
 
         internal static _Block? GetBlockInstance(string blockName)
         {

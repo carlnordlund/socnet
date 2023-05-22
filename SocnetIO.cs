@@ -135,13 +135,15 @@ namespace Socnet
         {
             try
             {
-                return File.ReadAllLines(filename);
+                if (File.Exists(filename))
+                    return File.ReadAllLines(filename);
+                response.Add("!Error: File not found");
             }
             catch (FileNotFoundException e)
             {
                 response.Add("!Error: " + e.Message);
-                return null;
             }
+            return null;
         }
 
     }

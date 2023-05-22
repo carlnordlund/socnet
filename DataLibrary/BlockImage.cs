@@ -121,7 +121,7 @@ namespace Socnet.DataLibrary
             for (int r = 0; r < nbrPositions; r++)
                 for (int c = 0; c < nbrPositions; c++)
                 {
-                    string[] blockNames = blockCellContent[index].Split('-');
+                    string[] blockNames = blockCellContent[index].Split(';');
                     blocks[r, c] = Functions.GetBlockInstances(blockNames);
                 }
         }

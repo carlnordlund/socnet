@@ -155,7 +155,7 @@ namespace Socnet
         }
 
         // This is a lookup for checking if a particular argument key exists - if so, returns the value; otherwise null
-        private string getArgument(string key)
+        private string getStringArgument(string key)
         {
             if (args_input.ContainsKey(key) && args_input[key].Length > 0)
                 return args_input[key];
@@ -165,7 +165,7 @@ namespace Socnet
         private int getIntegerArgument(string key)
         {
             int retval = -1;
-            Int32.TryParse(getArgument(key), out retval);
+            Int32.TryParse(getStringArgument(key), out retval);
             return retval;
         }
 
@@ -179,7 +179,7 @@ namespace Socnet
 
         public void f_setwd()
         {
-            string dir = getArgument("dir");
+            string dir = getStringArgument("dir");
             try
             {
                 Directory.SetCurrentDirectory(dir);
@@ -193,33 +193,37 @@ namespace Socnet
 
         public void f_loadmatrix()
         {
-            response.Add(SocnetIO.LoadDataStructure(response, dataset, getArgument("file"), "matrix", getArgument("name")));
+            response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "matrix", getStringArgument("name")));
         }
 
         public void f_loadtable()
         {
-            response.Add(SocnetIO.LoadDataStructure(response, dataset, getArgument("file"), "table", getArgument("name")));
+            response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "table", getStringArgument("name")));
         }
 
         public void f_load()
         {
-            response.Add(SocnetIO.LoadDataStructure(response, dataset, getArgument("file"), getArgument("type"), getArgument("name")));
+            response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), getStringArgument("type"), getStringArgument("name")));
         }
 
         public void f_loadscript()
         {
-            string[]? commands = SocnetIO.readAllLines(getArgument("file"), response);
+            string file = getStringArgument("file");
+            string[]? commands = SocnetIO.readAllLines(file, response);
             if (commands != null)
+            {
+                response.Add("Loading and executing '" + file + "'...");
                 foreach (string command in commands)
                 {
                     response.Add("> " + command);
                     executeCommand(command);
                 }
+            }
         }
 
         public void f_rename()
         {
-            string oldName = getArgument("name"), newName = getArgument("newname");
+            string oldName = getStringArgument("name"), newName = getStringArgument("newname");
             DataStructure? structure = dataset.GetStructureByName(oldName);
             
             if (structure == null)
@@ -240,18 +244,18 @@ namespace Socnet
 
         public void f_delete()
         {
-            DataStructure? structure = dataset.GetStructureByName(getArgument("name"));
+            DataStructure? structure = dataset.GetStructureByName(getStringArgument("name"));
             if (structure != null)
                 response.Add(dataset.DeleteStructure(structure));
             else
-                response.Add("!Error: Structure '" + getArgument("name") + "' not found");
+                response.Add("!Error: Structure '" + getStringArgument("name") + "' not found");
         }
 
         public void f_structures()
         {
             response.Add("DataType" + "\t" + "Name" + "\t" + "Size");
             response.Add("========" + "\t" + "====" + "\t" + "====");
-            string type = getArgument("type");
+            string type = getStringArgument("type");
             if (type == "")
                 foreach (KeyValuePair<string, DataStructure> obj in dataset.structures)
                     response.Add(obj.Value.DataType + "\t" + obj.Value.Name + "\t" + obj.Value.Size);
@@ -263,7 +267,7 @@ namespace Socnet
 
         public void f_view()
         {
-            string name = getArgument("name");
+            string name = getStringArgument("name");
             DataStructure? structure = dataset.GetStructureByName(name);
             if (structure == null) {
                 response.Add("!Error: Structure '" + name + "' not found");
@@ -282,14 +286,14 @@ namespace Socnet
                 return null;
             }
             BlockImage bi = new BlockImage("", nbrPositions);
-            string pattern = getArgument("pattern"), content = getArgument("content");
+            string pattern = getStringArgument("pattern"), content = getStringArgument("content");
             if (pattern != "")
             {
                 bi.setBlocksByPattern(pattern);
             }
             else if (content != "")
             {
-                string[] contentParts = content.Split(';');
+                string[] contentParts = content.Split('|');
                 if (contentParts.Length != nbrPositions * nbrPositions)
                 {
                     response.Add("!Error: Size mismatch between content and blockimage size");
@@ -298,6 +302,33 @@ namespace Socnet
                 bi.setBlocksByContentString(contentParts);
             }
             return bi;
+
+        }
+
+        public void f_directbm()
+        {
+            response.Add("Doing direct blockmodeling");
+
+            DataStructure? network = dataset.GetStructureByName(getStringArgument("network"), typeof(Matrix));
+            if (network == null)
+            {
+                response.Add("!Error: Network not found (parameter: network)");
+                return;
+            }
+            DataStructure? blockimage = dataset.GetStructureByName(getStringArgument("blockimage"), typeof(BlockImage));
+            if (blockimage == null)
+            {
+                response.Add("!Error: Blockimage not found (parameter: blockimage)");
+                return;
+            }
+            string searchType = getStringArgument("searchtype");
+            if (searchType =="" || !Functions.searchTypes.Contains(searchType))
+            {
+                response.Add("!Error: Search type not recognized/set (parameter: searchtype");
+                return;
+            }
+
+
 
         }
     }
