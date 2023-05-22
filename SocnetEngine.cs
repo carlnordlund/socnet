@@ -26,7 +26,8 @@ namespace Socnet
             {"setwd", new string[] {"dir" } },
             {"view", new string[] {"name" } },
             {"delete", new string[] {"name" } },
-            {"rename", new string[] {"name", "newname" } }
+            {"rename", new string[] {"name", "newname" } },
+            {"blockimage", new string[] {"size"} }
         };
 
         public SocnetEngine()
@@ -50,7 +51,7 @@ namespace Socnet
                 string argstring = match.Groups[5].Value.Trim();
 
                 args_input.Clear();
-                if (argstring.Length > 0 && args_required.ContainsKey(function))
+                if (argstring.Length > 0)
                 {
                     string[] args = argstring.Split(',');
                     string key, value;
@@ -59,7 +60,7 @@ namespace Socnet
                         string[] kv = args[i].Split('=', 2);
                         if (kv.Length == 1)
                         {
-                            if (i < args_required[function].Length)
+                            if (args_required.ContainsKey(function) && i < args_required[function].Length)
                                 key = args_required[function][i];
                             else
                             {
@@ -86,14 +87,14 @@ namespace Socnet
                         }
                         args_input[key] = value.Trim(trimChars);
                     }
-
-                    // Ok - now check if I got all necessary arguments
-                    foreach (string arg in args_required[function])
-                        if (!args_input.ContainsKey(arg))
-                        {
-                            response.Add("!Error: Argument '" + arg + "' missing");
-                            return response;
-                        }
+                    if (args_required.ContainsKey(function))
+                        // Ok - now check if I got all necessary arguments
+                        foreach (string arg in args_required[function])
+                            if (!args_input.ContainsKey(arg))
+                            {
+                                response.Add("!Error: Argument '" + arg + "' missing");
+                                return response;
+                            }
                 }
 
                 DataStructure? returnStructure = null;
@@ -161,6 +162,13 @@ namespace Socnet
             return "";
         }
 
+        private int getIntegerArgument(string key)
+        {
+            int retval = -1;
+            Int32.TryParse(getArgument(key), out retval);
+            return retval;
+        }
+
 
 
         // METHODS for FUNCTIONS
@@ -186,6 +194,11 @@ namespace Socnet
         public void f_loadmatrix()
         {
             response.Add(SocnetIO.LoadDataStructure(response, dataset, getArgument("file"), "matrix", getArgument("name")));
+        }
+
+        public void f_loadtable()
+        {
+            response.Add(SocnetIO.LoadDataStructure(response, dataset, getArgument("file"), "table", getArgument("name")));
         }
 
         public void f_load()
@@ -240,11 +253,11 @@ namespace Socnet
             response.Add("========" + "\t" + "====" + "\t" + "====");
             string type = getArgument("type");
             if (type == "")
-                foreach (KeyValuePair<string,DataStructure> obj in dataset.structures)
+                foreach (KeyValuePair<string, DataStructure> obj in dataset.structures)
                     response.Add(obj.Value.DataType + "\t" + obj.Value.Name + "\t" + obj.Value.Size);
             else
                 foreach (KeyValuePair<string, DataStructure> obj in dataset.structures)
-                    if (obj.Value.GetType().Name == type)
+                    if (obj.Value.GetType().Name.Equals(type,StringComparison.CurrentCultureIgnoreCase))
                         response.Add(obj.Value.DataType + "\t" + obj.Value.Name + "\t" + obj.Value.Size);
         }
 
@@ -257,6 +270,35 @@ namespace Socnet
                 return;
             }
             response.AddRange(structure.View);
+        }
+
+
+        public BlockImage? f_blockimage()
+        {
+            int nbrPositions = getIntegerArgument("size");
+            if (nbrPositions<2)
+            {
+                response.Add("!Error: Blockimage size must be at least 2");
+                return null;
+            }
+            BlockImage bi = new BlockImage("", nbrPositions);
+            string pattern = getArgument("pattern"), content = getArgument("content");
+            if (pattern != "")
+            {
+                bi.setBlocksByPattern(pattern);
+            }
+            else if (content != "")
+            {
+                string[] contentParts = content.Split(';');
+                if (contentParts.Length != nbrPositions * nbrPositions)
+                {
+                    response.Add("!Error: Size mismatch between content and blockimage size");
+                    return null;
+                }
+                bi.setBlocksByContentString(contentParts);
+            }
+            return bi;
+
         }
     }
 }
