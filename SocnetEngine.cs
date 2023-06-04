@@ -27,7 +27,8 @@ namespace Socnet
             {"view", new string[] {"name" } },
             {"delete", new string[] {"name" } },
             {"rename", new string[] {"name", "newname" } },
-            {"blockimage", new string[] {"size"} }
+            {"blockimage", new string[] {"size"} },
+            {"directbm", new string[] {"network","blockimage","searchtype","method" } }
         };
 
         public SocnetEngine()
@@ -308,13 +309,16 @@ namespace Socnet
         public void f_directbm()
         {
             response.Add("Doing direct blockmodeling");
+            Dictionary<string, object?> searchParams = new Dictionary<string, object?>();
 
+            //searchParams["network"] = dataset.GetStructureByName(getStringArgument("network"), typeof(Matrix));
             DataStructure? network = dataset.GetStructureByName(getStringArgument("network"), typeof(Matrix));
             if (network == null)
             {
                 response.Add("!Error: Network not found (parameter: network)");
                 return;
             }
+            //searchParams["blockimage"] = dataset.GetStructureByName(getStringArgument("blockimage"), typeof(BlockImage));
             DataStructure? blockimage = dataset.GetStructureByName(getStringArgument("blockimage"), typeof(BlockImage));
             if (blockimage == null)
             {
@@ -322,11 +326,27 @@ namespace Socnet
                 return;
             }
             string searchType = getStringArgument("searchtype");
-            if (searchType =="" || !Functions.searchTypes.Contains(searchType))
+            if (searchType =="" || !Blockmodeling.searchTypes.Contains(searchType))
             {
                 response.Add("!Error: Search type not recognized/set (parameter: searchtype");
                 return;
             }
+            string gofMethod = getStringArgument("method");
+            if (gofMethod == "" || !Blockmodeling.gofMethods.Contains(gofMethod))
+            {
+                response.Add("!Error: Method not recognized/set (parameter: method)");
+                return;
+            }
+
+            searchParams["network"] = network;
+            searchParams["blockimage"] = blockimage;
+            searchParams["searchtype"] = searchType;
+            searchParams["method"] = gofMethod;
+            searchParams["minclustersize"] = getIntegerArgument("minclustersize");
+            searchParams["nbrrestarts"] = getIntegerArgument("nbrrestarts");
+            searchParams["maxiterations"] = getIntegerArgument("maxiterations");
+
+            string statusInitMsg = Blockmodeling.InitializeSearch(searchParams);
 
 
 

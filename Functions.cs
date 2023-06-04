@@ -11,7 +11,7 @@ namespace Socnet
     public static class Functions
     {
         public static List<string> idealBlockNames = new List<string>() { "dnc", "nul", "com" };
-        public static List<string> searchTypes = new List<string>() { "localopt", "exhaustive", "testpartition" };
+        
 
         internal static _Block? GetBlockInstance(string blockName)
         {
@@ -28,11 +28,18 @@ namespace Socnet
         internal static List<_Block> GetBlockInstances(string[] blockNames)
         {
             List<_Block> blocks = new List<_Block>();
+            List<string> blocksAlready = new List<string>();
             foreach (string blockName in blockNames)
             {
-                _Block? block = GetBlockInstance(blockName);
-                if (block != null)
-                    blocks.Add(block);
+                if (!blocksAlready.Contains(blockName))
+                {
+                    _Block? block = GetBlockInstance(blockName);
+                    if (block != null)
+                    {
+                        blocks.Add(block);
+                        blocksAlready.Add(blockName);
+                    }
+                }
             }
             return blocks;
         }

@@ -36,33 +36,33 @@ namespace Socnet.DataLibrary
         //    SetBlocks(blocklists);
         //}
 
-        private void SetBlocks(string[,] blocklists)
-        {
-            if (blocklists == null)
-                return;
-            multiBlocked = false;
-            this.nbrPositions = blocklists.GetLength(0);
-            blocks = new List<_Block>[nbrPositions, nbrPositions];
-            positionNames = new string[nbrPositions];
-            for (int r=0; r< nbrPositions;r++)
-            {
-                positionNames[r] = "P" + r;
-                for (int c=0; c<nbrPositions;c++)
-                {
-                    this.blocks[r, c] = new List<_Block>();
-                    string[] blocks = blocklists[r, c].Split(',');
-                    if (blocks.Length > 1)
-                        multiBlocked = true;
-                    for (int i=0;i<blocks.Length;i++)
-                    {
-                        _Block? block = Functions.GetBlockInstance(blocks[i]);
-                        if (block != null)
-                            this.blocks[r, c].Add(block);
-                    }
-                }
-            }
+        //private void SetBlocks(string[,] blocklists)
+        //{
+        //    if (blocklists == null)
+        //        return;
+        //    multiBlocked = false;
+        //    this.nbrPositions = blocklists.GetLength(0);
+        //    blocks = new List<_Block>[nbrPositions, nbrPositions];
+        //    positionNames = new string[nbrPositions];
+        //    for (int r=0; r< nbrPositions;r++)
+        //    {
+        //        positionNames[r] = "P" + r;
+        //        for (int c=0; c<nbrPositions;c++)
+        //        {
+        //            this.blocks[r, c] = new List<_Block>();
+        //            string[] blocks = blocklists[r, c].Split(',');
+        //            if (blocks.Length > 1)
+        //                multiBlocked = true;
+        //            for (int i=0;i<blocks.Length;i++)
+        //            {
+        //                _Block? block = Functions.GetBlockInstance(blocks[i]);
+        //                if (block != null)
+        //                    this.blocks[r, c].Add(block);
+        //            }
+        //        }
+        //    }
 
-        }
+        //}
 
         internal override void GetContent(List<string> content)
         {
@@ -85,6 +85,7 @@ namespace Socnet.DataLibrary
                     line = line.TrimEnd(',');
                     content.Add(line);
                 }
+            content.Add("Multiblocked: " + multiBlocked);
         }
 
         internal override string GetSize()
@@ -100,15 +101,8 @@ namespace Socnet.DataLibrary
                 for (int c = 0; c < nbrPositions; c++)
                 {
                     blocks[r, c] = Functions.GetBlockInstances(patternBlocks);
-                    //blocks[r, c] = new List<_Block>();
-                    //foreach (string blockname in patternBlocks)
-                    //{
-                    //    //_Block? block = getBlockInstance(blockname);
-                    //    _Block? block = Functions.GetBlockInstance(blockname);
-                    //    if (block is _Block)
-                    //        blocks[r, c].Add(block);
-                    //}
                 }
+            checkMultiblocked();
         }
 
         internal void setBlocksByContentString(string[] blockCellContent)
@@ -123,7 +117,24 @@ namespace Socnet.DataLibrary
                 {
                     string[] blockNames = blockCellContent[index].Split(';');
                     blocks[r, c] = Functions.GetBlockInstances(blockNames);
+                    index++;
                 }
+            checkMultiblocked();
         }
+
+        // Check if this is multiblocked: if so, update multiblocked flag
+        // This is run when the blockimage is created/updated by pattern/content
+        private void checkMultiblocked()
+        {
+            if (blocks == null)
+                return;
+            multiBlocked = true;
+            for (int r = 0; r < nbrPositions; r++)
+                for (int c = 0; c < nbrPositions; c++)
+                    if (blocks[r, c].Count > 1)
+                        return;
+            multiBlocked = false;
+        }
+
     }
 }
