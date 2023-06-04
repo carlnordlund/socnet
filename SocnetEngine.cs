@@ -28,7 +28,8 @@ namespace Socnet
             {"delete", new string[] {"name" } },
             {"rename", new string[] {"name", "newname" } },
             {"blockimage", new string[] {"size"} },
-            {"directbm", new string[] {"network","blockimage","searchtype","method" } }
+            {"initdirectbm", new string[] {"network", "blockimage", "searchtype", "method" } },
+            {"bivarieties", new string[] {"blockimage"} }
         };
 
         public SocnetEngine()
@@ -303,22 +304,19 @@ namespace Socnet
                 bi.setBlocksByContentString(contentParts);
             }
             return bi;
-
         }
 
-        public void f_directbm()
+        public void f_initdirectbm()
         {
             response.Add("Doing direct blockmodeling");
             Dictionary<string, object?> searchParams = new Dictionary<string, object?>();
 
-            //searchParams["network"] = dataset.GetStructureByName(getStringArgument("network"), typeof(Matrix));
             DataStructure? network = dataset.GetStructureByName(getStringArgument("network"), typeof(Matrix));
             if (network == null)
             {
                 response.Add("!Error: Network not found (parameter: network)");
                 return;
             }
-            //searchParams["blockimage"] = dataset.GetStructureByName(getStringArgument("blockimage"), typeof(BlockImage));
             DataStructure? blockimage = dataset.GetStructureByName(getStringArgument("blockimage"), typeof(BlockImage));
             if (blockimage == null)
             {
@@ -348,6 +346,28 @@ namespace Socnet
 
             string statusInitMsg = Blockmodeling.InitializeSearch(searchParams);
 
+
+
+        }
+
+        public void f_bivarieties()
+        {
+            response.Add("Create varieties from multiblocked blockimage");
+            DataStructure? structure = dataset.GetStructureByName(getStringArgument("blockimage"), typeof(BlockImage));
+            if (structure == null || !(structure is BlockImage))
+            {
+                response.Add("!Error: 'blockimage' not set/recognized");
+                return;
+            }
+            BlockImage bi = (BlockImage)structure;
+            if (!bi.multiBlocked)
+            {
+                response.Add("!Error: Blockimage not multiblocked");
+                return;
+            }
+            List<BlockImage> blockimages = Functions.GetBlockImageVarieties(bi);
+            foreach (BlockImage blim in blockimages)
+                dataset.StoreStructure(blim);
 
 
         }

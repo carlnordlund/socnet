@@ -10,7 +10,7 @@ namespace Socnet.DataLibrary
     public class BlockImage : DataStructure
     {
         public List<_Block>[,]? blocks;
-        public string[]? positionNames;
+        public string[] positionNames;
         public int nbrPositions;
         public bool multiBlocked = false;
 
@@ -93,6 +93,11 @@ namespace Socnet.DataLibrary
             return nbrPositions + "x" + nbrPositions;
         }
 
+        internal _Block GetBlock(int r, int c, int i)
+        {
+            return blocks![r, c][i];
+        }
+
         internal void setBlocksByPattern(string pattern)
         {
             blocks = new List<_Block>[nbrPositions, nbrPositions];
@@ -136,5 +141,29 @@ namespace Socnet.DataLibrary
             multiBlocked = false;
         }
 
+        internal void setBlocksByPrimeIndices(int[,] blockIndices)
+        {
+            if (blockIndices == null)
+                return;
+            this.nbrPositions = blockIndices.GetLength(0);
+            blocks = new List<_Block>[nbrPositions, nbrPositions];
+            positionNames = new string[nbrPositions];
+            for (int r=0;r<nbrPositions;r++)
+            {
+                positionNames[r] = "P" + r;
+                for (int c=0;c<nbrPositions;c++)
+                {
+                    this.blocks[r, c] = new List<_Block>();
+                    if (Functions.indexToIdealBlockName.ContainsKey(blockIndices[r, c]))
+                    {
+                        _Block? block = Functions.GetBlockInstance(Functions.indexToIdealBlockName[blockIndices[r, c]]);
+                        if (block != null)
+                            this.blocks[r, c].Add(block);
+                    }
+                }
+            }
+            multiBlocked = false;
+
+        }
     }
 }

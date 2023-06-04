@@ -12,10 +12,10 @@ namespace Socnet.DataLibrary
         public string label;
         //Dictionary<string, string> supplementaryLabels = new Dictionary<string, string>();
 
-        public Actor(string label)
-        {
-            this.label = label;
-        }
+        //public Actor(string label)
+        //{
+        //    this.label = label;
+        //}
 
         public Actor(string label, int index)
         {
