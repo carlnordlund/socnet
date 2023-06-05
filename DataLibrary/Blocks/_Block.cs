@@ -8,7 +8,7 @@ namespace Socnet.DataLibrary.Blocks
 {
     public abstract class _Block
     {
-        public string name = "";
+        public string Name = "";
         public int primeIndex;
 
     }

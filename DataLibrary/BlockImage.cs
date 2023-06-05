@@ -77,7 +77,7 @@ namespace Socnet.DataLibrary
                         if (blocks[r,c] != null)
                         foreach (_Block block in blocks[r,c])
                         {
-                                line += block.name + ",";
+                                line += block.Name + ",";
                         }
                         line = line.TrimEnd(',');
                         line += "],";
@@ -86,6 +86,17 @@ namespace Socnet.DataLibrary
                     content.Add(line);
                 }
             content.Add("Multiblocked: " + multiBlocked);
+        }
+
+        internal List<string> GetAllUniqueBlockNames()
+        {
+            List<string> blockNames = new List<string>();
+            for (int r = 0; r < nbrPositions; r++)
+                for (int c = 0; c < nbrPositions; c++)
+                    foreach (_Block block in blocks![r, c])
+                        if (!blockNames.Contains(block.Name))
+                            blockNames.Add(block.Name);
+            return blockNames;
         }
 
         internal override string GetSize()

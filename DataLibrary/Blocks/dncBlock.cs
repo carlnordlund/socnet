@@ -10,7 +10,7 @@ namespace Socnet.DataLibrary.Blocks
     {
         public dncBlock()
         {
-            name = "dnc";
+            Name = "dnc";
             primeIndex = 0;
         }
     }

@@ -217,8 +217,11 @@ namespace Socnet
                 response.Add("Loading and executing '" + file + "'...");
                 foreach (string command in commands)
                 {
-                    response.Add("> " + command);
-                    executeCommand(command);
+                    if (command.Length > 0 && command[0] != '#')
+                    {
+                        response.Add("> " + command);
+                        executeCommand(command);
+                    }
                 }
             }
         }
@@ -345,13 +348,21 @@ namespace Socnet
             searchParams["maxiterations"] = getIntegerArgument("maxiterations");
 
             string statusInitMsg = Blockmodeling.InitializeSearch(searchParams);
-
-
-
+            if (statusInitMsg.Equals("ok"))
+                response.AddRange(Blockmodeling.logLines);
+            else if (statusInitMsg[0] == '!')
+                response.Add(statusInitMsg);
         }
+
+        public void f_startsearch()
+        {
+            Blockmodeling.StartSearch();
+        }
+
 
         public void f_bivarieties()
         {
+            response.Add("*** TEST FUNCTION ***");
             response.Add("Create varieties from multiblocked blockimage");
             DataStructure? structure = dataset.GetStructureByName(getStringArgument("blockimage"), typeof(BlockImage));
             if (structure == null || !(structure is BlockImage))

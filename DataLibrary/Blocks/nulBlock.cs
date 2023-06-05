@@ -10,7 +10,7 @@ namespace Socnet.DataLibrary.Blocks
     {
         public nulBlock()
         {
-            name = "nul";
+            Name = "nul";
             primeIndex = 1;
         }
     }

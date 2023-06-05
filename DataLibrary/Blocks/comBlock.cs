@@ -10,7 +10,7 @@ namespace Socnet.DataLibrary.Blocks
     {
         public comBlock()
         {
-            name = "com";
+            Name = "com";
             primeIndex = 2;
         }
     }
