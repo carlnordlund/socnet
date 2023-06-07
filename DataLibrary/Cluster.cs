@@ -35,7 +35,7 @@ namespace Socnet.DataLibrary
 
         public void sortByLabel()
         {
-            actors = actors.OrderBy(o => o.label).ToList();
+            actors = actors.OrderBy(o => o.Name).ToList();
         }
 
         public void clear()

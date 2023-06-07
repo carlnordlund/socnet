@@ -40,7 +40,7 @@ namespace Socnet.DataLibrary
             content.Add("Actorset:" + actorset.Name);
             content.Add("actor"+"\t"+"value");
             foreach (Actor actor in actorset.actors)
-                content.Add(actor.label + "\t" + Get(actor));
+                content.Add(actor.Name + "\t" + Get(actor));
         }
 
         internal string GetValueString()

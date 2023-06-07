@@ -104,7 +104,7 @@ namespace Socnet.DataLibrary
             return nbrPositions + "x" + nbrPositions;
         }
 
-        internal _Block GetBlock(int r, int c, int i)
+        internal _Block GetBlock(int r, int c, int i = 0)
         {
             return blocks![r, c][i];
         }

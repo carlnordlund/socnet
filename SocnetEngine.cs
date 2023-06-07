@@ -29,7 +29,9 @@ namespace Socnet
             {"rename", new string[] {"name", "newname" } },
             {"blockimage", new string[] {"size"} },
             {"initdirectbm", new string[] {"network", "blockimage", "searchtype", "method" } },
-            {"bivarieties", new string[] {"blockimage"} }
+            {"bivarieties", new string[] {"blockimage"} },
+            {"viewbm", new string[] {"blockmodel"} }
+            
         };
 
         public SocnetEngine()
@@ -356,7 +358,32 @@ namespace Socnet
 
         public void f_startsearch()
         {
-            Blockmodeling.StartSearch();
+            string status = Blockmodeling.StartSearch();
+            if (status.Equals("ok"))
+            {
+                List<BlockModel> blockmodels = Blockmodeling.generateBlockmodelStructuresFromBMSolutions();
+                foreach (BlockModel bm in blockmodels)
+                    response.Add(dataset.StoreStructure(bm));
+            }            
+        }
+
+        public void f_viewbm()
+        {
+            string name = getStringArgument("blockmodel");
+            DataStructure? bm = dataset.GetStructureByName(name, typeof(BlockModel));
+            if (bm == null)
+            {
+                response.Add("!Error: Blockmodel '" + name + "' not found (parameter: blockmodel)");
+                return;
+            }
+            response.AddRange(((BlockModel)bm).DisplayBlockmodel());
+        }
+
+
+
+        public void f_getbmlog()
+        {
+            response.AddRange(Blockmodeling.logLines);
         }
 
 

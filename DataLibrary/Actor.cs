@@ -8,24 +8,17 @@ namespace Socnet.DataLibrary
 {
     public class Actor : DataStructure
     {
-        public int index; 
-        public string label;
-        //Dictionary<string, string> supplementaryLabels = new Dictionary<string, string>();
+        public int index;
 
-        //public Actor(string label)
-        //{
-        //    this.label = label;
-        //}
-
-        public Actor(string label, int index)
+        public Actor(string name, int index)
         {
-            this.label = label;
+            this.Name = name;
             this.index = index;
         }
 
         internal override void GetContent(List<string> content)
         {
-            content.Add(label + " (" + index + ")");
+            content.Add(Name + " (" + index + ")");
         }
 
         internal override string GetSize()

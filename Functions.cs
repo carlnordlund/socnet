@@ -238,5 +238,31 @@ namespace Socnet
 
             return returnStructures;
         }
+
+        internal static double correlateTriplets(List<Triple> triples)
+        {
+            double mx = 0, my = 0, sx = 0, sy = 0, sxy = 0, w_sum = 0;
+            foreach (Triple t in triples)
+            {
+                mx += t.w * t.x;
+                my += t.w * t.y;
+                w_sum += t.w;
+            }
+            mx /= w_sum;
+            my /= w_sum;
+
+            foreach (Triple t in triples)
+            {
+                sx += t.w * (t.x - mx) * (t.x - mx);
+                sy += t.w * (t.y - my) * (t.y - my);
+                sxy += t.w * (t.x - mx) * (t.y - my);
+            }
+            sx /= w_sum;
+            sy /= w_sum;
+            sxy /= w_sum;
+
+            return sxy / Math.Sqrt(sx * sy);
+
+        }
     }
 }

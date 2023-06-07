@@ -21,11 +21,11 @@ namespace Socnet.DataLibrary
             content.Add("Actorsets: Rows:" + rowActorset.Name + " Cols:" + colActorset.Name);
             string line = "";
             foreach (Actor colActor in colActorset.actors)
-                line += "\t" + colActor.label;
+                line += "\t" + colActor.Name;
             content.Add(line);
             foreach (Actor rowActor in rowActorset.actors)
             {
-                line = rowActor.label;
+                line = rowActor.Name;
                 foreach (Actor colActor in colActorset.actors)
                     line += "\t" + Get(rowActor, colActor);
                 content.Add(line.TrimEnd('\t'));
