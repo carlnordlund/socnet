@@ -10,6 +10,7 @@ namespace Socnet.DataLibrary
     {
         public List<Actor> actors;
         public Dictionary<string, Actor> labelToActor;
+        public Dictionary<int, Actor> indexToActor;
 
         public int Count
         {
@@ -32,6 +33,7 @@ namespace Socnet.DataLibrary
             this.Name = name;
             this.actors = new List<Actor>();
             this.labelToActor = new Dictionary<string, Actor>();
+            this.indexToActor = new Dictionary<int, Actor>();
         }
 
         //public Actor? GetOrAddActorByLabel(string label)
@@ -57,11 +59,14 @@ namespace Socnet.DataLibrary
             return null;
         }
 
-        internal void recreateLabelToActor()
+        internal void recreateLabelAndIndexToActor()
         {
             labelToActor.Clear();
             foreach (Actor actor in actors)
+            {
                 labelToActor.Add(actor.label, actor);
+                indexToActor.Add(actor.index, actor);
+            }
         }
 
     }

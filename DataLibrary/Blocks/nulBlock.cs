@@ -13,5 +13,19 @@ namespace Socnet.DataLibrary.Blocks
             Name = "nul";
             primeIndex = 1;
         }
+
+        public override double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix)
+        {
+            double penalty = 0;
+            if (idealMatrix == null)
+            {
+                foreach (Actor rowActor in rowCluster.actors)
+                    foreach (Actor colActor in colCluster.actors)
+                        if (rowActor != colActor && matrix.Get(rowActor, colActor) > 0)
+                            penalty++;
+            }
+            return penalty;
+        }
+
     }
 }

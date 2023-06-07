@@ -11,5 +11,10 @@ namespace Socnet.DataLibrary.Blocks
         public string Name = "";
         public int primeIndex;
 
+        public virtual double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix = null)
+        {
+            return 0;
+        }
+
     }
 }

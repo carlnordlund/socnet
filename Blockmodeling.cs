@@ -26,9 +26,12 @@ namespace Socnet
         public static SearchHeuristic? searchHeuristic;
         public static string searchTypeName = "";
 
-        public delegate BMSolution GofMethod(Matrix matrix, BlockImage blockimage);
+        public delegate BMSolution GofMethod(Matrix matrix, BlockImage blockimage, Partition partition);
         public static GofMethod? gofMethod;
+        public static bool maximizeGof = false;
         public static string gofMethodName = "";
+
+        public static int minClusterSize = 1;
 
         public static bool initializationOk = false;
 
@@ -53,18 +56,28 @@ namespace Socnet
 
                 gofMethodName = "" + searchParams["method"] as string;
                 if (gofMethodName.Equals("hamming"))
+                {
                     gofMethod = binaryHamming;
+                    maximizeGof = false;
+
+                }
                 else if (gofMethodName.Equals("ziberna"))
+                {
                     gofMethod = ziberna2007;
+                    maximizeGof = false;
+                }
                 else if (gofMethodName.Equals("nordlund"))
+                {
                     gofMethod = nordlund2020;
+                    maximizeGof = true;
+                }
                 else
                     return "!Error - Method '" + gofMethodName + "' not implemented";
                 log("Method: " + gofMethodName);
 
                 searchTypeName = "" + searchParams["searchtype"] as string;
                 if (searchTypeName.Equals("localopt"))
-                    searchHeuristic = doExhaustiveSearch;
+                    searchHeuristic = doLocalOptSearch;
                 else if (searchTypeName.Equals("exhaustive"))
                     searchHeuristic = doExhaustiveSearch;
                 else
@@ -87,12 +100,8 @@ namespace Socnet
                     }
                 }
 
-
                 // Remove existing blockimages
                 blockimages.Clear();
-                // Ok - when do I need to create varieties? When can I keep a multiblock as it is?
-                // If method is "hamming" or "ziberna", then I can use a multiblocked blockimage as a singular blockimage: it will sort itself out
-                // If method is "nordlund", then I can't use multiblocked blockimage: instead I have to create all individual varieties
                 if (bi.multiBlocked && gofMethod == nordlund2020)
                 {
                     // Multiblocked for Nordlund2020: need to unwrap this and create non-multiblocked blockimages and place into blockimages
@@ -105,6 +114,9 @@ namespace Socnet
                     blockimages.Add(bi);
                     log("Blockimage: " + bi.Name);
                 }
+
+                if (searchParams.ContainsKey("minclustersize") && searchParams["minclustersize"] != null)
+                    Int32.TryParse(searchParams["minclustersize"]!.ToString(), out minClusterSize);
             }
             catch (Exception e)
             {
@@ -123,26 +135,81 @@ namespace Socnet
 
         public static void doExhaustiveSearch()
         {
+            log("Doing exhaustive search");
+            double bestGof = (maximizeGof) ? double.NegativeInfinity : double.PositiveInfinity;
+            
+            // List for storing optimal solutions
+            List<BMSolution> optimalSolutionsThisSearch = new List<BMSolution>();
 
+            foreach (BlockImage blockimage in blockimages)
+            {
+                log("Blockimage:" + blockimage);
+                int nbrPositions = blockimage.nbrPositions;
+                Partition partition = new Partition(matrix!.actorset, "part_" + blockimage.Name);
+                partition.createClusters(nbrPositions);
+                partition.setZeroPartition();
+
+                int testindex = 0;
+                while (partition.incrementPartition())
+                {
+                    if (!partition.CheckMinimumClusterSize(minClusterSize))
+                        continue;
+                    log("Test " + testindex + ": " + partition.GetPartString());
+
+
+                    BMSolution solution = gofMethod!(matrix, blockimage, partition);
+                    if ((maximizeGof && solution.gofValue >=bestGof) || (!maximizeGof && solution.gofValue <= bestGof))
+                    {
+                        log(solution.partString + ":" + solution.gofValue);
+                        if (solution.gofValue != bestGof)
+                            optimalSolutionsThisSearch.Clear();
+                        optimalSolutionsThisSearch.Add(solution);
+                        bestGof = solution.gofValue;
+                    }
+
+
+                    testindex++;
+                }
+                log("Exhaustive search done");
+                optimalSolutionsGlobal.AddRange(optimalSolutionsThisSearch);
+                log("Optimal partition(s):");
+                foreach (BMSolution solution in optimalSolutionsGlobal)
+                    log(solution.partString);
+            }
         }
 
         public static void doLocalOptSearch()
         {
+            log("Doing local optimization search");
 
         }
 
 
-        public static BMSolution binaryHamming(Matrix matrix, BlockImage blockimage)
+        public static BMSolution binaryHamming(Matrix matrix, BlockImage blockimage, Partition partition)
+        {
+            int nbrPos = blockimage.nbrPositions;
+            double penalty = 0, currentBlockPenalty, bestBlockPenalty;
+            for (int r=0; r<nbrPos; r++)
+                for (int c=0; c<nbrPos;c++)
+                {
+                    bestBlockPenalty = int.MaxValue;
+                    for (int i=0; i<blockimage.blocks![r,c].Count;i++)
+                    {
+                        currentBlockPenalty = blockimage.GetBlock(r, c, i).getPenaltyHamming(matrix, partition.clusters[r], partition.clusters[c]);
+                        if (currentBlockPenalty < bestBlockPenalty)
+                            bestBlockPenalty = currentBlockPenalty;
+                    }
+                    penalty += bestBlockPenalty;
+                }
+            return new BMSolution(matrix, blockimage, partition.GetPartString(), penalty, "hamming");
+        }
+
+        public static BMSolution ziberna2007(Matrix matrix, BlockImage blockimage, Partition partition)
         {
             return new BMSolution();
         }
 
-        public static BMSolution ziberna2007(Matrix matrix, BlockImage blockimage)
-        {
-            return new BMSolution();
-        }
-
-        public static BMSolution nordlund2020(Matrix matrix, BlockImage blockimage)
+        public static BMSolution nordlund2020(Matrix matrix, BlockImage blockimage, Partition partition)
         {
             return new BMSolution();
         }
@@ -160,6 +227,7 @@ namespace Socnet
             if (searchHeuristic == null)
                 return "!Error - Search heuristic not set.";
 
+            searchHeuristic();
 
             return "ok";
         }
@@ -168,7 +236,19 @@ namespace Socnet
     {
         public Matrix matrix;
         public BlockImage blockimage;
+        public string partString;
+        public double gofValue;
+        public string criteriaFunction;
 
-
+        public BMSolution(Matrix matrix, BlockImage blockimage, string partString, double gofValue, string criteriaFunction)
+        {
+            this.matrix = matrix;
+            this.blockimage = blockimage;
+            this.partString = partString;
+            this.gofValue = gofValue;
+            this.criteriaFunction = criteriaFunction;
+        }
     }
+
+
 }
