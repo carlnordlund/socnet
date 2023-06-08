@@ -186,7 +186,26 @@ namespace Socnet
 
         public static BMSolution binaryHamming(Matrix matrix, BlockImage blockimage, Partition partition)
         {
-            return new BMSolution();
+            int nbrPos = blockimage.nbrPositions;
+            int[,] blockindices = new int[nbrPos, nbrPos];
+            double penalty = 0, currentBlockPenalty, bestBlockPenalty;
+            for (int r=0; r<nbrPos;r++)
+                for (int c=0;c<nbrPos;c++)
+                {
+                    bestBlockPenalty = int.MaxValue;
+                    for (int i=0; i<blockimage.blocks![r,c].Count;i++)
+                    {
+                        currentBlockPenalty = blockimage.GetBlock(r, c, i).getPenaltyHamming(matrix, partition.clusters[r], partition.clusters[c]);
+                        if (currentBlockPenalty < bestBlockPenalty)
+                        {
+                            bestBlockPenalty = currentBlockPenalty;
+                            blockindices[r, c] = i;
+                        }
+                    }
+                    penalty += bestBlockPenalty;
+                }
+
+            return new BMSolution(matrix, blockimage, blockindices, partition.GetPartArrayCopy(), penalty, "hamming");
         }
 
         public static BMSolution ziberna2007(Matrix matrix, BlockImage blockimage, Partition partition)
@@ -216,7 +235,8 @@ namespace Socnet
                 return "!Error - Direct blockmodeling not yet properly initialized.";
             if (searchHeuristic == null)
                 return "!Error - Search heuristic not set.";
-
+            
+            searchHeuristic();
 
             return "ok";
         }
@@ -261,6 +281,23 @@ namespace Socnet
     {
         public Matrix matrix;
         public BlockImage blockimage;
+        public int[,] blockindices;
+        public int[] partarray;
+        public double gofValue;
+        public string criteriaFunction;
+
+        public BMSolution(Matrix matrix, BlockImage blockimage, int[,] blockindices, int[] partarray, double gofValue, string criteriaFunction)
+        {
+            this.matrix = matrix;
+            this.blockimage = blockimage;
+            this.blockindices = blockindices;
+            this.partarray = partarray;
+            this.gofValue = gofValue;
+            this.criteriaFunction = criteriaFunction;
+        }
+
+        //BMSolution(matrix, blockimage, new int[nbrPos, nbrPos], partition.GetPartArrayCopy(), Functions.correlateTriplets(triples), "nordlund");
+    }
 
 
 }

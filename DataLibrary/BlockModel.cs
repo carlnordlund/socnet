@@ -30,8 +30,6 @@ namespace Socnet.DataLibrary
             //this.partString = partString;
             this.gof = gof;
             this.gofMethod = gofMethod;
-            this.idealMatrix = idealMatrix;
-            this.blockPenalties = blockPenalties;
         }
 
 
