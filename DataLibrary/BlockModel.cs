@@ -12,11 +12,13 @@ namespace Socnet.DataLibrary
         public BlockImage blockimage;
         public Partition partition;
 
+        public Matrix idealMatrix;
 
         public int[,] blockIndices;
         //public string partString;
         public double gof;
         public string gofMethod;
+        public int[,] blockPenalties;
 
         public BlockModel(string name, Matrix matrix, BlockImage blockimage, Partition partition, int[,] blockIndices, double gof, string gofMethod)
         {
@@ -28,6 +30,8 @@ namespace Socnet.DataLibrary
             //this.partString = partString;
             this.gof = gof;
             this.gofMethod = gofMethod;
+            this.idealMatrix = idealMatrix;
+            this.blockPenalties = blockPenalties;
         }
 
 

@@ -386,6 +386,11 @@ namespace Socnet
             response.AddRange(Blockmodeling.logLines);
         }
 
+        public void f_getbmlog()
+        {
+            response.AddRange(Blockmodeling.logLines);
+        }
+
 
         public void f_bivarieties()
         {

@@ -186,25 +186,7 @@ namespace Socnet
 
         public static BMSolution binaryHamming(Matrix matrix, BlockImage blockimage, Partition partition)
         {
-            int nbrPos = blockimage.nbrPositions;
-            int[,] blockindices = new int[nbrPos, nbrPos];
-            double penalty = 0, currentBlockPenalty, bestBlockPenalty;
-            for (int r=0; r<nbrPos; r++)
-                for (int c=0; c<nbrPos;c++)
-                {
-                    bestBlockPenalty = int.MaxValue;
-                    for (int i=0; i<blockimage.blocks![r,c].Count;i++)
-                    {
-                        currentBlockPenalty = blockimage.GetBlock(r, c, i).getPenaltyHamming(matrix, partition.clusters[r], partition.clusters[c]);
-                        if (currentBlockPenalty < bestBlockPenalty)
-                        {
-                            bestBlockPenalty = currentBlockPenalty;
-                            blockindices[r, c] = i;
-                        }
-                    }
-                    penalty += bestBlockPenalty;
-                }
-            return new BMSolution(matrix, blockimage, blockindices, partition.GetPartArrayCopy(), penalty, "hamming");
+            return new BMSolution();
         }
 
         public static BMSolution ziberna2007(Matrix matrix, BlockImage blockimage, Partition partition)
@@ -235,15 +217,6 @@ namespace Socnet
             if (searchHeuristic == null)
                 return "!Error - Search heuristic not set.";
 
-            // Clear previously found solutions - perhaps make this optional (in case I add timeout function etc)
-            optimalSolutionsGlobal.Clear();
-
-            searchHeuristic();
-
-            // Here is where the search ends up - this is where I can list BMSolutions
-            log("Optimal partition(s):");
-            foreach (BMSolution solution in optimalSolutionsGlobal)
-                log("" + solution.partarray.ToString());
 
             return "ok";
         }
@@ -288,22 +261,6 @@ namespace Socnet
     {
         public Matrix matrix;
         public BlockImage blockimage;
-        public int[,] blockindices;
-        //public string partString;
-        public int[] partarray;
-        public double gofValue;
-        public string criteriaFunction;
-
-        public BMSolution(Matrix matrix, BlockImage blockimage, int[,] blockindices, int[] partarray, double gofValue, string criteriaFunction)
-        {
-            this.matrix = matrix;
-            this.blockimage = blockimage;
-            this.blockindices = blockindices;
-            this.partarray = partarray;
-            this.gofValue = gofValue;
-            this.criteriaFunction = criteriaFunction;
-        }
-    }
 
 
 }
