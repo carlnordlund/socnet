@@ -208,6 +208,9 @@ namespace Socnet
             return new BMSolution(matrix, blockimage, blockindices, partition.GetPartArrayCopy(), penalty, "hamming");
         }
 
+            return new BMSolution(matrix, blockimage, new int[nbrPos, nbrPos], partition.GetPartArrayCopy(), penalty, "hamming");
+        }
+
         public static BMSolution ziberna2007(Matrix matrix, BlockImage blockimage, Partition partition)
         {
             return new BMSolution(matrix, blockimage, new int[blockimage.nbrPositions, blockimage.nbrPositions], partition.GetPartArrayCopy(), 0, "ziberna");
