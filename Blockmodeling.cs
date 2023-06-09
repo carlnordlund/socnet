@@ -195,7 +195,7 @@ namespace Socnet
             string partString = "";
             foreach (BlockImage blockimage in blockimages)
             {
-                log("Blockimage:" + blockimage.Name);
+                //log("Blockimage:" + blockimage.Name);
                 int nbrPositions = blockimage.nbrPositions;
                 partition.createClusters(nbrPositions);
                 checkedPartString.Clear();
@@ -207,7 +207,7 @@ namespace Socnet
                 List<BMSolution> checkNextIteration = new List<BMSolution>();
                 for (int run = 0; run < nbrRestarts && !abortCouldNotFindPartition; run++)
                 {
-                    log("Run:" + run);
+                    //log("Run:" + run);
                     bestGofThisRun = bestGofStartValue;
                     int tries = 0;
                     while (true)
@@ -227,7 +227,7 @@ namespace Socnet
                         }
                     }
                     BMSolution solution = gofMethod!(matrix, blockimage, partition);
-                    log("Starting partition:" + partString + ", gof:" + solution.gofValue);
+                    //log("Starting partition:" + partString + ", gof:" + solution.gofValue);
                     bestGofThisRun = solution.gofValue;
                     bestSolutionsThisRun.Clear();
                     bestSolutionsThisRun.Add(solution);
@@ -236,16 +236,16 @@ namespace Socnet
                     bool abortThisRun = false;
                     for (int iter = 0; iter < maxNbrIterations && !abortThisRun && !abortCouldNotFindPartition; iter++)
                     {
-                        log("Iteration:" + iter);
+                        //log("Iteration:" + iter);
                         checkNextIteration.Clear();
                         foreach (BMSolution currentSolution in checkNeighborsOfThese)
                         {
-                            log("Check neighbors of " + string.Join(";", currentSolution.partarray));
+                            //log("Check neighbors of " + string.Join(";", currentSolution.partarray));
                             partition.setPartitionByPartArray(currentSolution.partarray);
                             bool foundBetterWhileSwitching = false;
                             string neighborPartString;
                             Partition neighborPartition;
-                            log("Switching...");
+                            //log("Switching...");
                             for (int c1=0; c1<nbrPositions && !foundBetterWhileSwitching; c1++)
                             {
                                 for (int c2=0;c2<nbrPositions && !foundBetterWhileSwitching; c2++)
@@ -265,11 +265,11 @@ namespace Socnet
                                                     {
                                                         checkedPartString.Add(neighborPartString);
                                                         BMSolution neighTest = gofMethod(matrix, blockimage, neighborPartition);
-                                                        log(neighborPartString + ": " + neighTest.gofValue);
+                                                        //log(neighborPartString + ": " + neighTest.gofValue);
                                                         bool betterGof = ((maximizeGof && neighTest.gofValue > bestGofThisRun) || (!maximizeGof && neighTest.gofValue < bestGofThisRun));
                                                         if (betterGof)
                                                         {
-                                                            log("Better gof - update bestGofThisRun, store this, skip more switching");
+                                                            //log("Better gof - update bestGofThisRun, store this, skip more switching");
                                                             foundBetterWhileSwitching = true;
                                                             checkNextIteration.Clear();
                                                             checkNextIteration.Add(neighTest);
@@ -279,7 +279,7 @@ namespace Socnet
                                                         }
                                                         else if (neighTest.gofValue==bestGofThisRun)
                                                         {
-                                                            log("Equally good gof - store this as well");
+                                                            //log("Equally good gof - store this as well");
                                                             checkNextIteration.Add(neighTest);
                                                             bestSolutionsThisRun.Add(neighTest);
                                                         }
@@ -291,7 +291,7 @@ namespace Socnet
                                 }
                             }
 
-                            log("Moving...");
+                            //log("Moving...");
                             bool foundBetterWhileMoving = false;
                             for (int c1=0;c1<nbrPositions && !foundBetterWhileMoving;c1++)
                             {
@@ -310,11 +310,11 @@ namespace Socnet
                                                 if (neighborPartition.CheckMinimumClusterSize(minClusterSize))
                                                 {
                                                     BMSolution neighTest = gofMethod(matrix, blockimage, neighborPartition);
-                                                    log(neighborPartString + ": " + neighTest.gofValue);
+                                                    //log(neighborPartString + ": " + neighTest.gofValue);
                                                     bool betterGof = ((maximizeGof && neighTest.gofValue > bestGofThisRun) || (!maximizeGof && neighTest.gofValue < bestGofThisRun));
                                                     if (betterGof)
                                                     {
-                                                        log("Better gof - update bestGofThisRun, skip more moving");
+                                                        //log("Better gof - update bestGofThisRun, skip more moving");
                                                         foundBetterWhileMoving = true;
                                                         checkNextIteration.Clear();
                                                         checkNextIteration.Add(neighTest);
@@ -324,7 +324,7 @@ namespace Socnet
                                                     }
                                                     else if (neighTest.gofValue==bestGofThisRun)
                                                     {
-                                                        log("Equally good gof - store this");
+                                                        //log("Equally good gof - store this");
                                                         checkNextIteration.Add(neighTest);
                                                         bestSolutionsThisRun.Add(neighTest);
                                                     }
@@ -338,29 +338,29 @@ namespace Socnet
                         }
                         if (checkNextIteration.Count>0)
                         {
-                            log("Iteration done - To check next iteration: " + checkNextIteration.Count);
+                            //log("Iteration done - To check next iteration: " + checkNextIteration.Count);
                             checkNeighborsOfThese.Clear();
                             checkNeighborsOfThese.AddRange(checkNextIteration);
                         }
                         else
                         {
-                            log("No better found - abort this run");
+                            //log("No better found - abort this run");
                             abortThisRun = true;
                             break;
                         }
 
                     }
-                    log("All iterations done for this run");
+                    //log("All iterations done for this run");
                     if ((maximizeGof && bestGofThisRun>bestGofAllRuns) || (!maximizeGof && bestGofThisRun<bestGofAllRuns))
                     {
-                        log("Found better gof this run: " + bestGofThisRun);
+                        //log("Found better gof this run: " + bestGofThisRun);
                         bestSolutionsThisBlockimage.Clear();
                         bestSolutionsThisBlockimage.AddRange(bestSolutionsThisRun);
                         bestGofAllRuns = bestGofThisRun;
                     }
                     else if (bestGofThisRun == bestGofAllRuns)
                     {
-                        log("Found equally good gof this run: " + bestGofThisRun);
+                        //log("Found equally good gof this run: " + bestGofThisRun);
                         bestSolutionsThisBlockimage.AddRange(bestSolutionsThisRun);
 
                     }
@@ -369,10 +369,10 @@ namespace Socnet
                 log("All runs done for this blockimage");
 
                 // Dont store for individual blockimages: that is done in Spider but not here yet
-                log("Compare with other blockimages");
+                //log("Compare with other blockimages");
                 if ((maximizeGof && bestGofAllRuns >= bestGofAllBlockimages) || (!maximizeGof && bestGofAllRuns <= bestGofAllBlockimages))
                 {
-                    log("This blockimage was better or equally good: " + bestGofAllRuns);
+                    //log("This blockimage was better or equally good: " + bestGofAllRuns);
                     if (bestGofAllRuns != bestGofAllBlockimages)
                         optimalSolutionsGlobal.Clear();
                     optimalSolutionsGlobal.AddRange(bestSolutionsThisBlockimage);
