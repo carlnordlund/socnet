@@ -29,40 +29,17 @@ namespace Socnet.DataLibrary
             }
         }
 
-        //public BlockImage(string name, string[,] blocklists)
-        //{
-        //    this.Name = name;
-        //    positionNames = new string[nbrPositions];
-        //    SetBlocks(blocklists);
-        //}
-
-        //private void SetBlocks(string[,] blocklists)
-        //{
-        //    if (blocklists == null)
-        //        return;
-        //    multiBlocked = false;
-        //    this.nbrPositions = blocklists.GetLength(0);
-        //    blocks = new List<_Block>[nbrPositions, nbrPositions];
-        //    positionNames = new string[nbrPositions];
-        //    for (int r=0; r< nbrPositions;r++)
-        //    {
-        //        positionNames[r] = "P" + r;
-        //        for (int c=0; c<nbrPositions;c++)
-        //        {
-        //            this.blocks[r, c] = new List<_Block>();
-        //            string[] blocks = blocklists[r, c].Split(',');
-        //            if (blocks.Length > 1)
-        //                multiBlocked = true;
-        //            for (int i=0;i<blocks.Length;i++)
-        //            {
-        //                _Block? block = Functions.GetBlockInstance(blocks[i]);
-        //                if (block != null)
-        //                    this.blocks[r, c].Add(block);
-        //            }
-        //        }
-        //    }
-
-        //}
+        public _Block[,]? getPickedBlocks(int[,] blockindices)
+        {
+            if (blockindices.GetLength(0)!=nbrPositions || blockindices.GetLength(1)!=nbrPositions)
+                return null;
+            _Block[,] retBlocks = new _Block[nbrPositions, nbrPositions];
+            for (int r = 0; r < nbrPositions; r++)
+                for (int c = 0; c < nbrPositions; c++)
+                    if (blockindices[r, c] < blocks![r, c].Count)
+                        retBlocks[r, c] = blocks[r, c][blockindices[r, c]];
+            return retBlocks;
+        }
 
         internal override void GetContent(List<string> content)
         {

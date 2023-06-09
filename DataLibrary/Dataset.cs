@@ -129,6 +129,15 @@ namespace Socnet.DataLibrary
                 return null;
         }
 
+        public List<DataStructure> GetStructuresByType(Type type)
+        {
+            List<DataStructure> retStructures = new List<DataStructure>();
+            foreach (KeyValuePair<string, DataStructure> obj in structures)
+                if (obj.Value.GetType() == type)
+                    retStructures.Add(obj.Value);
+            return retStructures;
+        }
+
         private string GetAutoName(string basename)
         {
             if (!structures.ContainsKey(basename))

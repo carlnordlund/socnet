@@ -369,14 +369,38 @@ namespace Socnet
 
         public void f_viewbm()
         {
+            BlockModel bm;
             string name = getStringArgument("blockmodel");
-            DataStructure? bm = dataset.GetStructureByName(name, typeof(BlockModel));
-            if (bm == null)
+            if (name.Length==0)
             {
-                response.Add("!Error: Blockmodel '" + name + "' not found (parameter: blockmodel)");
-                return;
+                List<DataStructure> structures = dataset.GetStructuresByType(typeof(BlockModel));
+                if (structures.Count == 1)
+                    bm = (BlockModel)structures[0];
+                else
+                {
+                    if (structures.Count == 0)
+                        response.Add("!Error: No BlockModel objects found");
+                    else
+                        response.Add("!Error: Found several BlockModel objects - specify which with 'blockmodel' parameter");
+                    return;
+                }
+
             }
-            response.AddRange(((BlockModel)bm).DisplayBlockmodel());
+            else
+            {
+                DataStructure? structure = dataset.GetStructureByName(name, typeof(BlockModel));
+                if (structure == null)
+                {
+                    response.Add("!Error: Blockmodel '" + name + "' not found (parameter: blockmodel)");
+                    return;
+                }
+                bm = (BlockModel)structure;
+            }
+            response.Add("Blockmodel:");
+            response.AddRange(bm.DisplayBlockmodel());
+            response.Add("Blockimage:");
+            response.AddRange(bm.DisplayBlockimage());
+            response.Add("Goodness-of-fit: " + bm.gof + " (" + bm.gofMethod + ")");
         }
 
 

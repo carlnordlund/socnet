@@ -47,15 +47,30 @@ namespace Socnet.DataLibrary
             return "[Blockmodel size]";
         }
 
+        internal List<string> DisplayBlockimage()
+        {
+            List<string> lines = new List<string>();
+            int nbrClusters = blockimage.nbrPositions;
+            string line = "";
+            for (int c = 0; c < nbrClusters; c++)
+                line += "\t" + blockimage.positionNames[c];
+            lines.Add(line);
+
+            for (int r=0;r<nbrClusters;r++)
+            {
+                line = blockimage.positionNames[r];
+                for (int c = 0; c < nbrClusters; c++)
+                    line += "\t" + blockimage.GetBlock(r, c, blockIndices[r, c]).Name;
+                lines.Add(line);
+            }
+            return lines;
+        }
+
         internal List<string> DisplayBlockmodel()
         {
             List<string> lines = new List<string>();
             int nbrClusters = partition.clusters.Length;
             string line = "";
-            //for (int c = 0; c < nbrClusters; c++)
-            //    foreach (Actor actor in partition.clusters[c].actors)
-            //        line += "\t" + c + "_" + actor.Name;
-            //lines.Add(line);
             for (int r = 0; r < nbrClusters; r++)
             {
 
@@ -67,7 +82,7 @@ namespace Socnet.DataLibrary
                         foreach (Actor colActor in partition.clusters[c].actors)
                         {
                             if (rowActor != colActor)
-                                line += matrix.Get(rowActor, colActor);
+                                line += (matrix.Get(rowActor, colActor) > 0) ? "X" : " ";
                             else
                                 line += @"\";
 
@@ -81,23 +96,7 @@ namespace Socnet.DataLibrary
                 if (r < nbrClusters - 1)
                     lines.Add("\t" + new string('-', partition.actorset.Count + nbrClusters - 1));
             }
-
             return lines;
-
-            //content.Add("Actorset:" + actorset.Name);
-            //string line = "";
-            //foreach (Actor colActor in actorset.actors)
-            //    line += "\t" + colActor.label;
-            //content.Add(line);
-            //foreach (Actor rowActor in actorset.actors)
-            //{
-            //    line = rowActor.label;
-            //    foreach (Actor colActor in actorset.actors)
-            //        line += "\t" + Get(rowActor, colActor);
-            //    content.Add(line.TrimEnd('\t'));
-            //}
-
-
         }
     }
 }
