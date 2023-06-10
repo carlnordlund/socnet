@@ -51,13 +51,15 @@ namespace Socnet.DataLibrary
                     for (int c = 0; c < nbrPositions; c++)
                     {
                         line += "[";
-                        if (blocks[r,c] != null)
-                        foreach (_Block block in blocks[r,c])
-                        {
-                                line += block.Name + ",";
-                        }
-                        line = line.TrimEnd(',');
+                        if (blocks[r, c] != null)
+                            line += string.Join(";", blocks[r, c]);
                         line += "],";
+                        //foreach (_Block block in blocks[r,c])
+                        //{
+                        //        line += block.Name + ";";
+                        //}
+                        //line = line.TrimEnd(',');
+                        //line += "],";
                     }
                     line = line.TrimEnd(',');
                     content.Add(line);

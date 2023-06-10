@@ -11,6 +11,64 @@ namespace Socnet
     public static class SocnetIO
     {
 
+        internal static string SaveDataStructure(List<string> response, Dataset dataset, string name, string filepath, string sep = "\t")
+        {
+            DataStructure? structure = dataset.GetStructureByName(name);
+            if (structure == null)
+                return "!Error: Structure '" + name + "' not found";
+            if (structure is Matrix)
+                return SaveMatrix((Matrix)structure, filepath, sep);
+            if (structure is BlockImage)
+                return SaveBlockImage((BlockImage)structure, filepath, sep);
+
+            return "ok";
+        }
+
+        private static string SaveBlockImage(BlockImage blockimage, string filepath, string sep)
+        {
+            if (blockimage == null)
+                return "!Error: BlockImage is null";
+
+            
+
+            return "";
+        }
+
+        private static string SaveMatrix(Matrix matrix, string filepath, string sep)
+        {
+            if (matrix == null)
+                return "!Error: Matrix is null";
+            int size = matrix.actorset.Count;
+            string[,] filecells = new string[size + 1, size + 1];
+            filecells[0, 0] = "";
+            foreach (Actor rowActor in matrix.actorset.actors)
+            {
+                filecells[0, rowActor.index + 1] = rowActor.Name;
+                filecells[rowActor.index + 1, 0] = rowActor.Name;
+                foreach (Actor colActor in matrix.actorset.actors)
+                    filecells[rowActor.index + 1, colActor.index + 1] = matrix.Get(rowActor, colActor).ToString();
+            }
+            WriteFileCells(filecells, filepath, sep);
+            return "Matrix '" + matrix.Name + "' saved: " + filepath;
+        }
+
+        private static void WriteFileCells(string[,] filecells, string filepath, string sep)
+        {
+            int nbrRows = filecells.GetLength(0);
+            int nbrCols = filecells.GetLength(1);
+            List<string> csvLines = new List<string>();
+            string line = "";
+            for (int r=0;r<nbrRows;r++)
+            {
+                line = "";
+                for (int c = 0; c < nbrCols-1; c++)
+                    line += filecells[r, c] + sep;
+                line += filecells[r, nbrCols-1];
+                csvLines.Add(line);
+            }
+            File.WriteAllLines(filepath, csvLines);
+        }
+
         internal static string LoadDataStructure(List<string> response, Dataset dataset, string filepath, string type, string name)
         {
             if (!File.Exists(filepath))

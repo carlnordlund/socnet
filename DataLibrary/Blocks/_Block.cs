@@ -21,5 +21,10 @@ namespace Socnet.DataLibrary.Blocks
             return new List<Triple>();
         }
 
+        public override string ToString()
+        {
+            return Name;
+        }
+
     }
 }

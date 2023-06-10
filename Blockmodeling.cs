@@ -45,6 +45,8 @@ namespace Socnet
         public static Matrix? matrix = null;
         public static List<BlockImage> blockimages = new List<BlockImage>();
 
+        public static System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+
         internal static string InitializeSearch(Dictionary<string, object?> searchParams)
         {
             logLines.Clear();
@@ -433,8 +435,11 @@ namespace Socnet
                 return "!Error - Direct blockmodeling not yet properly initialized.";
             if (searchHeuristic == null)
                 return "!Error - Search heuristic not set.";
-            
+            stopwatch.Reset();
+            stopwatch.Start();
             searchHeuristic();
+            stopwatch.Stop();
+
 
             return "ok";
         }

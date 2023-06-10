@@ -30,8 +30,9 @@ namespace Socnet
             {"blockimage", new string[] {"size"} },
             {"initdirectbm", new string[] {"network", "blockimage", "searchtype", "method" } },
             {"bivarieties", new string[] {"blockimage"} },
-            {"viewbm", new string[] {"blockmodel"} }
-            
+            {"viewbm", new string[] {"blockmodel"} },
+            {"save", new string[] {"name","file"} }
+
         };
 
         public SocnetEngine()
@@ -210,6 +211,11 @@ namespace Socnet
             response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), getStringArgument("type"), getStringArgument("name")));
         }
 
+        public void f_save()
+        {
+            response.Add(SocnetIO.SaveDataStructure(response, dataset, getStringArgument("name"), getStringArgument("file")));
+        }
+
         public void f_loadscript()
         {
             string file = getStringArgument("file");
@@ -361,6 +367,7 @@ namespace Socnet
             string status = Blockmodeling.StartSearch();
             if (status.Equals("ok"))
             {
+                response.Add("Execution time (ms):" + Blockmodeling.stopwatch.ElapsedMilliseconds);
                 List<BlockModel> blockmodels = Blockmodeling.generateBlockmodelStructuresFromBMSolutions();
                 foreach (BlockModel bm in blockmodels)
                     response.Add(dataset.StoreStructure(bm));
