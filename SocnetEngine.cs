@@ -264,6 +264,12 @@ namespace Socnet
                 response.Add("!Error: Structure '" + getStringArgument("name") + "' not found");
         }
 
+        public void f_deleteall()
+        {
+            response.Add(dataset.DeleteAllStructures());
+
+        }
+
         public void f_structures()
         {
             response.Add("DataType" + "\t" + "Name" + "\t" + "Size");

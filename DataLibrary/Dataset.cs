@@ -159,6 +159,13 @@ namespace Socnet.DataLibrary
             return "Deleted structure '" + structure.Name + "' (" + structure.DataType + ")";
         }
 
+        internal string DeleteAllStructures()
+        {
+            structures.Clear();
+            return "Deleted all structures";
+        }
+
+
         private List<DataStructure> getStructuresByActorset(Actorset actorset)
         {
             List<DataStructure> dependents = new List<DataStructure>();
@@ -168,5 +175,6 @@ namespace Socnet.DataLibrary
                     dependents.Add(obj.Value);
             return dependents;
         }
+
     }
 }
