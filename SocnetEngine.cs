@@ -360,12 +360,14 @@ namespace Socnet
             searchParams["minclustersize"] = getIntegerArgument("minclustersize");
             searchParams["nbrrestarts"] = getIntegerArgument("nbrrestarts");
             searchParams["maxiterations"] = getIntegerArgument("maxiterations");
+            searchParams["maxtime"] = getIntegerArgument("maxtime");
 
             string statusInitMsg = Blockmodeling.InitializeSearch(searchParams);
             if (statusInitMsg.Equals("ok"))
                 response.AddRange(Blockmodeling.logLines);
             else if (statusInitMsg[0] == '!')
                 response.Add(statusInitMsg);
+            Blockmodeling.logLines.Clear();
         }
 
         public void f_startsearch()
@@ -377,7 +379,11 @@ namespace Socnet
                 List<BlockModel> blockmodels = Blockmodeling.generateBlockmodelStructuresFromBMSolutions();
                 foreach (BlockModel bm in blockmodels)
                     response.Add(dataset.StoreStructure(bm));
-            }            
+            }
+            else if (status.Equals("timeout"))
+            {
+                f_getbmlog();
+            }
         }
 
         public void f_viewbm()

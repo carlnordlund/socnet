@@ -46,6 +46,10 @@ namespace Socnet
         public static List<BlockImage> blockimages = new List<BlockImage>();
 
         public static System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+        public static long maxElapsedMilliseconds = 60000;
+
+        public static bool timeoutAbort = false;
+        public static bool timeoutActive = true;
 
         internal static string InitializeSearch(Dictionary<string, object?> searchParams)
         {
@@ -59,7 +63,7 @@ namespace Socnet
                 if (matrix == null)
                     return "!Error - 'network' is null";
                 log("Network: " + matrix.Name);
-
+                
                 gofMethodName = "" + searchParams["method"] as string;
                 if (gofMethodName.Equals("hamming"))
                 {
@@ -125,8 +129,14 @@ namespace Socnet
                     log("Blockimage: " + bi.Name);
                 }
 
-                if (searchParams.ContainsKey("minclustersize") && searchParams["minclustersize"] != null)
-                    Int32.TryParse(searchParams["minclustersize"]!.ToString(), out minClusterSize);
+                minClusterSize = (searchParams.ContainsKey("minclustersize") && searchParams["minclustersize"] is int && (int)searchParams["minclustersize"]! > 0) ? (int)searchParams["minclustersize"]! : minClusterSize;
+                maxElapsedMilliseconds = (searchParams.ContainsKey("maxtime") && searchParams["maxtime"] is int) ? (int)searchParams["maxtime"]! : maxElapsedMilliseconds;
+                timeoutActive = (maxElapsedMilliseconds > 0);
+
+
+
+
+                //searchParams["millisectimeout"]
             }
             catch (Exception e)
             {
@@ -189,7 +199,7 @@ namespace Socnet
 
         public static void doLocalOptSearch()
         {
-            log("Doing local optimization search");
+            stopwatch.Restart();
             double bestGofStartValue = (maximizeGof) ? double.NegativeInfinity : double.PositiveInfinity;
 
             double bestGofThisRun, bestGofAllRuns, bestGofAllBlockimages = bestGofStartValue;
@@ -238,6 +248,14 @@ namespace Socnet
                     bool abortThisRun = false;
                     for (int iter = 0; iter < maxNbrIterations && !abortThisRun && !abortCouldNotFindPartition; iter++)
                     {
+                        if (timeoutActive && stopwatch.ElapsedMilliseconds>maxElapsedMilliseconds)
+                        {
+                            log("Timeout: more than " + maxElapsedMilliseconds + " milliseconds passed.");
+                            log("Blockimage: " + blockimage.Name + " - Run:" + run + " - Iteration:" + iter);
+                            timeoutAbort = true;
+                            return;
+                        }
+                            
                         //log("Iteration:" + iter);
                         checkNextIteration.Clear();
                         foreach (BMSolution currentSolution in checkNeighborsOfThese)
@@ -368,7 +386,7 @@ namespace Socnet
                     }
 
                 }
-                log("All runs done for this blockimage");
+                //log("All runs done for this blockimage");
 
                 // Dont store for individual blockimages: that is done in Spider but not here yet
                 //log("Compare with other blockimages");
@@ -381,8 +399,8 @@ namespace Socnet
                     bestGofAllBlockimages = bestGofAllRuns;
                 }
             }
+            stopwatch.Stop();
         }
-
 
         public static BMSolution binaryHamming(Matrix matrix, BlockImage blockimage, Partition partition)
         {
@@ -435,10 +453,11 @@ namespace Socnet
                 return "!Error - Direct blockmodeling not yet properly initialized.";
             if (searchHeuristic == null)
                 return "!Error - Search heuristic not set.";
-            stopwatch.Reset();
-            stopwatch.Start();
+            timeoutAbort = false;
             searchHeuristic();
-            stopwatch.Stop();
+
+            if (timeoutAbort == true)
+                return "timeout";
 
 
             return "ok";
