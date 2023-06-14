@@ -41,6 +41,17 @@ namespace Socnet.DataLibrary
             return retBlocks;
         }
 
+        public bool hasBlocks()
+        {
+            if (blocks == null)
+                return false;
+            for (int r = 0; r < nbrPositions; r++)
+                for (int c = 0; c < nbrPositions; c++)
+                    if (blocks[r, c].Count == 0)
+                        return false;
+            return true;
+        }
+
         internal override void GetContent(List<string> content)
         {
             string line = "";
@@ -155,5 +166,6 @@ namespace Socnet.DataLibrary
             multiBlocked = false;
 
         }
+
     }
 }

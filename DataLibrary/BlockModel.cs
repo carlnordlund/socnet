@@ -12,7 +12,7 @@ namespace Socnet.DataLibrary
         public BlockImage blockimage;
         public Partition partition;
 
-        public Matrix idealMatrix;
+        //public Matrix idealMatrix;
 
         public int[,] blockIndices;
         //public string partString;
@@ -28,7 +28,7 @@ namespace Socnet.DataLibrary
             this.partition = partition;
             this.blockIndices = blockIndices;
             //this.partString = partString;
-            this.gof = gof;
+            this.gof = Math.Round(gof, 4);
             this.gofMethod = gofMethod;
         }
 
