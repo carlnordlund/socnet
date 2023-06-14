@@ -26,12 +26,25 @@ namespace Socnet
 
         private static string SaveBlockImage(BlockImage blockimage, string filepath, string sep)
         {
-            if (blockimage == null)
-                return "!Error: BlockImage is null";
-
-            
-
-            return "";
+            if (blockimage == null || blockimage.blocks == null)
+                return "!Error: Blockimage (or its blocks) is null";
+            int nbrPositions = blockimage.nbrPositions;
+            string[,] filecells = new string[nbrPositions + 1, nbrPositions + 1];
+            filecells[0, 0] = "";
+            for (int r = 0; r < nbrPositions; r++)
+            {
+                filecells[0, r + 1] = blockimage.positionNames[r];
+                filecells[r + 1, 0] = blockimage.positionNames[r];
+                for (int c = 0; c < nbrPositions; c++)
+                {
+                    if (blockimage.blocks[r, c] != null)
+                        filecells[r + 1, c + 1] = "[" + String.Join(";", blockimage.blocks[r, c]) + "]";
+                    else
+                        filecells[r + 1, c + 1] = "[]";
+                }
+            }
+            WriteFileCells(filecells, filepath, sep);
+            return "Blockimage '" + blockimage + "' saved: " + filepath;
         }
 
         private static string SaveMatrix(Matrix matrix, string filepath, string sep)
@@ -80,7 +93,7 @@ namespace Socnet
             string dsname = (name.Length == 0) ? Path.GetFileNameWithoutExtension(filepath) : name;
             if (type.Equals("matrix"))
             {
-                ActorsAndData aod = parseActorsAndData(lines, response);
+                ActorsAndData aod = parseActorsAndData(lines);
                 if (aod.error)
                     return aod.errorMsg;
                 if (aod.rowLabels.Length != aod.colLabels.Length)
@@ -102,7 +115,7 @@ namespace Socnet
             }
             else if (type.Equals("table"))
             {
-                ActorsAndData aod = parseActorsAndData(lines, response);
+                ActorsAndData aod = parseActorsAndData(lines);
                 if (aod.error)
                     return aod.errorMsg;
                 Actorset? rowActorset = dataset.GetActorsetByLabels(aod.rowLabels);
@@ -128,39 +141,42 @@ namespace Socnet
                         return "!Error: Couldn't create Actorset from column labels";
                     // If I am here, this means I got a colActorset, which might or might not already be stored
                     response.Add(dataset.StoreStructure(colActorset));
-                    //addColActorset = true;
                 }
-                //if (addRowActorset)
-                //    response.Add(dataset.StoreStructure(rowActorset));
-                //if (addColActorset)
-                //    response.Add(dataset.StoreStructure(colActorset));
-                
-
-
-
-
-                //Actorset? rowActorset = dataset.GetActorsetByLabels(aod.rowLabels);
-                //if (rowActorset == null)
-                //    rowActorset = dataset.CreateActorsetByLabels(aod.rowLabels);
-                //if (rowActorset == null)
-                //    return "!Error: Couldn't create Actorset from row labels";
-                //response.Add(dataset.StoreStructure(rowActorset));
-                //Actorset? colActorset = dataset.GetActorsetByLabels(aod.colLabels);
-                //if (colActorset == null)
-                //    colActorset = dataset.CreateActorsetByLabels(aod.colLabels);
-                //if (colActorset == null)
-                //    return "!Error: Couldn't create Actorset from column labels";
-                //response.Add(dataset.StoreStructure(colActorset));
                 Table table = new Table(rowActorset, colActorset, dsname, "F2");
                 table.installData(aod.rowLabels, aod.colLabels, aod.data);
                 response.Add(dataset.StoreStructure(table));
+            }
+            else if (type.Equals("blockimage"))
+            {
+                string[] positionNames = lines[0].TrimStart('\t').Split('\t');
+                int nbrPositions = positionNames.Length;
+                if (lines.Length - 1 != nbrPositions)
+                {
+                    return "!Error: Row/col mismatch for blockimage file";
+                }
+                BlockImage blockimage = new BlockImage(dsname, nbrPositions);
+                for (int r=0;r<nbrPositions;r++)
+                {
+                    blockimage.positionNames[r] = positionNames[r];
+                    // Do rest here...
+                }
+
+
+
+                //ActorsAndData aod = parseActorsAndData(lines);
+                //if (aod.error)
+                //    return aod.errorMsg;
+                //BlockImage blockimage = new BlockImage(dsname, aod.rowLabels.Length);
+                //blockimage.installData(aod.rowLabels, aod.data);
+
+
             }
             else
                 return "!Error: Type '" + type + "' not recognized";
             return "Loading data structure: OK";
         }
 
-        private static ActorsAndData parseActorsAndData(string[] lines, List<string> response, char separator = '\t')
+        private static ActorsAndData parseActorsAndData(string[] lines, char separator = '\t')
         {
             ActorsAndData actorsAndData = new ActorsAndData();
             try

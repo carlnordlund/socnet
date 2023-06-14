@@ -65,12 +65,6 @@ namespace Socnet.DataLibrary
                         if (blocks[r, c] != null)
                             line += string.Join(";", blocks[r, c]);
                         line += "],";
-                        //foreach (_Block block in blocks[r,c])
-                        //{
-                        //        line += block.Name + ";";
-                        //}
-                        //line = line.TrimEnd(',');
-                        //line += "],";
                     }
                     line = line.TrimEnd(',');
                     content.Add(line);
