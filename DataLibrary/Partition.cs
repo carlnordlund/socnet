@@ -117,9 +117,9 @@ namespace Socnet.DataLibrary
             return false;
         }
 
-        internal string GetPartString()
+        internal string GetPartString(string sep=";")
         {
-            return String.Join(";", partArray);
+            return String.Join(sep, partArray);
         }
 
         internal bool CheckMinimumClusterSize(int minClusterSize)
