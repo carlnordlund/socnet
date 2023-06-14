@@ -91,6 +91,8 @@ namespace Socnet
                     searchHeuristic = doLocalOptSearch;
                     nbrRestarts = (searchParams.ContainsKey("nbrrestarts") && searchParams["nbrrestarts"] is int && (int)searchParams["nbrrestarts"]! > 0) ? (int)searchParams["nbrrestarts"]! : 10;
                     maxNbrIterations = (searchParams.ContainsKey("maxiterations") && searchParams["maxiterations"] is int && (int)searchParams["maxiterations"]! > 0) ? (int)searchParams["maxiterations"]! : 25;
+                    log("nbrrestarts: " + nbrRestarts);
+                    log("maxiterations: " + maxNbrIterations);
                 }
                 else if (searchTypeName.Equals("exhaustive"))
                     searchHeuristic = doExhaustiveSearch;
@@ -133,6 +135,12 @@ namespace Socnet
                 maxElapsedMilliseconds = (searchParams.ContainsKey("maxtime") && searchParams["maxtime"] is int) ? (int)searchParams["maxtime"]! : maxElapsedMilliseconds;
                 timeoutActive = (maxElapsedMilliseconds > 0);
 
+                log("minclustersize: " + minClusterSize);
+                if (timeoutActive)
+                    log("maxtime: " + maxElapsedMilliseconds + " (timeout active)");
+                else
+                    log("maxtime: (timeout inactive)");
+
 
 
 
@@ -145,11 +153,9 @@ namespace Socnet
 
             // All ok above - direct search successfully initialized
             initializationOk = true;
-            log("Clearing previous search caches...");
             // Clear optimalSolutionsGlobal & checkedPartStrings
             optimalSolutionsGlobal.Clear();
             checkedPartString.Clear();
-            log("Blockmodeling initialization done!");
             return "ok";
         }
 
@@ -160,10 +166,11 @@ namespace Socnet
             
             // List for storing optimal solutions
             List<BMSolution> optimalSolutionsThisSearch = new List<BMSolution>();
-
+            int blockimagesDone = 0;
+            stopwatch.Restart();
             foreach (BlockImage blockimage in blockimages)
             {
-                log("Blockimage:" + blockimage.Name);
+                //log("Blockimage:" + blockimage.Name);
                 blockimage.GetContent(logLines);
                 int nbrPositions = blockimage.nbrPositions;
                 Partition partition = new Partition(matrix!.actorset, "part_" + blockimage.Name);
@@ -187,14 +194,35 @@ namespace Socnet
                         optimalSolutionsThisSearch.Add(solution);
                         bestGof = solution.gofValue;
                     }
-
-
                     testindex++;
+                    if (timeoutActive && stopwatch.ElapsedMilliseconds > maxElapsedMilliseconds)
+                    {
+                        stopwatch.Stop();
+                        log("Timeout: more than " + maxElapsedMilliseconds + " milliseconds passed.");
+                        log("Blockimage: " + blockimage.Name + " (" + blockimagesDone + "/" + blockimages.Count + ")");
+                        log("Partition: " + partition.GetPartString("") + " (testindex=" + testindex + ")");
+                        //double shareDone = (double)blockimagesDone / (double)blockimages.Count;
+                        //log("Blockimage: " + blockimage.Name + " (" + (int)(100 * (double)blockimagesDone / (double)blockimages.Count) + "%) - Run:" + run + " - Iteration:" + iter);
+                        //if (shareDone > 0)
+                        //{
+                        //    double estimatedTimeToFinish = stopwatch.ElapsedMilliseconds / shareDone;
+                        //    log(" : try setting 'maxtime=" + ((int)estimatedTimeToFinish + 10) + "'");
+                        //}
+                        // Possible to estimate how long it will take based on the above?
+
+
+                        timeoutAbort = true;
+                        return;
+                    }
+
+
                 }
                 log("Exhaustive search done for this blockimage.");
                 log(" ");
+                blockimagesDone++;
             }
             optimalSolutionsGlobal.AddRange(optimalSolutionsThisSearch);
+            stopwatch.Stop();
         }
 
         public static void doLocalOptSearch()
@@ -205,6 +233,8 @@ namespace Socnet
             double bestGofThisRun, bestGofAllRuns, bestGofAllBlockimages = bestGofStartValue;
             Partition partition = new Partition(matrix!.actorset, "localopt");
             string partString = "";
+            int blockimagesDone = 0;
+            
             foreach (BlockImage blockimage in blockimages)
             {
                 //log("Blockimage:" + blockimage.Name);
@@ -248,10 +278,20 @@ namespace Socnet
                     bool abortThisRun = false;
                     for (int iter = 0; iter < maxNbrIterations && !abortThisRun && !abortCouldNotFindPartition; iter++)
                     {
-                        if (timeoutActive && stopwatch.ElapsedMilliseconds>maxElapsedMilliseconds)
+                        if (timeoutActive && stopwatch.ElapsedMilliseconds > maxElapsedMilliseconds)
                         {
+                            stopwatch.Stop();
                             log("Timeout: more than " + maxElapsedMilliseconds + " milliseconds passed.");
-                            log("Blockimage: " + blockimage.Name + " - Run:" + run + " - Iteration:" + iter);
+                            double shareDone = (double)blockimagesDone / (double)blockimages.Count;
+                            log("Blockimage: " + blockimage.Name + " (" + (int)(100 * (double)blockimagesDone / (double)blockimages.Count) + "%) - Run:" + run + " - Iteration:" + iter);
+                            if (shareDone > 0)
+                            {
+                                double estimatedTimeToFinish = stopwatch.ElapsedMilliseconds / shareDone;
+                                log(" : try setting 'maxtime=" + ((int)estimatedTimeToFinish + 10) + "'");
+                            }
+                            // Possible to estimate how long it will take based on the above?
+
+
                             timeoutAbort = true;
                             return;
                         }
@@ -398,6 +438,7 @@ namespace Socnet
                     optimalSolutionsGlobal.AddRange(bestSolutionsThisBlockimage);
                     bestGofAllBlockimages = bestGofAllRuns;
                 }
+                blockimagesDone++;
             }
             stopwatch.Stop();
         }
@@ -458,7 +499,7 @@ namespace Socnet
 
             if (timeoutAbort == true)
                 return "timeout";
-
+            log("Search time (ms):" + stopwatch.Elapsed);
 
             return "ok";
         }
