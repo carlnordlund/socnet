@@ -161,6 +161,7 @@ namespace Socnet
             // List for storing optimal solutions
             List<BMSolution> optimalSolutionsThisSearch = new List<BMSolution>();
 
+            stopwatch.Restart();
             foreach (BlockImage blockimage in blockimages)
             {
                 log("Blockimage:" + blockimage.Name);
@@ -194,6 +195,7 @@ namespace Socnet
                 log("Exhaustive search done for this blockimage.");
                 log(" ");
             }
+            stopwatch.Stop();
             optimalSolutionsGlobal.AddRange(optimalSolutionsThisSearch);
         }
 
