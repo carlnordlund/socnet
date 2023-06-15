@@ -340,6 +340,11 @@ namespace Socnet
                 response.Add("!Error: Blockimage not found (parameter: blockimage)");
                 return;
             }
+            if (!((BlockImage)blockimage).hasBlocks())
+            {
+                response.Add("!Error: Blockimage '" + blockimage.Name + "' has unspecified blocks");
+                return;
+            }
             string searchType = getStringArgument("searchtype");
             if (searchType =="" || !Blockmodeling.searchTypes.Contains(searchType))
             {
@@ -380,10 +385,8 @@ namespace Socnet
                 foreach (BlockModel bm in blockmodels)
                     response.Add(dataset.StoreStructure(bm));
             }
-            else if (status.Equals("timeout"))
-            {
-                f_getbmlog();
-            }
+            else
+                response.Add(status);
         }
 
         public void f_viewbm()

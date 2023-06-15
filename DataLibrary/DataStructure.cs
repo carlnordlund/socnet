@@ -37,7 +37,6 @@ namespace Socnet.DataLibrary
 
         internal abstract void GetContent(List<string> content);
 
-
     }
 
 }

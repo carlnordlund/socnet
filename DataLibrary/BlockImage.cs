@@ -41,6 +41,17 @@ namespace Socnet.DataLibrary
             return retBlocks;
         }
 
+        public bool hasBlocks()
+        {
+            if (blocks == null)
+                return false;
+            for (int r = 0; r < nbrPositions; r++)
+                for (int c = 0; c < nbrPositions; c++)
+                    if (blocks[r, c].Count == 0)
+                        return false;
+            return true;
+        }
+
         internal override void GetContent(List<string> content)
         {
             string line = "";
@@ -54,12 +65,6 @@ namespace Socnet.DataLibrary
                         if (blocks[r, c] != null)
                             line += string.Join(";", blocks[r, c]);
                         line += "],";
-                        //foreach (_Block block in blocks[r,c])
-                        //{
-                        //        line += block.Name + ";";
-                        //}
-                        //line = line.TrimEnd(',');
-                        //line += "],";
                     }
                     line = line.TrimEnd(',');
                     content.Add(line);
@@ -155,5 +160,6 @@ namespace Socnet.DataLibrary
             multiBlocked = false;
 
         }
+
     }
 }
