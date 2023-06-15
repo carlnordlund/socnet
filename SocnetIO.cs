@@ -38,13 +38,13 @@ namespace Socnet
                 for (int c = 0; c < nbrPositions; c++)
                 {
                     if (blockimage.blocks[r, c] != null)
-                        filecells[r + 1, c + 1] = "[" + String.Join(";", blockimage.blocks[r, c]) + "]";
+                        filecells[r + 1, c + 1] = String.Join(";", blockimage.blocks[r, c]);
                     else
-                        filecells[r + 1, c + 1] = "[]";
+                        filecells[r + 1, c + 1] = "";
                 }
             }
             WriteFileCells(filecells, filepath, sep);
-            return "Blockimage '" + blockimage + "' saved: " + filepath;
+            return "Blockimage '" + blockimage.Name + "' saved: " + filepath;
         }
 
         private static string SaveMatrix(Matrix matrix, string filepath, string sep)
@@ -158,18 +158,13 @@ namespace Socnet
                 for (int r=0;r<nbrPositions;r++)
                 {
                     blockimage.positionNames[r] = positionNames[r];
+                    string[] cells = lines[r + 1].Split('\t');
+                    for (int c=0;c<nbrPositions;c++)
+                        blockimage.setBlockByPattern(r, c, cells[c + 1]);
                     // Do rest here...
                 }
-
-
-
-                //ActorsAndData aod = parseActorsAndData(lines);
-                //if (aod.error)
-                //    return aod.errorMsg;
-                //BlockImage blockimage = new BlockImage(dsname, aod.rowLabels.Length);
-                //blockimage.installData(aod.rowLabels, aod.data);
-
-
+                blockimage.checkMultiblocked();
+                response.Add(dataset.StoreStructure(blockimage));
             }
             else
                 return "!Error: Type '" + type + "' not recognized";

@@ -122,9 +122,15 @@ namespace Socnet.DataLibrary
             checkMultiblocked();
         }
 
+        internal void setBlockByPattern(int r, int c, string pattern)
+        {
+            blocks![r, c] = Functions.GetBlockInstances(pattern.Split(';'));
+        }
+
+
         // Check if this is multiblocked: if so, update multiblocked flag
         // This is run when the blockimage is created/updated by pattern/content
-        private void checkMultiblocked()
+        public void checkMultiblocked()
         {
             if (blocks == null)
                 return;
