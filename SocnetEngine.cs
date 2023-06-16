@@ -31,7 +31,8 @@ namespace Socnet
             {"initdirectbm", new string[] {"network", "blockimage", "searchtype", "method" } },
             {"bivarieties", new string[] {"blockimage"} },
             {"viewbm", new string[] {"blockmodel"} },
-            {"save", new string[] {"name","file"} }
+            {"save", new string[] {"name","file"} },
+            {"bmextract", new string[] {"blockmodel", "type"} }
 
         };
 
@@ -423,6 +424,11 @@ namespace Socnet
             response.Add("Blockimage:");
             response.AddRange(bm.DisplayBlockimage());
             response.Add("Goodness-of-fit: " + bm.gof + " (" + bm.gofMethod + ")");
+        }
+
+        public void f_bmextract()
+        {
+
         }
 
 
