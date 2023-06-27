@@ -445,6 +445,9 @@ namespace Socnet
             }
             else if (type.Equals("matrix"))
             {
+                Matrix bmMatrix = ((BlockModel)blockmodel).GetBlockModelMatrix();
+                response.Add(dataset.StoreStructure(bmMatrix.actorset));
+                response.Add(dataset.StoreStructure(bmMatrix));
                 // REWORK THIS
                 // Better to create a Matrix object immediately in the BlockModel - see notes
                 
@@ -455,7 +458,7 @@ namespace Socnet
                 //Matrix bmMatrix = ((BlockModel)blockmodel).GetBlockModelMatrix(bmActorset);
 
 
-                response.Add(dataset.StoreStructure(bmActorset));
+                //response.Add(dataset.StoreStructure(bmActorset));
             }
                 
 

@@ -126,14 +126,28 @@ namespace Socnet.DataLibrary
             return actorset;
         }
 
-        internal string[] GetActorsetLabels()
+
+        internal Matrix GetBlockModelMatrix()
         {
-            string[] actorLabels = new string[matrix.actorset.Count];
-
-
-
-
-            return actorLabels;
+            Actorset bmActorset = new Actorset(this.Name + "_actorset");
+            int nbrPositions = partition.clusters.Length;
+            Dictionary<Actor, Actor> actorIndexMap = new Dictionary<Actor, Actor>();
+            int index = 0;
+            for (int i=0;i<nbrPositions;i++)
+            {
+                foreach (Actor actor in partition.clusters[i].actors)
+                {
+                    Actor bmActor = new Actor(i + "_" + actor.Name, index);
+                    bmActorset.actors.Add(bmActor);
+                    actorIndexMap.Add(actor,bmActor);
+                    index++;
+                }
+            }
+            Matrix bmMatrix = new Matrix(bmActorset, this.Name + "_matrix", matrix.Cellformat);
+            foreach (Actor rowActor in matrix.actorset.actors)
+                foreach (Actor colActor in matrix.actorset.actors)
+                    bmMatrix.Set(actorIndexMap[rowActor], actorIndexMap[colActor], matrix.Get(rowActor, colActor));
+            return bmMatrix;
         }
     }
 }
