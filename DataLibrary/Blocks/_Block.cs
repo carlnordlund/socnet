@@ -21,6 +21,8 @@ namespace Socnet.DataLibrary.Blocks
             return new List<Triple>();
         }
 
+        public abstract _Block cloneBlock();
+
         public override string ToString()
         {
             return Name;

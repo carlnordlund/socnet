@@ -17,6 +17,11 @@ namespace Socnet.DataLibrary.Blocks
             primeIndex = 8;
         }
 
+        public override _Block cloneBlock()
+        {
+            return new denuciBlock(this.d);
+        }
+
         public override List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster)
         {
             List<Triple> triplets = new List<Triple>();

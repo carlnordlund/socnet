@@ -17,6 +17,11 @@ namespace Socnet.DataLibrary.Blocks
             primeIndex = 9;
         }
 
+        public override _Block cloneBlock()
+        {
+            return new denBlock(this.d);
+        }
+
         public override double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster)
         {
             double nbrCells = 0, sum = 0;

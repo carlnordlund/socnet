@@ -98,5 +98,42 @@ namespace Socnet.DataLibrary
             }
             return lines;
         }
+
+        internal BlockImage ExtractBlockimage()
+        {
+            if (!blockimage.multiBlocked)
+                return blockimage;
+            // It is multiblocked, so create new Blockimage based on this
+
+            BlockImage bi = new BlockImage(blockimage, blockIndices);
+            return bi;
+
+        }
+
+        internal Actorset GetBlockModelActorset()
+        {
+            Actorset actorset = new Actorset("actorset_" + this.Name);
+            int nbrClusters = partition.clusters.Length;
+            int index = 0;
+            for (int i = 0; i < nbrClusters; i++)
+            {
+                foreach (Actor actor in partition.clusters[i].actors)
+                {
+                    actorset.actors.Add(new Actor(i + "_" + actor.Name, index));
+                    index++;
+                }
+            }
+            return actorset;
+        }
+
+        internal string[] GetActorsetLabels()
+        {
+            string[] actorLabels = new string[matrix.actorset.Count];
+
+
+
+
+            return actorLabels;
+        }
     }
 }

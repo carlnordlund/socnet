@@ -14,6 +14,11 @@ namespace Socnet.DataLibrary.Blocks
             primeIndex = 2;
         }
 
+        public override _Block cloneBlock()
+        {
+            return new comBlock();
+        }
+
         public override double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster)
         {
             double penalty = 0;
@@ -33,5 +38,6 @@ namespace Socnet.DataLibrary.Blocks
                         triplets.Add(new Triple(matrix.Get(rowActor, colActor), 1, 1));
             return triplets;
         }
+
     }
 }

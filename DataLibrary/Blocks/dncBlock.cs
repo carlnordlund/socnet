@@ -13,5 +13,10 @@ namespace Socnet.DataLibrary.Blocks
             Name = "dnc";
             primeIndex = 0;
         }
+
+        public override _Block cloneBlock()
+        {
+            return new dncBlock();
+        }
     }
 }

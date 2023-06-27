@@ -29,6 +29,25 @@ namespace Socnet.DataLibrary
             }
         }
 
+        public BlockImage(BlockImage template, int[,] blockindices)
+        {
+            this.Name = template.Name;
+            this.nbrPositions = template.nbrPositions;
+            this.blocks = new List<_Block>[nbrPositions, nbrPositions];
+            positionNames = new string[nbrPositions];
+            for (int r=0;r<nbrPositions;r++)
+            {
+                positionNames[r] = template.positionNames[r];
+                for (int c =0; c < nbrPositions; c++) {
+                    blocks[r, c] = new List<_Block>
+                    {
+                        template.blocks![r, c][blockindices[r, c]].cloneBlock()
+                    };
+                }
+            }
+        }
+
+
         public _Block[,]? getPickedBlocks(int[,] blockindices)
         {
             if (blockindices.GetLength(0)!=nbrPositions || blockindices.GetLength(1)!=nbrPositions)

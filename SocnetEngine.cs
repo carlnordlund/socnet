@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Socnet.DataLibrary;
 using System.Text.RegularExpressions;
 using System.Net.Http;
-
+using System.Net;
 
 namespace Socnet
 {
@@ -36,6 +36,7 @@ namespace Socnet
             {"bmextract", new string[] {"blockmodel", "type"} }
 
         };
+
 
         public SocnetEngine()
         {
@@ -176,8 +177,6 @@ namespace Socnet
             return retval;
         }
 
-
-
         // METHODS for FUNCTIONS
         public void f_getwd()
         {
@@ -196,11 +195,6 @@ namespace Socnet
             {
                 response.Add("!Error: " + e.Message);
             }
-        }
-
-        public void f_checkupdate()
-        {
-            // Function to check if there is an update to this
         }
 
         public void f_loadmatrix()
@@ -284,7 +278,7 @@ namespace Socnet
             string type = getStringArgument("type");
             if (type == "")
                 foreach (KeyValuePair<string, DataStructure> obj in dataset.structures)
-                    response.Add(obj.Value.DataType + "\t" + obj.Value.Name + "\t" + obj.Value.Size);
+                    response.Add(obj.Key+"\t"+ obj.Value.DataType + "\t" + obj.Value.Name + "\t" + obj.Value.Size);
             else
                 foreach (KeyValuePair<string, DataStructure> obj in dataset.structures)
                     if (obj.Value.GetType().Name.Equals(type,StringComparison.CurrentCultureIgnoreCase))
@@ -434,6 +428,37 @@ namespace Socnet
 
         public void f_bmextract()
         {
+            // "blockmodel", "type"
+
+            DataStructure? blockmodel = dataset.GetStructureByName(getStringArgument("blockmodel"), typeof(BlockModel));
+            if (blockmodel == null)
+            {
+                response.Add("!Error: Blockmodel not found");
+                return;
+            }
+            string type = getStringArgument("type");
+            if (type.Equals("blockimage"))
+            {
+                BlockImage bi = ((BlockModel)blockmodel).ExtractBlockimage();
+                //bi.Name = dataset.GetAutoName(bi.Name);
+                response.Add(dataset.StoreStructure(bi));
+            }
+            else if (type.Equals("matrix"))
+            {
+                // REWORK THIS
+                // Better to create a Matrix object immediately in the BlockModel - see notes
+                
+
+                // Ok - so I might need to create both Actorset and Matrix here from scratch, i.e. not as an ExtractMatrix kind of thing
+                //Actorset bmActorset = ((BlockModel)blockmodel).GetBlockModelActorset();
+
+                //Matrix bmMatrix = ((BlockModel)blockmodel).GetBlockModelMatrix(bmActorset);
+
+
+                response.Add(dataset.StoreStructure(bmActorset));
+            }
+                
+
 
         }
 

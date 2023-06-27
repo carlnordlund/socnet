@@ -70,7 +70,6 @@ namespace Socnet.DataLibrary
                 if (actorset.labelToActor.ContainsKey(labels[i]))
                     return null;    // Making sure that an actorset doesn't contain two actors with the same label
                 actorset.labelToActor.Add(labels[i], actor);
-                //actorset.recreateLabelToActor();
             }
             return actorset;
         }
@@ -83,6 +82,15 @@ namespace Socnet.DataLibrary
 
             if (structure == null)
                 return "!Error - Can't store a null structure";
+
+            // Does structure already exist? Perhaps under different name? Should only be one dict entry per object
+            foreach (KeyValuePair<string,DataStructure> obj in structures)
+                if (obj.Value == structure)
+                {
+                    // Ok - this Data structure object already exists in the structures. Give error etc
+                    return "!Error - Structure '" + structure.Name + "' already exists under name '" + obj.Key + "'";
+                }
+
             if (structure.Name.Length == 0) {
                 // Ok - has no name, give a new unique one. No need to check if already exists: doesn't
                 structure.Name = GetAutoName(structure.GetType().Name.ToLower());
@@ -138,7 +146,7 @@ namespace Socnet.DataLibrary
             return retStructures;
         }
 
-        private string GetAutoName(string basename)
+        internal string GetAutoName(string basename)
         {
             if (!structures.ContainsKey(basename))
                 return basename;
