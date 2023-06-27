@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Socnet.DataLibrary;
 using System.Text.RegularExpressions;
+using System.Net.Http;
 
 
 namespace Socnet
@@ -195,6 +196,11 @@ namespace Socnet
             {
                 response.Add("!Error: " + e.Message);
             }
+        }
+
+        public void f_checkupdate()
+        {
+            // Function to check if there is an update to this
         }
 
         public void f_loadmatrix()
