@@ -146,7 +146,8 @@ namespace Socnet
                     response.AddRange(returnStructure.View);
                 return response;
             }
-            response.Add("!Error: Syntax error!");
+            if (command.Trim().Length>0)
+                response.Add("!Error: Syntax error!");
             return response;
         }
 
@@ -448,17 +449,10 @@ namespace Socnet
                 Matrix bmMatrix = ((BlockModel)blockmodel).GetBlockModelMatrix();
                 response.Add(dataset.StoreStructure(bmMatrix.actorset));
                 response.Add(dataset.StoreStructure(bmMatrix));
-                // REWORK THIS
-                // Better to create a Matrix object immediately in the BlockModel - see notes
-                
+            }
+            else if (type.Equals("partition"))
+            {
 
-                // Ok - so I might need to create both Actorset and Matrix here from scratch, i.e. not as an ExtractMatrix kind of thing
-                //Actorset bmActorset = ((BlockModel)blockmodel).GetBlockModelActorset();
-
-                //Matrix bmMatrix = ((BlockModel)blockmodel).GetBlockModelMatrix(bmActorset);
-
-
-                //response.Add(dataset.StoreStructure(bmActorset));
             }
                 
 

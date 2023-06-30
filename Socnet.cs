@@ -105,7 +105,8 @@ void startInteractiveMode()
                 System.Environment.Exit(0);
                 break;
             }
-            displayResponse(engine.executeCommand(input, true));
+            if (input.Length>0)
+                displayResponse(engine.executeCommand(input, true));
         }
     }
 }
