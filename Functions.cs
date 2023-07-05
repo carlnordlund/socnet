@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Transactions;
 using Socnet.DataLibrary;
 using Socnet.DataLibrary.Blocks;
 
@@ -32,13 +34,33 @@ namespace Socnet
 
         internal static _Block? GetBlockInstance(string blockName)
         {
-            var objecttype = Type.GetType("Socnet.DataLibrary.Blocks." + blockName+"Block");
+            //string pattern = @"^(([\w]+)\s*?=\s*?)?(\w+)(\((.*?)\))?$";
+            //Match match = Regex.Match(command.Trim(), pattern);
+
+            string pattern = @"^([\w]+)(\(([^\)]+)\))?";
+
+            Match match = Regex.Match(blockName, pattern);
+            if (!match.Success)
+                return null;
+
+            var objecttype = Type.GetType("Socnet.DataLibrary.Blocks." + match.Groups[1].Value +"Block");
+
+
 
             if (objecttype == null)
                 return null;
             var instObj = Activator.CreateInstance(objecttype);
             if (instObj is _Block)
-                return (_Block)instObj;
+            {
+                _Block instBlock = (_Block)instObj;
+                if (match.Groups[3].Value.Length>0)
+                {
+                    double v = 0;
+                    if (double.TryParse(match.Groups[3].Value, out v))
+                        instBlock.initArgValue(v);
+                }
+                return instBlock;
+            }
             return null;
         }
 

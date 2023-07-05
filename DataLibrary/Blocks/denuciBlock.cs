@@ -10,11 +10,23 @@ namespace Socnet.DataLibrary.Blocks
     {
         public double d;
 
-        public denuciBlock(double d = 0.5)
+        public denuciBlock()
+        {
+            Name = "denuci";
+            this.d = 0.5;
+            primeIndex = 8;
+        }
+
+        public denuciBlock(double d)
         {
             Name = "denuci";
             this.d = d;
             primeIndex = 8;
+        }
+
+        public override void initArgValue(double v)
+        {
+            this.d = v;
         }
 
         public override _Block cloneBlock()
@@ -34,7 +46,7 @@ namespace Socnet.DataLibrary.Blocks
 
         public override string ToString()
         {
-            return Name + "_" + d;
+            return Name + "(" + d + ")";
         }
 
     }

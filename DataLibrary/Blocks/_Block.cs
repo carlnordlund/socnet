@@ -23,6 +23,11 @@ namespace Socnet.DataLibrary.Blocks
 
         public abstract _Block cloneBlock();
 
+        public virtual void initArgValue(double v)
+        {
+
+        }
+
         public override string ToString()
         {
             return Name;
