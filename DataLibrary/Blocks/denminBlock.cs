@@ -6,22 +6,22 @@ using System.Threading.Tasks;
 
 namespace Socnet.DataLibrary.Blocks
 {
-    public class denBlock : _Block
+    public class denminBlock : _Block
     {
         public double d;
 
-        public denBlock()
+        public denminBlock()
         {
-            Name = "den";
+            Name = "denmin";
             this.d = 0.5;
-            primeIndex = 9;
+            primeIndex = 10;
         }
 
-        public denBlock(double d = 0.5)
+        public denminBlock(double d = 0.5)
         {
-            Name = "den";
+            Name = "denmin";
             this.d = d;
-            primeIndex = 9;
+            primeIndex = 10;
         }
 
         public override void initArgValue(double v)
@@ -31,7 +31,7 @@ namespace Socnet.DataLibrary.Blocks
 
         public override _Block cloneBlock()
         {
-            return new denBlock(this.d);
+            return new denminBlock(this.d);
         }
 
         public override List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster)
@@ -46,10 +46,11 @@ namespace Socnet.DataLibrary.Blocks
             int i1 = (int)Math.Round((double)nbrCells * d);
             int i0 = nbrCells - i1;
             observedList.Sort();
-            for (int i = 0; i < i0; i++)
-                triplets.Add(new Triple(observedList[i], 0, 1));
-            for (int i = i0; i < nbrCells; i++)
+            observedList.Reverse();
+            for (int i = 0; i < i1; i++)
                 triplets.Add(new Triple(observedList[i], 1, 1));
+            for (int i = i1; i < nbrCells; i++)
+                triplets.Add(new Triple(observedList[i], observedList[i], 1));
             return triplets;
         }
 
@@ -63,14 +64,18 @@ namespace Socnet.DataLibrary.Blocks
                         nbrCells++;
                         sum += (matrix.Get(rowActor, colActor) > 0) ? 1 : 0;
                     }
-            int approxSum = (int)Math.Round(nbrCells * d);
-            return Math.Abs(sum - approxSum);
+            int minSum = (int)Math.Ceiling(nbrCells * d);
+            if (sum < minSum)
+                return minSum - sum;
+            return 0;
         }
+
+
+
 
         public override string ToString()
         {
             return Name + "_" + d;
         }
-
     }
 }

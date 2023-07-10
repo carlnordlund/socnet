@@ -12,7 +12,7 @@ namespace Socnet
 {
     public static class Functions
     {
-        public static List<string> idealBlockNames = new List<string>() { "dnc", "nul", "com", "reg", "rre", "cre", "rfn", "cfn", "denuci", "den", "kco", "pco", "sumreg", "meanreg", "maxreg", "vcom" };
+        public static List<string> idealBlockNames = new List<string>() { "dnc", "nul", "com", "reg", "rre", "cre", "rfn", "cfn", "denuci", "den", "denmin", "kco", "pco", "sumreg", "meanreg", "maxreg", "vcom" };
 
         public static Dictionary<int, string> indexToIdealBlockName = new Dictionary<int, string>() {
             { 0, "dnc" },
@@ -25,12 +25,13 @@ namespace Socnet
             { 7, "cfn" },
             { 8, "denuci" },
             { 9, "den" },
-            { 10, "kco" },
-            { 11, "pco" },
-            { 12, "sumreg" },
-            { 13, "meanreg" },
-            { 14, "maxreg" },
-            { 15, "vcom" } };
+            { 10, "denmin" },
+            { 11, "kco" },
+            { 12, "pco" },
+            { 13, "sumreg" },
+            { 14, "meanreg" },
+            { 15, "maxreg" },
+            { 16, "vcom" } };
 
         internal static _Block? GetBlockInstance(string blockName)
         {

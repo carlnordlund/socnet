@@ -11,8 +11,8 @@ namespace Socnet
     {
         public static Dictionary<string, List<string>> availableBlocks = new Dictionary<string, List<string>>()
         {
-            { "hamming", new List<string>() { "dnc","nul","com","reg","rre","cre","rfn","cfn" } },
-            { "nordlund", new List<string>() { "dnc","nul","com","reg","rre","cre","rfn","cfn", "denuci", "den" } },
+            { "hamming", new List<string>() { "dnc","nul","com","reg","rre","cre","rfn","cfn", "den", "denmin" } },
+            { "nordlund", new List<string>() { "dnc","nul","com","reg","rre","cre","rfn","cfn", "denuci", "den", "denmin" } },
             { "ziberna", new List<string>() { "dnc","nul","com","maxreg","meanreg","sumreg" } }
         };
 
