@@ -60,7 +60,7 @@ namespace Socnet.DataLibrary
             {
                 line = blockimage.positionNames[r];
                 for (int c = 0; c < nbrClusters; c++)
-                    line += "\t" + blockimage.GetBlock(r, c, blockIndices[r, c]).Name;
+                    line += "\t" + blockimage.GetBlock(r, c, blockIndices[r, c]).ToString();
                 lines.Add(line);
             }
             return lines;

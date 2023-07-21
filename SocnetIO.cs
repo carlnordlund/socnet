@@ -107,6 +107,7 @@ namespace Socnet
                     actorset = dataset.CreateActorsetByLabels(aod.rowLabels);
                     if (actorset == null)
                         return "!Error: Couldn't create Actorset from labels";
+                    actorset.Name = dsname + "_actors";
                     response.Add(dataset.StoreStructure(actorset));
                 }
                 Matrix matrix = new Matrix(actorset, dsname, "F2");

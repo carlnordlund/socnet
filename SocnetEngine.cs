@@ -33,7 +33,8 @@ namespace Socnet
             {"bivarieties", new string[] {"blockimage"} },
             {"viewbm", new string[] {"blockmodel"} },
             {"save", new string[] {"name","file"} },
-            {"bmextract", new string[] {"blockmodel", "type"} }
+            {"bmextract", new string[] {"blockmodel", "type"} },
+            {"coreperi", new string[] {"network", "searchtype" } }
 
         };
 
@@ -323,6 +324,76 @@ namespace Socnet
                 bi.setBlocksByContentString(contentParts);
             }
             return bi;
+        }
+
+        public void f_coreperi()
+        {
+            response.Add("Init and running corr-based core-peri");
+            Dictionary<string, object?> searchParams = new Dictionary<string, object?>();
+
+            DataStructure? network = dataset.GetStructureByName(getStringArgument("network"), typeof(Matrix));
+            if (network == null)
+            {
+                response.Add("!Error: Network not found (parameter: network)");
+                return;
+            }
+
+            string searchType = getStringArgument("searchtype");
+            if (searchType == "" || !Blockmodeling.searchTypes.Contains(searchType))
+            {
+                response.Add("!Error: Search type not recognized/set (parameter: searchtype");
+                return;
+            }
+
+            BlockImage cpbi = new BlockImage("cp", 2);
+            cpbi.setBlockByPattern(1, 1, "nul");
+            string core = getStringArgument("core");
+            cpbi.setBlockByPattern(0, 0, (core.Length>2 && core.Substring(0, 3).Equals("pco")) ? core : "com");
+            
+            string intercat = getStringArgument("intercat");
+            if (intercat !="")
+            {
+                cpbi.setBlockByPattern(1, 0, intercat);
+                cpbi.setBlockByPattern(0, 1, intercat);
+            }
+            else
+            {
+                string ptoc = getStringArgument("ptoc");
+                if (ptoc != "")
+                    cpbi.setBlockByPattern(1, 0, ptoc);
+                else
+                    cpbi.setBlockByPattern(1, 0, "dnc");
+                string ctop = getStringArgument("ctop");
+                if (ctop!= "")
+                    cpbi.setBlockByPattern(0, 1, ctop);
+                else
+                    cpbi.setBlockByPattern(0, 1, "dnc");
+            }
+            if (!cpbi.hasBlocks())
+            {
+                response.Add("!Error: Something wrong with inter-categorical blocks");
+                return;
+            }
+
+
+
+            searchParams["network"] = network;
+            searchParams["blockimage"] = cpbi;
+            searchParams["searchtype"] = searchType;
+            searchParams["method"] = "nordlund";
+            searchParams["minclustersize"] = getIntegerArgument("minclustersize");
+            searchParams["nbrrestarts"] = getIntegerArgument("nbrrestarts");
+            searchParams["maxiterations"] = getIntegerArgument("maxiterations");
+            searchParams["maxtime"] = getIntegerArgument("maxtime");
+
+            string statusInitMsg = Blockmodeling.InitializeSearch(searchParams);
+            if (statusInitMsg.Equals("ok"))
+                f_startsearch();
+            else if (statusInitMsg[0] == '!')
+                response.Add(statusInitMsg);
+            Blockmodeling.logLines.Clear();
+
+
         }
 
         public void f_initdirectbm()

@@ -12,7 +12,7 @@ namespace Socnet
         public static Dictionary<string, List<string>> availableBlocks = new Dictionary<string, List<string>>()
         {
             { "hamming", new List<string>() { "dnc","nul","com","reg","rre","cre","rfn","cfn", "den", "denmin" } },
-            { "nordlund", new List<string>() { "dnc","nul","com","reg","rre","cre","rfn","cfn", "denuci", "den", "denmin" } },
+            { "nordlund", new List<string>() { "dnc","nul","com","reg","rre","cre","rfn","cfn", "denuci", "den", "denmin","pco" } },
             { "ziberna", new List<string>() { "dnc","nul","com","maxreg","meanreg","sumreg" } }
         };
 
@@ -49,7 +49,7 @@ namespace Socnet
         public static long maxElapsedMilliseconds = 60000;
 
         public static bool timeoutAbort = false;
-        public static bool timeoutActive = true;
+        public static bool timeoutActive = true;        
 
         internal static string InitializeSearch(Dictionary<string, object?> searchParams)
         {
