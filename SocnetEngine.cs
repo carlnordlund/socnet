@@ -36,7 +36,8 @@ namespace Socnet
             {"bmextract", new string[] {"blockmodel", "type"} },
             {"coreperi", new string[] {"network", "searchtype" } },
             {"dichotomize", new string[] {"name", "condition", "threshold" } },
-            {"symmetrize", new string[] {"name", "method" } }
+            {"symmetrize", new string[] {"name", "method" } },
+            {"loadedgelist", new string[] {"file", "col1","col2" } }
 
         };
 
@@ -248,6 +249,18 @@ namespace Socnet
 
         public void f_loadedgelist()
         {
+            response.Add(SocnetIO.LoadEdgelist(response,
+                dataset,
+                getStringArgument("file"),
+                getIntegerArgument("col1"),
+                getIntegerArgument("col2"),
+                getStringArgument("symmetric"),
+                getStringArgument("actorset"),
+                getIntegerArgument("colval"),
+                getStringArgument("headers"),
+                getStringArgument("sep")
+            ));
+
             // to-do
 
         }

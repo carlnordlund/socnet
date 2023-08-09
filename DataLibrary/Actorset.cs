@@ -62,6 +62,7 @@ namespace Socnet.DataLibrary
         internal void recreateLabelAndIndexToActor()
         {
             labelToActor.Clear();
+            indexToActor.Clear();
             foreach (Actor actor in actors)
             {
                 labelToActor.Add(actor.Name, actor);

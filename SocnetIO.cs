@@ -82,6 +82,75 @@ namespace Socnet
             File.WriteAllLines(filepath, csvLines);
         }
 
+        internal static string LoadEdgelist(List<string> response, Dataset dataset, string filepath, int col1, int col2, string symmetric, string actorsetName, int colval, string headers, string sep)
+        {
+            if (!File.Exists(filepath))
+                return "!Error: File '" + filepath + "' not found";
+            string[] lines = File.ReadAllLines(filepath);
+            if (lines.Length == 0)
+                return "!Error: File '" + filepath + "' is empty";
+            string dsName = Path.GetFileNameWithoutExtension(filepath);
+            sep = (sep.Length == 0) ? "\t" : sep;
+            int startline = (headers.Length > 0 && headers.ToLower()[0] == 'n') ? 0 : 1;
+            bool symm = (symmetric.Length > 0 && symmetric.ToLower()[0] == 'y');
+            Actorset? actorset;
+            bool storeActorset = false;
+            string[] cells;
+            col1--;
+            col2--;
+            colval--;
+            try
+            {
+                if (actorsetName.Length > 0)
+                {
+                    DataStructure? actorsetPrev = dataset.GetStructureByName(actorsetName, typeof(Actorset));
+                    if (actorsetPrev == null)
+                        return "!Error: Specified actorset '" + actorsetName + "' not found";
+                    actorset = (Actorset)actorsetPrev;
+                    response.Add("Reusing previous actorset: '" + actorsetName + "'");
+                }
+                else
+                {
+                    List<string> actorLabels = new List<string>();
+                    for (int i = startline; i < lines.Length; i++)
+                    {
+                        cells = lines[i].Split(sep);
+                        if (!actorLabels.Contains(cells[col1]))
+                            actorLabels.Add(cells[col1]);
+                        if (!actorLabels.Contains(cells[col2]))
+                            actorLabels.Add(cells[col2]);
+                    }
+                    actorset = dataset.CreateActorsetByLabels(actorLabels.ToArray());
+                    if (actorset == null)
+                        return "!Error: Something went wrong when creating actorset";
+                    response.Add("Creating new actorset: " + actorset.Count);
+                    storeActorset = true;
+                }
+                Matrix matrix = new Matrix(actorset, dsName, "F2");
+                Actor a1, a2;
+                double val;
+                for (int i = startline; i < lines.Length; i++)
+                {
+                    cells = lines[i].Split(sep);
+                    a1 = actorset.GetActorByLabel(cells[col1])!;
+                    a2 = actorset.GetActorByLabel(cells[col2])!;
+                    val = (colval > 0) ? double.Parse(cells[colval]) : 1;
+                    matrix.Set(a1, a2, val);
+                    if (symm)
+                        matrix.Set(a2, a1, val);
+                }
+                if (storeActorset)
+                    response.Add(dataset.StoreStructure(actorset));
+                response.Add(dataset.StoreStructure(matrix));
+                return "Loading edgelist: OK";
+            }
+            catch (Exception e)
+            {
+                return "!Error: " + e.Message;
+            }
+        }
+
+
         internal static string LoadDataStructure(List<string> response, Dataset dataset, string filepath, string type, string name)
         {
             if (!File.Exists(filepath))
