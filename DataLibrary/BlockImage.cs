@@ -29,6 +29,12 @@ namespace Socnet.DataLibrary
             }
         }
 
+        public void setPositionName(int positionIndex, string positionName)
+        {
+            if (positionIndex >= 0 && positionIndex < nbrPositions)
+                positionNames[positionIndex] = positionName;
+        }
+
         public BlockImage(BlockImage template, int[,] blockindices)
         {
             this.Name = template.Name;

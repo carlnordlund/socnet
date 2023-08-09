@@ -33,6 +33,9 @@ namespace Socnet
             { 15, "maxreg" },
             { 16, "vcom" } };
 
+        public static List<string> conditionAbbrs = new List<string>() { "gt","ge","lt","le","eq","ne" };
+        public static List<string> symmMethods = new List<string>() { "max","min","minnonzero","average","sum","difference","ut","lt" };
+
         internal static _Block? GetBlockInstance(string blockName)
         {
             //string pattern = @"^(([\w]+)\s*?=\s*?)?(\w+)(\((.*?)\))?$";
@@ -262,7 +265,7 @@ namespace Socnet
             return returnStructures;
         }
 
-        internal static double correlateTriplets(List<Triple> triples)
+        public static double correlateTriplets(List<Triple> triples)
         {
             double mx = 0, my = 0, sx = 0, sy = 0, sxy = 0, w_sum = 0;
             foreach (Triple t in triples)
@@ -287,5 +290,137 @@ namespace Socnet
             return sxy / Math.Sqrt(sx * sy);
 
         }
+
+        public static DataStructure? Dichotomize(DataStructure structure, string condition, double threshold, double truevalue, double falsevalue)
+        {
+            if (structure is Matrix)
+                return Dichotomize((Matrix)structure, condition, threshold, truevalue, falsevalue);
+            else if (structure is Vector)
+                return Dichotomize((Vector)structure, condition, threshold, truevalue, falsevalue);
+            else if (structure is Table)
+                return Dichotomize((Table)structure, condition, threshold, truevalue, falsevalue);
+            else
+                return null;
+        }
+
+        internal static Matrix Dichotomize(Matrix matrix, string condition, double threshold, double truevalue, double falsevalue)
+        {
+            Matrix dichMatrix = new Matrix(matrix.actorset, "dich_" + condition + threshold + "_" + matrix.Name, matrix.Cellformat);
+            foreach (Actor rowActor in matrix.actorset.actors)
+                foreach (Actor colActor in matrix.actorset.actors)
+                    dichMatrix.Set(rowActor, colActor, Dichotomize(matrix.Get(rowActor, colActor), condition, threshold, truevalue, falsevalue));
+            return dichMatrix;
+        }
+
+        internal static Table Dichotomize(Table table, string condition, double threshold, double truevalue, double falsevalue)
+        {
+            Table dichTable = new Table(table.rowActorset,table.colActorset, "dich_" + condition + threshold + "_" + table.Name, table.Cellformat);
+            foreach (Actor rowActor in table.rowActorset.actors)
+                foreach (Actor colActor in table.colActorset.actors)
+                    dichTable.Set(rowActor, colActor, Dichotomize(table.Get(rowActor, colActor), condition, threshold, truevalue, falsevalue));
+            return dichTable;
+        }
+
+        internal static Vector Dichotomize(Vector vector, string condition, double threshold, double truevalue, double falsevalue)
+        {
+            Vector dichVector = new Vector(vector.actorset, "dich_" + condition + threshold + "_" + vector.Name, vector.Cellformat);
+            foreach (Actor actor in vector.actorset.actors)
+                dichVector.Set(actor, Dichotomize(vector.Get(actor), condition, threshold, truevalue, falsevalue));
+            return dichVector;
+        }
+
+        internal static double Dichotomize(double value, string condition, double threshold, double truevalue, double falsevalue)
+        {
+            bool conditionMet = (condition.Equals("eq") && value == threshold) ||
+                (condition.Equals("ne") && value != threshold) ||
+                (condition.Equals("ge") && value >= threshold) ||
+                (condition.Equals("gt") && value > threshold) ||
+                (condition.Equals("le") && value <= threshold) ||
+                (condition.Equals("lt") && value < threshold);
+            if (conditionMet)
+                return (double.IsNaN(truevalue)) ? value : truevalue;
+            else
+                return (double.IsNaN(falsevalue)) ? value : falsevalue;
+        }
+
+        public static Matrix? Symmetrize(Matrix matrix, string method)
+        {
+            Func<double, double, double> symm;
+            if (method.Equals("min"))
+                symm = SymMin;
+            else if (method.Equals("max"))
+                symm = SymMax;
+            else if (method.Equals("minnonzero"))
+                symm = SymMinNonzero;
+            else if (method.Equals("average"))
+                symm = SymAverage;
+            else if (method.Equals("sum"))
+                symm = SymSum;
+            else if (method.Equals("difference"))
+                symm = SymDiff;
+            else if (method.Equals("ut"))
+                symm = SymUpperTriangle;
+            else if (method.Equals("lt"))
+                symm = SymLowerTriangle;
+            else
+                return null;
+
+            double symval = 0;
+            Matrix symmMatrix = new Matrix(matrix.actorset, "symm_" + method + "_" + matrix.Name, matrix.Cellformat);
+            foreach (Actor rowActor in matrix.actorset.actors)
+                foreach (Actor colActor in matrix.actorset.actors)
+                    if (rowActor.index < colActor.index)
+                    {
+                        symval = symm(matrix.Get(rowActor, colActor), matrix.Get(colActor, rowActor));
+                        symmMatrix.Set(rowActor, colActor, symval);
+                        symmMatrix.Set(colActor, rowActor, symval);
+                    }
+            return symmMatrix;
+        }
+
+        public static double SymMax(double lt, double ut)
+        {
+            return Math.Max(lt, ut);
+        }
+
+        public static double SymMin(double lt, double ut)
+        {
+            return Math.Min(lt, ut);
+        }
+
+        public static double SymMinNonzero(double lt, double ut)
+        {
+            if (lt == 0 || ut == 0)
+                return Math.Max(lt, ut);
+            return Math.Min(lt, ut);
+        }
+
+        public static double SymAverage(double lt, double ut)
+        {
+            return (lt + ut) / 2;
+        }
+
+        public static double SymSum(double lt, double ut)
+        {
+            return (ut + lt);
+        }
+
+        public static double SymDiff(double lt, double ut)
+        {
+            return Math.Abs(lt - ut);
+        }
+
+        public static double SymUpperTriangle(double lt, double ut)
+        {
+            return ut;
+        }
+
+        public static double SymLowerTriangle(double lt, double ut)
+        {
+            return lt;
+        }
+
+
+
     }
 }

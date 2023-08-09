@@ -34,7 +34,9 @@ namespace Socnet
             {"viewbm", new string[] {"blockmodel"} },
             {"save", new string[] {"name","file"} },
             {"bmextract", new string[] {"blockmodel", "type"} },
-            {"coreperi", new string[] {"network", "searchtype" } }
+            {"coreperi", new string[] {"network", "searchtype" } },
+            {"dichotomize", new string[] {"name", "condition", "threshold" } },
+            {"symmetrize", new string[] {"name", "method" } }
 
         };
 
@@ -179,6 +181,13 @@ namespace Socnet
             return retval;
         }
 
+        private double getDoubleArgument(string key)
+        {
+            double retval = double.NaN;
+            double.TryParse(getStringArgument(key), out retval);
+            return retval;
+        }
+
         // METHODS for FUNCTIONS
         public void f_getwd()
         {
@@ -235,6 +244,12 @@ namespace Socnet
                     }
                 }
             }
+        }
+
+        public void f_loadedgelist()
+        {
+            // to-do
+
         }
 
         public void f_rename()
@@ -346,6 +361,8 @@ namespace Socnet
             }
 
             BlockImage cpbi = new BlockImage("cp", 2);
+            cpbi.setPositionName(0, "C");
+            cpbi.setPositionName(1, "P");
             cpbi.setBlockByPattern(1, 1, "nul");
             string core = getStringArgument("core");
             cpbi.setBlockByPattern(0, 0, (core.Length>2 && core.Substring(0, 3).Equals("pco")) ? core : "com");
@@ -458,8 +475,10 @@ namespace Socnet
                 foreach (BlockModel bm in blockmodels)
                     response.Add(dataset.StoreStructure(bm));
             }
-            else
-                response.Add(status);
+            else if (status.Equals("timeout"))
+            {
+                response.AddRange(Blockmodeling.logLines);
+            }
         }
 
         public void f_viewbm()
@@ -558,8 +577,58 @@ namespace Socnet
             List<BlockImage> blockimages = Functions.GetBlockImageVarieties(bi);
             foreach (BlockImage blim in blockimages)
                 dataset.StoreStructure(blim);
+        }
 
+        public Matrix? f_symmetrize()
+        {
+            DataStructure? structure = dataset.GetStructureByName(getStringArgument("name"));
+            if (!(structure is Matrix))
+            {
+                response.Add("!Error: Can only symmetrize Matrix structures");
+                return null;
+            }
+            Matrix matrix = (Matrix)structure;
+            string method = getStringArgument("method").ToLower();
+            if (!Functions.symmMethods.Contains(method))
+            {
+                response.Add("!Error: Symmetrization method '" + method + "' not known");
+                return null;
+            }
+            Matrix? symmMatrix = Functions.Symmetrize(matrix, method);
+            return symmMatrix;
+        }
 
+        public DataStructure? f_dichotomize()
+        {
+            response.Add("Dichotomization");
+            DataStructure? structure = dataset.GetStructureByName(getStringArgument("name"));
+            if (structure == null)
+            {
+                response.Add("!Error: Structure not found");
+                return null;
+            }
+            if (!(structure is Matrix || structure is Table || structure is Vector))
+            {
+                response.Add("!Error: Can only dichotomize Matrix, Table and Vector structures");
+                return null;
+            }
+            double threshold = getDoubleArgument("threshold");
+            if (double.IsNaN(threshold))
+            {
+                response.Add("!Error: Couldn't parse 'threshold' argument");
+                return null;
+            }
+            string condition = getStringArgument("condition").ToLower();
+            if (!Functions.conditionAbbrs.Contains(condition))
+            {
+                response.Add("!Error: Condition '" + condition + "' not available. Options: ge,gt,le,lt,eq,ne");
+                return null;
+            }
+            string truevalstr = getStringArgument("truevalue"), falsevalstr = getStringArgument("falsevalue");
+            double truevalue = truevalstr.Equals("") ? 1 : truevalstr.Equals("keep") ? double.NaN : getDoubleArgument("truevalue");
+            double falsevalue = falsevalstr.Equals("") ? 0 : falsevalstr.Equals("keep") ? double.NaN : getDoubleArgument("falsevalue");
+
+            return Functions.Dichotomize(structure, condition, threshold, truevalue, falsevalue);
         }
     }
 }

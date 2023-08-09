@@ -184,7 +184,6 @@ namespace Socnet
                         continue;
                     //log("Test " + testindex + ": " + partition.GetPartString());
 
-
                     BMSolution solution = gofMethod!(matrix, blockimage, partition);
                     if ((maximizeGof && solution.gofValue >=bestGof) || (!maximizeGof && solution.gofValue <= bestGof))
                     {
