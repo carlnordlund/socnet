@@ -211,8 +211,11 @@ namespace Socnet
 
         public void f_dir()
         {
+            string[] dirs = Directory.GetDirectories(Directory.GetCurrentDirectory(),"*",SearchOption.TopDirectoryOnly);
             string[] files = Directory.GetFiles(Directory.GetCurrentDirectory());
-            response.Add("Files in folder '" + Directory.GetCurrentDirectory() + "':");
+            response.Add("'" + Directory.GetCurrentDirectory() + "':");
+            foreach (string dir in dirs)
+                response.Add(" /" + Path.GetFileName(dir) + "/");
             foreach (string file in files)
             {
                 response.Add(" " + Path.GetFileName(file));
