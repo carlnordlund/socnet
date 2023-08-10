@@ -209,6 +209,15 @@ namespace Socnet
             }
         }
 
+        public void f_dir()
+        {
+            string[] files = Directory.GetFiles(Directory.GetCurrentDirectory());
+            response.Add("Files in folder '" + Directory.GetCurrentDirectory() + "':");
+            foreach (string file in files)
+            {
+                response.Add(" " + Path.GetFileName(file));
+            }
+        }
         public void f_loadmatrix()
         {
             response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "matrix", getStringArgument("name")));
