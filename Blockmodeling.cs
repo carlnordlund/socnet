@@ -288,6 +288,7 @@ namespace Socnet
                     double bestGofTemp = bestGofStartValue;
                     int tries;
                     BMSolution tempSolution;
+                    bool foundNewStartPartition = false;
                     for (int i = 0; i < nbrRandomStart; i++)
                     {
                         Partition tempPartition = new Partition(partition);
@@ -297,6 +298,8 @@ namespace Socnet
                             partString = tempPartition.setRandomPartition(minClusterSize, random);
                             if (!checkedPartString.Contains(partString))
                             {
+                                // Good - I have found at least one nonchecked partition that can be used
+                                foundNewStartPartition = true;
                                 tempSolution = gofMethod!(matrix, blockimage, tempPartition);
                                 if ((maximizeGof && tempSolution.gofValue > bestGofTemp) || (!maximizeGof && tempSolution.gofValue < bestGofTemp))
                                 {
@@ -306,13 +309,19 @@ namespace Socnet
                                 break;
                             }
                             tries++;
-                            if (tries > 1000)
+                            if (tries > 10)
                             {
-                                abortCouldNotFindPartition = true;
+                                //abortCouldNotFindPartition = true;
                                 break;
                             }
                         }
                     }
+
+                    // Check that I really found a free starting position in the search above
+                    if (!foundNewStartPartition)
+                        // If not: break and try next run
+                        break;
+
                     checkedPartString.Add(partition.GetPartString());
 
 

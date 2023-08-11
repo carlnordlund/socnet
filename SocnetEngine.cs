@@ -427,6 +427,7 @@ namespace Socnet
             searchParams["nbrrestarts"] = getIntegerArgument("nbrrestarts");
             searchParams["maxiterations"] = getIntegerArgument("maxiterations");
             searchParams["maxtime"] = getIntegerArgument("maxtime");
+            searchParams["nbrrandomstart"] = getIntegerArgument("nbrrandomstart");
 
             string statusInitMsg = Blockmodeling.InitializeSearch(searchParams);
             if (statusInitMsg.Equals("ok"))
@@ -557,22 +558,22 @@ namespace Socnet
             if (type.Equals("blockimage"))
             {
                 BlockImage bi = ((BlockModel)blockmodel).ExtractBlockimage();
-                //bi.Name = dataset.GetAutoName(bi.Name);
+                bi.Name = dataset.GetAutoName(bi.Name);
                 response.Add(dataset.StoreStructure(bi));
+                //return bi;
             }
             else if (type.Equals("matrix"))
             {
                 Matrix bmMatrix = ((BlockModel)blockmodel).GetBlockModelMatrix();
                 response.Add(dataset.StoreStructure(bmMatrix.actorset));
                 response.Add(dataset.StoreStructure(bmMatrix));
+                //return ((BlockModel)blockmodel).GetBlockModelMatrix();
             }
-            else if (type.Equals("partition"))
+            else
             {
+                response.Add("!Error: 'type' must be either 'matrix' or 'blockimage'");
 
             }
-                
-
-
         }
 
 

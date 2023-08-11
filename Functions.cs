@@ -12,7 +12,7 @@ namespace Socnet
 {
     public static class Functions
     {
-        public static List<string> idealBlockNames = new List<string>() { "dnc", "nul", "com", "reg", "rre", "cre", "rfn", "cfn", "denuci", "den", "denmin", "kco", "pco", "sumreg", "meanreg", "maxreg", "vcom" };
+        public static List<string> idealBlockNames = new List<string>() { "dnc", "nul", "com", "reg", "rre", "cre", "rfn", "cfn", "denuci", "den", "denmin", "pco", "sumreg", "meanreg", "maxreg", "vcom" };
 
         public static Dictionary<int, string> indexToIdealBlockName = new Dictionary<int, string>() {
             { 0, "dnc" },
