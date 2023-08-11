@@ -34,6 +34,7 @@ namespace Socnet
         public static int minClusterSize = 1;
         public static int nbrRestarts = 10;
         public static int maxNbrIterations = 25;
+        public static int nbrRandomStart = 5;
 
         public static bool initializationOk = false;
 
@@ -91,8 +92,10 @@ namespace Socnet
                     searchHeuristic = doLocalOptSearch;
                     nbrRestarts = (searchParams.ContainsKey("nbrrestarts") && searchParams["nbrrestarts"] is int && (int)searchParams["nbrrestarts"]! > 0) ? (int)searchParams["nbrrestarts"]! : 10;
                     maxNbrIterations = (searchParams.ContainsKey("maxiterations") && searchParams["maxiterations"] is int && (int)searchParams["maxiterations"]! > 0) ? (int)searchParams["maxiterations"]! : 25;
+                    nbrRandomStart = (searchParams.ContainsKey("nbrrandomstart") && searchParams["nbrrandomstart"] is int && (int)searchParams["nbrrandomstart"]! > 0) ? (int)searchParams["nbrrandomstart"]!:5;
                     log("nbrrestarts: " + nbrRestarts);
                     log("maxiterations: " + maxNbrIterations);
+                    log("nbrrandomstart: " + nbrRandomStart);
                 }
                 else if (searchTypeName.Equals("exhaustive"))
                     searchHeuristic = doExhaustiveSearch;
@@ -251,23 +254,68 @@ namespace Socnet
                 {
                     //log("Run:" + run);
                     bestGofThisRun = bestGofStartValue;
-                    int tries = 0;
-                    while (true)
+
+                    // Version 1
+                    //// Search for suitable starting partition: make sure that it is a novel one
+                    //int tries = 0;
+                    //while (true)
+                    //{
+                    //    partString = partition.setRandomPartition(minClusterSize, random);
+                    //    if (!checkedPartString.Contains(partString))
+                    //    {
+                    //        checkedPartString.Add(partString);
+                    //        break;
+                    //        //// The condition below should never trigger: the setRandomPartition above makes sure that minClusterSize is fulfilled
+                    //        //if (partition.CheckMinimumClusterSize(minClusterSize))
+                    //        //    // But I should break, as I have now found a partition that is good enough
+                    //        //    break;
+                    //        //else
+                    //        //    break;
+                    //    }
+                    //    tries++;
+                    //    if (tries>1000)
+                    //    {
+                    //        abortCouldNotFindPartition = true;
+                    //        break;
+                    //    }
+                    //}
+                    //BMSolution solution = gofMethod!(matrix, blockimage, partition);
+                    //// Ok - have found a starting position and got its solution
+                    ///
+
+                    // Version 2
+                    // Like above, but search for 5 different partitions
+                    double bestGofTemp = bestGofStartValue;
+                    int tries;
+                    BMSolution tempSolution;
+                    for (int i = 0; i < nbrRandomStart; i++)
                     {
-                        partString = partition.setRandomPartition(minClusterSize, random);
-                        if (!checkedPartString.Contains(partString))
+                        Partition tempPartition = new Partition(partition);
+                        tries = 0;
+                        while (true)
                         {
-                            checkedPartString.Add(partString);
-                            if (partition.CheckMinimumClusterSize(minClusterSize))
+                            partString = tempPartition.setRandomPartition(minClusterSize, random);
+                            if (!checkedPartString.Contains(partString))
+                            {
+                                tempSolution = gofMethod!(matrix, blockimage, tempPartition);
+                                if ((maximizeGof && tempSolution.gofValue > bestGofTemp) || (!maximizeGof && tempSolution.gofValue < bestGofTemp))
+                                {
+                                    partition = tempPartition;
+                                    bestGofTemp = tempSolution.gofValue;
+                                }
                                 break;
-                        }
-                        tries++;
-                        if (tries>1000)
-                        {
-                            abortCouldNotFindPartition = true;
-                            break;
+                            }
+                            tries++;
+                            if (tries > 1000)
+                            {
+                                abortCouldNotFindPartition = true;
+                                break;
+                            }
                         }
                     }
+                    checkedPartString.Add(partition.GetPartString());
+
+
                     BMSolution solution = gofMethod!(matrix, blockimage, partition);
                     //log("Starting partition:" + partString + ", gof:" + solution.gofValue);
                     bestGofThisRun = solution.gofValue;
@@ -276,8 +324,10 @@ namespace Socnet
                     checkNeighborsOfThese.Clear();
                     checkNeighborsOfThese.Add(solution);
                     bool abortThisRun = false;
+                    int itercheck = 0;
                     for (int iter = 0; iter < maxNbrIterations && !abortThisRun && !abortCouldNotFindPartition; iter++)
                     {
+                        itercheck = iter;
                         if (timeoutActive && stopwatch.ElapsedMilliseconds > maxElapsedMilliseconds)
                         {
                             stopwatch.Stop();
@@ -410,6 +460,7 @@ namespace Socnet
                         }
 
                     }
+                    log("Nbr iterations done in this run: " + itercheck);
                     //log("All iterations done for this run");
                     if ((maximizeGof && bestGofThisRun>bestGofAllRuns) || (!maximizeGof && bestGofThisRun<bestGofAllRuns))
                     {

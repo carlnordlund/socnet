@@ -481,6 +481,7 @@ namespace Socnet
             searchParams["nbrrestarts"] = getIntegerArgument("nbrrestarts");
             searchParams["maxiterations"] = getIntegerArgument("maxiterations");
             searchParams["maxtime"] = getIntegerArgument("maxtime");
+            searchParams["nbrrandomstart"] = getIntegerArgument("nbrrandomstart");
 
             string statusInitMsg = Blockmodeling.InitializeSearch(searchParams);
             if (statusInitMsg.Equals("ok"))
