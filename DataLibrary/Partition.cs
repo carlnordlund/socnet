@@ -43,13 +43,11 @@ namespace Socnet.DataLibrary
             }
         }
 
-        internal void createClusters(int nbrClusters)
+        public void createClusters(int nbrClusters)
         {
             clusters = new Cluster[nbrClusters];
-            //clusters.Clear();
             for (int i = 0; i < nbrClusters; i++)
                 clusters[i] = new Cluster("P" + i);
-            //clusters.Add(new Cluster("P" + i));
             this.nbrClusters = nbrClusters;
         }
 

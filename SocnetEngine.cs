@@ -29,8 +29,10 @@ namespace Socnet
             {"delete", new string[] {"name" } },
             {"rename", new string[] {"name", "newname" } },
             {"blockimage", new string[] {"size"} },
+            {"partition", new string[] {"actorset","nbrclusters"} },
             {"initdirectbm", new string[] {"network", "blockimage", "searchtype", "method" } },
             {"bivarieties", new string[] {"blockimage"} },
+            {"bmtest", new string[] {"network","blockimage","partition","method"} },
             {"viewbm", new string[] {"blockmodel"} },
             {"save", new string[] {"name","file"} },
             {"bmextract", new string[] {"blockmodel", "type"} },
@@ -366,6 +368,61 @@ namespace Socnet
             return bi;
         }
 
+        public Partition? f_partition()
+        {
+            string actorsetName = getStringArgument("actorset");
+            if (actorsetName.Length == 0)
+            {
+                response.Add("!Error: No 'actorset' specified");
+                return null;
+            }
+            DataStructure? structure = dataset.GetStructureByName(actorsetName, typeof(Actorset));
+            if (structure == null || !(structure is Actorset))
+            {
+                response.Add("!Error: Actorset '" + actorsetName + "' not found");
+                return null;
+            }
+            Actorset actorset = (Actorset)structure;
+            int nbrClusters = getIntegerArgument("nbrclusters");
+            if (nbrClusters < 1)
+            {
+                response.Add("!Error: Number of clusters must be at least 1");
+                return null;
+            }
+            Partition partition = new Partition(actorset, "");
+            partition.createClusters(nbrClusters);
+
+            string partstring = getStringArgument("partarray");
+            if (partstring.Length>0)
+            {
+                // Ok - also provided a partarray thingie, so initialize the partition
+                string[] cells = partstring.Split(";");
+                if (cells.Length!=actorset.Count)
+                {
+                    response.Add("!Error: Length of provided partarray (" + cells.Length + ") not same length as Actorset (" + actorset.Count + ")");
+                    return null;
+                }
+                int[] partarray = new int[cells.Length];
+                foreach (Actor actor in actorset.actors)
+                {
+                    if (!Int32.TryParse(cells[actor.index], out partarray[actor.index]))
+                    {
+                        response.Add("!Error: Couldn't convert '" + cells[actor.index] + "' to an integer");
+                        return null;
+                    }
+                    if (partarray[actor.index]<0 || partarray[actor.index] >= partition.clusters.Length)
+                    {
+                        response.Add("!Error: Partition index '"+cells[actor.index] + "' out of bounds");
+                        return null;
+                    }
+                }
+
+                partition.setPartitionByPartArray(partarray);
+            }
+
+
+            return partition;
+        }
         public void f_coreperi()
         {
             response.Add("Init and running corr-based core-peri");
@@ -437,6 +494,44 @@ namespace Socnet
             Blockmodeling.logLines.Clear();
 
 
+        }
+
+        public BlockModel? f_bmtest()
+        {
+            DataStructure? network = dataset.GetStructureByName(getStringArgument("network"), typeof(Matrix));
+            if (network == null)
+            {
+                response.Add("!Error: Network '" + getStringArgument("network") + "' not found (parameter: network)");
+                return null;
+            }
+            DataStructure? blockimage = dataset.GetStructureByName(getStringArgument("blockimage"), typeof(BlockImage));
+            if (blockimage == null)
+            {
+                response.Add("!Error: Blockimage '" + getStringArgument("blockimage") + "'not found (parameter: blockimage)");
+                return null;
+            }
+            DataStructure? partition = dataset.GetStructureByName(getStringArgument("partition"), typeof(Partition));
+            if (partition == null)
+            {
+                response.Add("!Error: Partition '" + getStringArgument("partition") + "' not found (parameter: blockimage)");
+                return null;
+            }
+
+            string gofMethod = getStringArgument("method");
+            if (gofMethod == "" || !Blockmodeling.gofMethods.Contains(gofMethod))
+            {
+                response.Add("!Error: Method '" + gofMethod + "' not recognized/set (parameter: method)");
+                return null;
+            }
+
+            if (gofMethod.Equals("nordlund") && ((BlockImage)blockimage).multiBlocked)
+            {
+                response.Add("!Error: Can't do 'bmtest()' with method 'nordlund' and multiblocked 'blockimage'");
+                return null;
+            }
+
+            BlockModel? blockmodel = Blockmodeling.GetHypotheticalBlockmodel((Matrix)network, (BlockImage)blockimage, (Partition)partition, gofMethod);
+            return blockmodel;
         }
 
         public void f_initdirectbm()
@@ -571,6 +666,7 @@ namespace Socnet
             }
             else
             {
+                // Need to add extract Partition here as well
                 response.Add("!Error: 'type' must be either 'matrix' or 'blockimage'");
 
             }

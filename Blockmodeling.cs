@@ -503,6 +503,7 @@ namespace Socnet
             stopwatch.Stop();
         }
 
+
         public static BMSolution binaryHamming(Matrix matrix, BlockImage blockimage, Partition partition)
         {
             int nbrPos = blockimage.nbrPositions;
@@ -562,6 +563,21 @@ namespace Socnet
             log("Search time (ms):" + stopwatch.Elapsed);
 
             return "ok";
+        }
+
+        internal static BlockModel? GetHypotheticalBlockmodel(Matrix network, BlockImage blockimage, Partition partition, string gofMethod)
+        {
+            BMSolution solution;
+            if (gofMethod.Equals("nordlund"))
+                solution = nordlund2020(network, blockimage, partition);
+            else if (gofMethod.Equals("hamming"))
+                solution = binaryHamming(network, blockimage, partition);
+            else
+                return null;
+            // Ok - got solution, now convert to Blockmodel
+            string bmName = "bm_" + solution.matrix.Name + "_" + solution.blockimage.Name + "_" + partition.Name;
+            BlockModel bm = new BlockModel(bmName, network, blockimage, partition, solution.blockindices, solution.gofValue, solution.criteriaFunction);
+            return bm;
         }
 
         internal static List<BlockModel> generateBlockmodelStructuresFromBMSolutions()
