@@ -12,6 +12,8 @@ namespace Socnet
 {
     public class SocnetEngine
     {
+
+        public string versionString = "Version 1.0 (August 2023)";
         Dataset dataset;
         char[] trimChars = new Char[] { ' ', '"', '\'' };
 
@@ -192,6 +194,23 @@ namespace Socnet
         }
 
         // METHODS for FUNCTIONS
+        public void f_help()
+        {
+            response.Add("HELP SECTION");
+            response.Add("============");
+            response.Add(versionString);
+            response.Add("See website for documentation:");
+            response.Add("https://socnet.se");
+            response.Add(" ");
+            response.Add("The socnet client is used to do blockmodeling analyses, with some extra functionality for data management.");
+            response.Add("You type in commands on the prompt to do various things with data: load, save, transform,  analyze etc.");
+            response.Add("It is also possible to execute an external text/script file containing a list of commands: then start the");
+            response.Add("socnet client with the -f <filepath> extension.");
+            response.Add("Check socnet.se for command references, how-to, and quick-start tutorial!");
+        }
+
+
+
         public void f_getwd()
         {
             response.Add(Directory.GetCurrentDirectory());

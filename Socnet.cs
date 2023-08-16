@@ -1,17 +1,20 @@
 ﻿// See https://aka.ms/new-console-template for more information
 Console.WriteLine("socnet.exe " + String.Join(" ", args));
 
+// Create SocnetEngine instance and responseLines
+Socnet.SocnetEngine engine = new Socnet.SocnetEngine();
+
+
 // Welcome message
 Console.WriteLine("Socnet - Network analysis in C#");
 Console.WriteLine("===============================");
-Console.WriteLine("Version 1.0 (April 2023)");
+Console.WriteLine(engine.versionString);
 Console.WriteLine("Developed by Carl Nordlund - carl.nordlund@liu.se");
 Console.WriteLine("Part of the Nordint.net project: https://nordint.net");
 Console.WriteLine();
 
 
-// Create SocnetEngine instance and responseLines
-Socnet.SocnetEngine engine = new Socnet.SocnetEngine();
+
 
 
 // Parse arguments and prepare
