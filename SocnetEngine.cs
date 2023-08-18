@@ -24,25 +24,27 @@ namespace Socnet
         Dictionary<string, string[]> args_required = new Dictionary<string, string[]>()
         {
             {"load", new string[] {"file","type" } },
+            {"save", new string[] {"name","file"} },
             {"loadscript", new string[] {"file" } },
             {"loadmatrix", new string[] {"file" } },
+            {"loadtable", new string[] {"file" } },
+            {"loadblockimage", new string[] {"file" } },
+            {"loadpartition", new string[] {"file" } },
+            {"loadedgelist", new string[] {"file", "col1","col2" } },
             {"setwd", new string[] {"dir" } },
             {"view", new string[] {"name" } },
             {"delete", new string[] {"name" } },
             {"rename", new string[] {"name", "newname" } },
             {"blockimage", new string[] {"size"} },
             {"partition", new string[] {"actorset","nbrclusters"} },
-            {"initdirectbm", new string[] {"network", "blockimage", "searchtype", "method" } },
+            {"bminit", new string[] {"network", "blockimage", "searchtype", "method" } },
             {"bivarieties", new string[] {"blockimage"} },
             {"bmtest", new string[] {"network","blockimage","partition","method"} },
-            {"viewbm", new string[] {"blockmodel"} },
-            {"save", new string[] {"name","file"} },
+            {"bmview", new string[] {"blockmodel"} },
             {"bmextract", new string[] {"blockmodel", "type"} },
             {"coreperi", new string[] {"network", "searchtype" } },
             {"dichotomize", new string[] {"name", "condition", "threshold" } },
-            {"symmetrize", new string[] {"name", "method" } },
-            {"loadedgelist", new string[] {"file", "col1","col2" } }
-
+            {"symmetrize", new string[] {"name", "method" } }
         };
 
 
@@ -242,6 +244,12 @@ namespace Socnet
                 response.Add(" " + Path.GetFileName(file));
             }
         }
+
+        public void f_load()
+        {
+            response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), getStringArgument("type"), getStringArgument("name")));
+        }
+
         public void f_loadmatrix()
         {
             response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "matrix", getStringArgument("name")));
@@ -252,9 +260,14 @@ namespace Socnet
             response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "table", getStringArgument("name")));
         }
 
-        public void f_load()
+        public void f_loadblockimage()
         {
-            response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), getStringArgument("type"), getStringArgument("name")));
+            response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "blockimage", getStringArgument("name")));
+        }
+
+        public void f_loadpartition()
+        {
+            response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "partition", getStringArgument("name")));
         }
 
         public void f_save()
@@ -341,7 +354,7 @@ namespace Socnet
             string type = getStringArgument("type");
             if (type == "")
                 foreach (KeyValuePair<string, DataStructure> obj in dataset.structures)
-                    response.Add(obj.Key+"\t"+ obj.Value.DataType + "\t" + obj.Value.Name + "\t" + obj.Value.Size);
+                    response.Add(obj.Value.DataType + "\t" + obj.Value.Name + "\t" + obj.Value.Size);
             else
                 foreach (KeyValuePair<string, DataStructure> obj in dataset.structures)
                     if (obj.Value.GetType().Name.Equals(type,StringComparison.CurrentCultureIgnoreCase))
@@ -553,7 +566,7 @@ namespace Socnet
             return blockmodel;
         }
 
-        public void f_initdirectbm()
+        public void f_bminit()
         {
             response.Add("Doing direct blockmodeling");
             Dictionary<string, object?> searchParams = new Dictionary<string, object?>();
@@ -622,7 +635,7 @@ namespace Socnet
             }
         }
 
-        public void f_viewbm()
+        public void f_bmview()
         {
             BlockModel bm;
             string name = getStringArgument("blockmodel");
@@ -683,17 +696,15 @@ namespace Socnet
                 response.Add(dataset.StoreStructure(bmMatrix));
                 //return ((BlockModel)blockmodel).GetBlockModelMatrix();
             }
-            else
+            else if (type.Equals("partition"))
             {
-                // Need to add extract Partition here as well
-                response.Add("!Error: 'type' must be either 'matrix' or 'blockimage'");
-
+                response.Add(dataset.StoreStructure(((BlockModel)blockmodel).partition));
             }
         }
 
 
 
-        public void f_getbmlog()
+        public void f_bmlog()
         {
             response.AddRange(Blockmodeling.logLines);
         }

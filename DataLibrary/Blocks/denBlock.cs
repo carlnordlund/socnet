@@ -69,7 +69,7 @@ namespace Socnet.DataLibrary.Blocks
 
         public override string ToString()
         {
-            return Name + "_" + d;
+            return Name + "(" + d + ")";
         }
 
     }

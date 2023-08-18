@@ -80,20 +80,24 @@ namespace Socnet.DataLibrary
         internal override void GetContent(List<string> content)
         {
             string line = "";
-            if (blocks !=null)
+            if (blocks != null)
+            {
+                for (int c = 0; c < nbrPositions; c++)
+                    line += "\t" + positionNames[c];
+                content.Add(line);
                 for (int r = 0; r < nbrPositions; r++)
                 {
-                    line = "";
+                    line = positionNames[r];
                     for (int c = 0; c < nbrPositions; c++)
                     {
-                        line += "[";
+                        line += "\t[";
                         if (blocks[r, c] != null)
                             line += string.Join(";", blocks[r, c]);
-                        line += "],";
+                        line += "]";
                     }
-                    line = line.TrimEnd(',');
                     content.Add(line);
                 }
+            }
             content.Add("Multiblocked: " + multiBlocked);
         }
 

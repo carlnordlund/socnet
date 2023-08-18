@@ -60,7 +60,7 @@ namespace Socnet.DataLibrary
             {
                 content.Add("Cluster " + i + ": " + clusters[i].Name);
                 foreach (Actor actor in clusters[i].actors)
-                    content.Add(actor.Name);
+                    content.Add(actor.Name + "\t(" + actor.index + ")");
             }
         }
 

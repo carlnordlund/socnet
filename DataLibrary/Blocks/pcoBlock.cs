@@ -38,9 +38,9 @@ namespace Socnet.DataLibrary.Blocks
             List<Triple> triplets = new List<Triple>();
             // nr, nc : Nbr of rows/columns
             double nr = rowCluster.actors.Count, nc = colCluster.actors.Count;
-            
+
             // kr, kc : Nbr of cells to check in each row/column
-            double kr = (nc - ((rowCluster == colCluster ? 1 : 0))) * p, kc = (nr - ((rowCluster == colCluster ? 1 : 0))) * p;
+            double kr = Math.Ceiling((nc - ((rowCluster == colCluster ? 1 : 0))) * p), kc = Math.Ceiling((nr - ((rowCluster == colCluster ? 1 : 0))) * p);
 
             // nt : Total number of triplets that will be checked
             double nt = (int)kr * nr + (int)kc * nc;
@@ -93,7 +93,7 @@ namespace Socnet.DataLibrary.Blocks
 
         public override string ToString()
         {
-            return Name + "_" + p;
+            return Name + "(" + p + ")";
         }
 
 

@@ -20,9 +20,12 @@ namespace Socnet
                 return SaveMatrix((Matrix)structure, filepath, sep);
             if (structure is BlockImage)
                 return SaveBlockImage((BlockImage)structure, filepath, sep);
+            if (structure is Partition)
+                return SavePartition((Partition)structure, filepath, sep);
 
-            return "ok";
+            return "error - structure type not implemented";
         }
+
 
         private static string SaveBlockImage(BlockImage blockimage, string filepath, string sep)
         {
@@ -45,6 +48,32 @@ namespace Socnet
             }
             WriteFileCells(filecells, filepath, sep);
             return "Blockimage '" + blockimage.Name + "' saved: " + filepath;
+        }
+
+        private static string SavePartition(Partition partition, string filepath, string sep)
+        {
+            if (partition == null)
+                return "!Error: Partition is null";
+            int size = partition.actorset.Count;
+            string[,] filecells = new string[size + 1, 2];
+            filecells[0, 0] = "actor";
+            filecells[0, 1] = "partindex";
+            for (int c = 0; c < partition.clusters.Length; c++)
+            {
+                foreach (Actor actor in partition.clusters[c].actors)
+                {
+                    filecells[actor.index + 1, 0] = actor.Name;
+                    filecells[actor.index + 1, 1] = c.ToString();
+                }
+            }
+            WriteFileCells(filecells, filepath, sep);
+
+            //foreach (Actor actor in partition.actorset.actors)
+            //{
+            //    filecells[actor.index + 1, 0] = actor.Name;
+            //}
+
+            return "Partition '" + partition.Name + "' saved: " + filepath;
         }
 
         private static string SaveMatrix(Matrix matrix, string filepath, string sep)
@@ -216,6 +245,33 @@ namespace Socnet
                 table.installData(aod.rowLabels, aod.colLabels, aod.data);
                 response.Add(dataset.StoreStructure(table));
             }
+            else if (type.Equals("partition"))
+            {
+                ActorsAndData aod = parseActorsAndData(lines);
+                if (aod.error)
+                    return aod.errorMsg;
+                Actorset? actorset = dataset.GetActorsetByLabels(aod.rowLabels);
+                if (actorset == null)
+                {
+                    actorset = dataset.CreateActorsetByLabels(aod.rowLabels);
+                    if (actorset == null)
+                        return "!Error: Couldn't create Actorset from first row labels";
+                    response.Add(dataset.StoreStructure(actorset));
+                }
+                Partition partition = new Partition(actorset, dsname);
+                int[] partArray = new int[actorset.Count];
+                int maxIndex = -1;
+                for (int r=0;r<actorset.Count;r++)
+                {
+                    partArray[r] = (int)aod.data[r, 0];
+                    if (partArray[r] < 0)
+                        return "!Error: Cluster index can't be negative";
+                    maxIndex = (partArray[r] > maxIndex) ? partArray[r] : maxIndex;
+                }
+                partition.createClusters(maxIndex + 1);
+                partition.setPartitionByPartArray(partArray);
+                response.Add(dataset.StoreStructure(partition));
+            }
             else if (type.Equals("blockimage"))
             {
                 string[] positionNames = lines[0].TrimStart('\t').Split('\t');
@@ -247,7 +303,7 @@ namespace Socnet
             try
             {
                 string[] colLabels = lines[0].TrimStart(separator).Split(separator);
-                int nbrCols = colLabels.Length;
+                int nbrCols = colLabels.Length - (lines[0][0] != separator ? 1 : 0);
                 int nbrRows = lines.Length - 1;
                 string[] rowLabels = new string[nbrRows];
                 double[,] data = new double[nbrRows, nbrCols];

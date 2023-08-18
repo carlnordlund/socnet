@@ -540,7 +540,16 @@ namespace Socnet
             for (int r = 0; r < nbrPos; r++)
                 for (int c = 0; c < nbrPos; c++)
                     triples.AddRange(blockimage.GetBlock(r, c).getTripletList(matrix, partition.clusters[r], partition.clusters[c]));
-            return new BMSolution(matrix, blockimage, new int[nbrPos,nbrPos], partition.GetPartArrayCopy(), Functions.correlateTriplets(triples), "nordlund");
+            try
+            {
+                return new BMSolution(matrix, blockimage, new int[nbrPos, nbrPos], partition.GetPartArrayCopy(), Functions.correlateTriplets(triples), "nordlund");
+            }
+            catch (Exception e)
+            {
+                Console.Write("Exception: " + e.Message);
+            }
+            return new BMSolution();
+            //return new BMSolution(matrix, blockimage, new int[nbrPos,nbrPos], partition.GetPartArrayCopy(), Functions.correlateTriplets(triples), "nordlund");
         }
 
 

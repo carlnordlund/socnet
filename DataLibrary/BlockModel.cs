@@ -110,6 +110,12 @@ namespace Socnet.DataLibrary
 
         }
 
+        internal Partition ExtractPartition()
+        {
+            return partition;
+        }
+
+
         internal Actorset GetBlockModelActorset()
         {
             Actorset actorset = new Actorset("actorset_" + this.Name);
@@ -149,5 +155,6 @@ namespace Socnet.DataLibrary
                     bmMatrix.Set(actorIndexMap[rowActor], actorIndexMap[colActor], matrix.Get(rowActor, colActor));
             return bmMatrix;
         }
+
     }
 }
