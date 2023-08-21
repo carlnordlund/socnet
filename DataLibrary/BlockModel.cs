@@ -135,7 +135,7 @@ namespace Socnet.DataLibrary
 
         internal Matrix GetBlockModelMatrix()
         {
-            Actorset bmActorset = new Actorset(this.Name + "_actorset");
+            Actorset bmActorset = new Actorset(this.Name + "_actors");
             int nbrPositions = partition.clusters.Length;
             Dictionary<Actor, Actor> actorIndexMap = new Dictionary<Actor, Actor>();
             int index = 0;

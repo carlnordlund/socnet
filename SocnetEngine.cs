@@ -425,11 +425,11 @@ namespace Socnet
             partition.createClusters(nbrClusters);
 
             string partstring = getStringArgument("partarray");
-            if (partstring.Length>0)
+            if (partstring.Length > 0)
             {
                 // Ok - also provided a partarray thingie, so initialize the partition
                 string[] cells = partstring.Split(";");
-                if (cells.Length!=actorset.Count)
+                if (cells.Length != actorset.Count)
                 {
                     response.Add("!Error: Length of provided partarray (" + cells.Length + ") not same length as Actorset (" + actorset.Count + ")");
                     return null;
@@ -442,15 +442,17 @@ namespace Socnet
                         response.Add("!Error: Couldn't convert '" + cells[actor.index] + "' to an integer");
                         return null;
                     }
-                    if (partarray[actor.index]<0 || partarray[actor.index] >= partition.clusters.Length)
+                    if (partarray[actor.index] < 0 || partarray[actor.index] >= partition.clusters.Length)
                     {
-                        response.Add("!Error: Partition index '"+cells[actor.index] + "' out of bounds");
+                        response.Add("!Error: Partition index '" + cells[actor.index] + "' out of bounds");
                         return null;
                     }
                 }
 
                 partition.setPartitionByPartArray(partarray);
             }
+            else
+                partition.setZeroPartition();
 
 
             return partition;
@@ -520,7 +522,7 @@ namespace Socnet
 
             string statusInitMsg = Blockmodeling.InitializeSearch(searchParams);
             if (statusInitMsg.Equals("ok"))
-                f_startsearch();
+                f_bmstart();
             else if (statusInitMsg[0] == '!')
                 response.Add(statusInitMsg);
             Blockmodeling.logLines.Clear();
@@ -568,7 +570,6 @@ namespace Socnet
 
         public void f_bminit()
         {
-            response.Add("Doing direct blockmodeling");
             Dictionary<string, object?> searchParams = new Dictionary<string, object?>();
 
             DataStructure? network = dataset.GetStructureByName(getStringArgument("network"), typeof(Matrix));
@@ -619,7 +620,7 @@ namespace Socnet
             Blockmodeling.logLines.Clear();
         }
 
-        public void f_startsearch()
+        public void f_bmstart()
         {
             string status = Blockmodeling.StartSearch();
             if (status.Equals("ok"))
@@ -632,6 +633,10 @@ namespace Socnet
             else if (status.Equals("timeout"))
             {
                 response.AddRange(Blockmodeling.logLines);
+            }
+            else
+            {
+                response.Add("!Error: Indirect blockmodeling not properly initialized!");
             }
         }
 

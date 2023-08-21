@@ -178,8 +178,10 @@ namespace Socnet.DataLibrary
         {
             List<DataStructure> dependents = new List<DataStructure>();
             foreach (KeyValuePair<string,DataStructure> obj in structures)
-            //foreach (DataStructure structure in structures)
-                if (obj.Value is Matrix && ((Matrix)obj.Value).actorset == actorset)
+                if (    (obj.Value is Matrix && ((Matrix)obj.Value).actorset == actorset) || 
+                        (obj.Value is Table && (((Table)obj.Value).colActorset==actorset || ((Table)obj.Value).rowActorset == actorset) ) ||
+                        (obj.Value is Partition && ((Partition)obj.Value).actorset == actorset)
+                   )
                     dependents.Add(obj.Value);
             return dependents;
         }

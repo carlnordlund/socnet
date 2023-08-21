@@ -156,6 +156,7 @@ namespace Socnet
 
             // All ok above - direct search successfully initialized
             initializationOk = true;
+            log("Initialization seems to have gone ok!");
             // Clear optimalSolutionsGlobal & checkedPartStrings
             optimalSolutionsGlobal.Clear();
             checkedPartString.Clear();
@@ -237,7 +238,9 @@ namespace Socnet
             Partition partition = new Partition(matrix!.actorset, "localopt");
             string partString = "";
             int blockimagesDone = 0;
-            
+
+            blockimages = GenerateRandomOrderBy(blockimages);
+
             foreach (BlockImage blockimage in blockimages)
             {
                 //log("Blockimage:" + blockimage.Name);
@@ -412,47 +415,47 @@ namespace Socnet
 
                             //log("Moving...");
                             bool foundBetterWhileMoving = false;
-                            for (int c1=0;c1<nbrPositions && !foundBetterWhileMoving;c1++)
-                            {
-                                for (int c2=0;c2<nbrPositions && !foundBetterWhileMoving; c2++)
-                                {
-                                    if (c1!=c2)
-                                    {
-                                        foreach (Actor actor in partition.clusters[c1].actors)
-                                        {
-                                            neighborPartition = new Partition(partition);
-                                            neighborPartition.moveActor(actor, c1, c2);
-                                            neighborPartString = neighborPartition.GetPartString();
-                                            if (!checkedPartString.Contains(neighborPartString))
-                                            {
-                                                checkedPartString.Add(neighborPartString);
-                                                if (neighborPartition.CheckMinimumClusterSize(minClusterSize))
-                                                {
-                                                    BMSolution neighTest = gofMethod(matrix, blockimage, neighborPartition);
-                                                    //log(neighborPartString + ": " + neighTest.gofValue);
-                                                    bool betterGof = ((maximizeGof && neighTest.gofValue > bestGofThisRun) || (!maximizeGof && neighTest.gofValue < bestGofThisRun));
-                                                    if (betterGof)
-                                                    {
-                                                        //log("Better gof - update bestGofThisRun, skip more moving");
-                                                        foundBetterWhileMoving = true;
-                                                        checkNextIteration.Clear();
-                                                        checkNextIteration.Add(neighTest);
-                                                        bestGofThisRun = neighTest.gofValue;
-                                                        bestSolutionsThisRun.Clear();
-                                                        bestSolutionsThisRun.Add(neighTest);
-                                                    }
-                                                    else if (neighTest.gofValue==bestGofThisRun)
-                                                    {
-                                                        //log("Equally good gof - store this");
-                                                        checkNextIteration.Add(neighTest);
-                                                        bestSolutionsThisRun.Add(neighTest);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            //for (int c1=0;c1<nbrPositions && !foundBetterWhileMoving;c1++)
+                            //{
+                            //    for (int c2=0;c2<nbrPositions && !foundBetterWhileMoving; c2++)
+                            //    {
+                            //        if (c1!=c2)
+                            //        {
+                            //            foreach (Actor actor in partition.clusters[c1].actors)
+                            //            {
+                            //                neighborPartition = new Partition(partition);
+                            //                neighborPartition.moveActor(actor, c1, c2);
+                            //                neighborPartString = neighborPartition.GetPartString();
+                            //                if (!checkedPartString.Contains(neighborPartString))
+                            //                {
+                            //                    checkedPartString.Add(neighborPartString);
+                            //                    if (neighborPartition.CheckMinimumClusterSize(minClusterSize))
+                            //                    {
+                            //                        BMSolution neighTest = gofMethod(matrix, blockimage, neighborPartition);
+                            //                        //log(neighborPartString + ": " + neighTest.gofValue);
+                            //                        bool betterGof = ((maximizeGof && neighTest.gofValue > bestGofThisRun) || (!maximizeGof && neighTest.gofValue < bestGofThisRun));
+                            //                        if (betterGof)
+                            //                        {
+                            //                            //log("Better gof - update bestGofThisRun, skip more moving");
+                            //                            foundBetterWhileMoving = true;
+                            //                            checkNextIteration.Clear();
+                            //                            checkNextIteration.Add(neighTest);
+                            //                            bestGofThisRun = neighTest.gofValue;
+                            //                            bestSolutionsThisRun.Clear();
+                            //                            bestSolutionsThisRun.Add(neighTest);
+                            //                        }
+                            //                        else if (neighTest.gofValue==bestGofThisRun)
+                            //                        {
+                            //                            //log("Equally good gof - store this");
+                            //                            checkNextIteration.Add(neighTest);
+                            //                            bestSolutionsThisRun.Add(neighTest);
+                            //                        }
+                            //                    }
+                            //                }
+                            //            }
+                            //        }
+                            //    }
+                            //}
 
                         }
                         if (checkNextIteration.Count>0)
@@ -469,7 +472,7 @@ namespace Socnet
                         }
 
                     }
-                    log("Nbr iterations done in this run: " + itercheck);
+                    //log("Nbr iterations done in this run: " + itercheck);
                     //log("All iterations done for this run");
                     if ((maximizeGof && bestGofThisRun>bestGofAllRuns) || (!maximizeGof && bestGofThisRun<bestGofAllRuns))
                     {
@@ -503,6 +506,11 @@ namespace Socnet
             stopwatch.Stop();
         }
 
+        private static List<BlockImage> GenerateRandomOrderBy(List<BlockImage> blockimages)
+        {
+            var shuffledList = blockimages.OrderBy(_ => random.Next()).ToList();
+            return shuffledList;
+        }
 
         public static BMSolution binaryHamming(Matrix matrix, BlockImage blockimage, Partition partition)
         {
