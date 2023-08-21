@@ -36,6 +36,8 @@ namespace Socnet
         public static int maxNbrIterations = 25;
         public static int nbrRandomStart = 5;
 
+        public static Boolean doSwitching = true;
+
         public static bool initializationOk = false;
 
         static Random random = new Random();
@@ -93,9 +95,11 @@ namespace Socnet
                     nbrRestarts = (searchParams.ContainsKey("nbrrestarts") && searchParams["nbrrestarts"] is int && (int)searchParams["nbrrestarts"]! > 0) ? (int)searchParams["nbrrestarts"]! : 10;
                     maxNbrIterations = (searchParams.ContainsKey("maxiterations") && searchParams["maxiterations"] is int && (int)searchParams["maxiterations"]! > 0) ? (int)searchParams["maxiterations"]! : 25;
                     nbrRandomStart = (searchParams.ContainsKey("nbrrandomstart") && searchParams["nbrrandomstart"] is int && (int)searchParams["nbrrandomstart"]! > 0) ? (int)searchParams["nbrrandomstart"]!:5;
+                    doSwitching = (searchParams.ContainsKey("doswitching") && searchParams["doswitching"]!=null && searchParams["doswitching"] is string && ((string)searchParams["doswitching"]!).Length > 0 && ((string)searchParams["doswitching"]!).ToLower()[0] == 'y');
                     log("nbrrestarts: " + nbrRestarts);
                     log("maxiterations: " + maxNbrIterations);
                     log("nbrrandomstart: " + nbrRandomStart);
+                    log("doswitching: " + ((doSwitching) ? "yes" : "no"));
                 }
                 else if (searchTypeName.Equals("exhaustive"))
                     searchHeuristic = doExhaustiveSearch;
@@ -368,42 +372,45 @@ namespace Socnet
                             string neighborPartString;
                             Partition neighborPartition;
                             //log("Switching...");
-                            for (int c1=0; c1<nbrPositions && !foundBetterWhileSwitching; c1++)
+                            if (doSwitching)
                             {
-                                for (int c2=0;c2<nbrPositions && !foundBetterWhileSwitching; c2++)
+                                for (int c1 = 0; c1 < nbrPositions && !foundBetterWhileSwitching; c1++)
                                 {
-                                    if (c1!=c2)
+                                    for (int c2 = 0; c2 < nbrPositions && !foundBetterWhileSwitching; c2++)
                                     {
-                                        foreach (Actor a1 in partition.clusters[c1].actors)
+                                        if (c1 != c2)
                                         {
-                                            foreach (Actor a2 in partition.clusters[c2].actors)
+                                            foreach (Actor a1 in partition.clusters[c1].actors)
                                             {
-                                                if (a1.index>a2.index)
+                                                foreach (Actor a2 in partition.clusters[c2].actors)
                                                 {
-                                                    neighborPartition = new Partition(partition);
-                                                    neighborPartition.switchActors(a1, c1, a2, c2);
-                                                    neighborPartString = neighborPartition.GetPartString();
-                                                    if (!checkedPartString.Contains(neighborPartString))
+                                                    if (a1.index > a2.index)
                                                     {
-                                                        checkedPartString.Add(neighborPartString);
-                                                        BMSolution neighTest = gofMethod(matrix, blockimage, neighborPartition);
-                                                        //log(neighborPartString + ": " + neighTest.gofValue);
-                                                        bool betterGof = ((maximizeGof && neighTest.gofValue > bestGofThisRun) || (!maximizeGof && neighTest.gofValue < bestGofThisRun));
-                                                        if (betterGof)
+                                                        neighborPartition = new Partition(partition);
+                                                        neighborPartition.switchActors(a1, c1, a2, c2);
+                                                        neighborPartString = neighborPartition.GetPartString();
+                                                        if (!checkedPartString.Contains(neighborPartString))
                                                         {
-                                                            //log("Better gof - update bestGofThisRun, store this, skip more switching");
-                                                            foundBetterWhileSwitching = true;
-                                                            checkNextIteration.Clear();
-                                                            checkNextIteration.Add(neighTest);
-                                                            bestGofThisRun = neighTest.gofValue;
-                                                            bestSolutionsThisRun.Clear();
-                                                            bestSolutionsThisRun.Add(neighTest);
-                                                        }
-                                                        else if (neighTest.gofValue==bestGofThisRun)
-                                                        {
-                                                            //log("Equally good gof - store this as well");
-                                                            checkNextIteration.Add(neighTest);
-                                                            bestSolutionsThisRun.Add(neighTest);
+                                                            checkedPartString.Add(neighborPartString);
+                                                            BMSolution neighTest = gofMethod(matrix, blockimage, neighborPartition);
+                                                            //log(neighborPartString + ": " + neighTest.gofValue);
+                                                            bool betterGof = ((maximizeGof && neighTest.gofValue > bestGofThisRun) || (!maximizeGof && neighTest.gofValue < bestGofThisRun));
+                                                            if (betterGof)
+                                                            {
+                                                                //log("Better gof - update bestGofThisRun, store this, skip more switching");
+                                                                foundBetterWhileSwitching = true;
+                                                                checkNextIteration.Clear();
+                                                                checkNextIteration.Add(neighTest);
+                                                                bestGofThisRun = neighTest.gofValue;
+                                                                bestSolutionsThisRun.Clear();
+                                                                bestSolutionsThisRun.Add(neighTest);
+                                                            }
+                                                            else if (neighTest.gofValue == bestGofThisRun)
+                                                            {
+                                                                //log("Equally good gof - store this as well");
+                                                                checkNextIteration.Add(neighTest);
+                                                                bestSolutionsThisRun.Add(neighTest);
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -415,47 +422,47 @@ namespace Socnet
 
                             //log("Moving...");
                             bool foundBetterWhileMoving = false;
-                            //for (int c1=0;c1<nbrPositions && !foundBetterWhileMoving;c1++)
-                            //{
-                            //    for (int c2=0;c2<nbrPositions && !foundBetterWhileMoving; c2++)
-                            //    {
-                            //        if (c1!=c2)
-                            //        {
-                            //            foreach (Actor actor in partition.clusters[c1].actors)
-                            //            {
-                            //                neighborPartition = new Partition(partition);
-                            //                neighborPartition.moveActor(actor, c1, c2);
-                            //                neighborPartString = neighborPartition.GetPartString();
-                            //                if (!checkedPartString.Contains(neighborPartString))
-                            //                {
-                            //                    checkedPartString.Add(neighborPartString);
-                            //                    if (neighborPartition.CheckMinimumClusterSize(minClusterSize))
-                            //                    {
-                            //                        BMSolution neighTest = gofMethod(matrix, blockimage, neighborPartition);
-                            //                        //log(neighborPartString + ": " + neighTest.gofValue);
-                            //                        bool betterGof = ((maximizeGof && neighTest.gofValue > bestGofThisRun) || (!maximizeGof && neighTest.gofValue < bestGofThisRun));
-                            //                        if (betterGof)
-                            //                        {
-                            //                            //log("Better gof - update bestGofThisRun, skip more moving");
-                            //                            foundBetterWhileMoving = true;
-                            //                            checkNextIteration.Clear();
-                            //                            checkNextIteration.Add(neighTest);
-                            //                            bestGofThisRun = neighTest.gofValue;
-                            //                            bestSolutionsThisRun.Clear();
-                            //                            bestSolutionsThisRun.Add(neighTest);
-                            //                        }
-                            //                        else if (neighTest.gofValue==bestGofThisRun)
-                            //                        {
-                            //                            //log("Equally good gof - store this");
-                            //                            checkNextIteration.Add(neighTest);
-                            //                            bestSolutionsThisRun.Add(neighTest);
-                            //                        }
-                            //                    }
-                            //                }
-                            //            }
-                            //        }
-                            //    }
-                            //}
+                            for (int c1 = 0; c1 < nbrPositions && !foundBetterWhileMoving; c1++)
+                            {
+                                for (int c2 = 0; c2 < nbrPositions && !foundBetterWhileMoving; c2++)
+                                {
+                                    if (c1 != c2)
+                                    {
+                                        foreach (Actor actor in partition.clusters[c1].actors)
+                                        {
+                                            neighborPartition = new Partition(partition);
+                                            neighborPartition.moveActor(actor, c1, c2);
+                                            neighborPartString = neighborPartition.GetPartString();
+                                            if (!checkedPartString.Contains(neighborPartString))
+                                            {
+                                                checkedPartString.Add(neighborPartString);
+                                                if (neighborPartition.CheckMinimumClusterSize(minClusterSize))
+                                                {
+                                                    BMSolution neighTest = gofMethod(matrix, blockimage, neighborPartition);
+                                                    //log(neighborPartString + ": " + neighTest.gofValue);
+                                                    bool betterGof = ((maximizeGof && neighTest.gofValue > bestGofThisRun) || (!maximizeGof && neighTest.gofValue < bestGofThisRun));
+                                                    if (betterGof)
+                                                    {
+                                                        //log("Better gof - update bestGofThisRun, skip more moving");
+                                                        foundBetterWhileMoving = true;
+                                                        checkNextIteration.Clear();
+                                                        checkNextIteration.Add(neighTest);
+                                                        bestGofThisRun = neighTest.gofValue;
+                                                        bestSolutionsThisRun.Clear();
+                                                        bestSolutionsThisRun.Add(neighTest);
+                                                    }
+                                                    else if (neighTest.gofValue == bestGofThisRun)
+                                                    {
+                                                        //log("Equally good gof - store this");
+                                                        checkNextIteration.Add(neighTest);
+                                                        bestSolutionsThisRun.Add(neighTest);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
 
                         }
                         if (checkNextIteration.Count>0)

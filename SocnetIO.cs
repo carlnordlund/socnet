@@ -156,13 +156,19 @@ namespace Socnet
                     storeActorset = true;
                 }
                 Matrix matrix = new Matrix(actorset, dsName, "F2");
-                Actor a1, a2;
+                Actor? a1, a2;
                 double val;
                 for (int i = startline; i < lines.Length; i++)
                 {
                     cells = lines[i].Split(sep);
-                    a1 = actorset.GetActorByLabel(cells[col1])!;
-                    a2 = actorset.GetActorByLabel(cells[col2])!;
+                    a1 = actorset.GetActorByLabel(cells[col1]);
+                    a2 = actorset.GetActorByLabel(cells[col2]);
+                    if (a1 == null || a2==null)
+                    {
+                        response.Add("!Error: Actor label not found (either '" + cells[col1] + "' or '" + cells[col2] + "')");
+                        continue;
+                    }
+                        
                     val = (colval > 0) ? double.Parse(cells[colval]) : 1;
                     matrix.Set(a1, a2, val);
                     if (symm)
