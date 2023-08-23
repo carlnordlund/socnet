@@ -20,13 +20,13 @@ namespace Socnet.DataLibrary.Blocks
         public pcoBlock(double p=0.5)
         {
             Name = "pco";
-            this.p = p;
+            this.p = Functions.minMaxRange(p, 0, 1);
             primeIndex = 11;
         }
 
         public override void initArgValue(double v)
         {
-            this.p = v;
+            this.p = Functions.minMaxRange(v, 0, 1);
         }
         public override _Block cloneBlock()
         {

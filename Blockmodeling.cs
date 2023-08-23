@@ -554,6 +554,19 @@ namespace Socnet
             for (int r = 0; r < nbrPos; r++)
                 for (int c = 0; c < nbrPos; c++)
                     triples.AddRange(blockimage.GetBlock(r, c).getTripletList(matrix, partition.clusters[r], partition.clusters[c]));
+
+            // Testing that the total weight of all triplets is equal to the total size of cells
+            // Good to do this test when implementing new correlation-based blocks, to make sure their relative
+            // importance is proportional as their sizes
+            // This checks for non-dnc blockimages, so for testing, make sure to not use dnc type of blocks
+            //int nbrCells = matrix.actorset.Count * (matrix.actorset.Count - 1);
+            //double totWeight = 0;
+            //foreach (Triple triple in triples)
+            //    totWeight += triple.w;
+            //if (nbrCells!=Math.Round(totWeight))
+            //    Console.Write("Error: nbrcells=" + nbrCells + " vs totweight=" + totWeight);
+            // End testing
+
             try
             {
                 return new BMSolution(matrix, blockimage, new int[nbrPos, nbrPos], partition.GetPartArrayCopy(), Functions.correlateTriplets(triples), "nordlund");

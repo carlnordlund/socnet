@@ -20,13 +20,13 @@ namespace Socnet.DataLibrary.Blocks
         public denminBlock(double d = 0.5)
         {
             Name = "denmin";
-            this.d = d;
+            this.d = Functions.minMaxRange(d, 0, 1);
             primeIndex = 10;
         }
 
         public override void initArgValue(double v)
         {
-            this.d = v;
+            this.d = Functions.minMaxRange(v, 0, 1);
         }
 
         public override _Block cloneBlock()

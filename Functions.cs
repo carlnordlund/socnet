@@ -263,7 +263,7 @@ namespace Socnet
 
         public static double correlateTriplets(List<Triple> triples)
         {
-            double mx = 0, my = 0, sx = 0, sy = 0, sxy = 0, w_sum = 0;
+            double mx = 0, my = 0, sx = 0, sy = 0, sxy = 0, w_sum = 0, denom = 0;
             foreach (Triple t in triples)
             {
                 mx += t.w * t.x;
@@ -282,9 +282,10 @@ namespace Socnet
             sx /= w_sum;
             sy /= w_sum;
             sxy /= w_sum;
-
-            return sxy / Math.Sqrt(sx * sy);
-
+            denom = Math.Sqrt(sx * sy);
+            if (denom == 0)
+                return -1;
+            return sxy / denom;
         }
 
         public static DataStructure? Dichotomize(DataStructure structure, string condition, double threshold, double truevalue, double falsevalue)
@@ -416,7 +417,13 @@ namespace Socnet
             return lt;
         }
 
-
-
+        internal static double minMaxRange(double v, int min, int max)
+        {
+            if (v > max)
+                return max;
+            else if (v < min)
+                return min;
+            return v;
+        }
     }
 }
