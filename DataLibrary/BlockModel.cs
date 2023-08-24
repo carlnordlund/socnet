@@ -70,13 +70,15 @@ namespace Socnet.DataLibrary
         {
             List<string> lines = new List<string>();
             int nbrClusters = partition.clusters.Length;
+            lines.Add("+" + new string('-', partition.actorset.Count + nbrClusters - 1) + "+");
             string line = "";
             for (int r = 0; r < nbrClusters; r++)
             {
 
                 foreach (Actor rowActor in partition.clusters[r].actors)
                 {
-                    line = r + "_" + rowActor.Name + "\t";
+                    //line = r + "_" + rowActor.Name + "\t";
+                    line = "|";
                     for (int c = 0; c < nbrClusters; c++)
                     {
                         foreach (Actor colActor in partition.clusters[c].actors)
@@ -90,11 +92,12 @@ namespace Socnet.DataLibrary
                         line += "|";
 
                     }
-                    line = line.TrimEnd('|');
+                    //line = line.TrimEnd('|');
+                    line += "\t"+ r + "_" + rowActor.Name;
                     lines.Add(line);
                 }
-                if (r < nbrClusters - 1)
-                    lines.Add("\t" + new string('-', partition.actorset.Count + nbrClusters - 1));
+                if (r < nbrClusters)
+                    lines.Add("+" + new string('-', partition.actorset.Count + nbrClusters - 1) + "+");
             }
             return lines;
         }
