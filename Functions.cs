@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -340,6 +341,60 @@ namespace Socnet
                 return (double.IsNaN(falsevalue)) ? value : falsevalue;
         }
 
+        public static DataStructure? Rescale(DataStructure structure, double min, double max, bool incldiag=false)
+        {
+            if (structure is Matrix)
+                return Rescale((Matrix)structure, min, max);
+            return null;
+        }
+
+        public static Matrix? Rescale(Matrix matrix, double newMin, double newMax, bool incldiag = false)
+        {
+            double oldMin = GetMinValue(matrix, incldiag), oldMax = GetMaxValue(matrix, incldiag);
+            Matrix rescaled = new Matrix(matrix.actorset, "rescaled" + newMin + "-" + newMax + "_" + matrix.Name, matrix.Cellformat);
+            foreach (Actor rowActor in matrix.actorset.actors)
+                foreach (Actor colActor in matrix.actorset.actors)
+                    if (rowActor != colActor || incldiag)
+                        rescaled.Set(rowActor, colActor, newMin + (matrix.Get(rowActor, colActor) - oldMin) * (newMax - newMin) / (oldMax - oldMin));
+            return rescaled;
+        }
+
+        public static double GetMinValue(DataStructure structure, bool incldiag=false)
+        {
+            if (structure is Matrix)
+                return GetMinValue((Matrix)structure, incldiag);
+            return 0;
+        }
+
+        public static double GetMinValue(Matrix matrix, bool incldiag=false)
+        {
+            double min = double.MaxValue;
+            foreach (Actor rowActor in matrix.actorset.actors)
+                foreach (Actor colActor in matrix.actorset.actors)
+                    if (rowActor != colActor || incldiag)
+                        if (matrix.Get(rowActor, colActor) < min)
+                            min = matrix.Get(rowActor, colActor);
+            return min;
+        }
+
+        public static double GetMaxValue(DataStructure structure, bool incldiag=false)
+        {
+            if (structure is Matrix)
+                return GetMaxValue((Matrix)structure, incldiag);
+            return 0;
+        }
+        
+        public static double GetMaxValue(Matrix matrix, bool incldiag=false)
+        {
+            double max = double.MinValue;
+            foreach (Actor rowActor in matrix.actorset.actors)
+                foreach (Actor colActor in matrix.actorset.actors)
+                    if (rowActor != colActor || incldiag)
+                        if (matrix.Get(rowActor, colActor) > max)
+                            max = matrix.Get(rowActor, colActor);
+            return max;
+        }
+
         public static Matrix? Symmetrize(Matrix matrix, string method)
         {
             Func<double, double, double> symm;
@@ -425,5 +480,6 @@ namespace Socnet
                 return min;
             return v;
         }
+
     }
 }

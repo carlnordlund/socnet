@@ -44,7 +44,8 @@ namespace Socnet
             {"bmextract", new string[] {"blockmodel", "type"} },
             {"coreperi", new string[] {"network", "searchtype" } },
             {"dichotomize", new string[] {"name", "condition", "threshold" } },
-            {"symmetrize", new string[] {"name", "method" } }
+            {"symmetrize", new string[] {"name", "method" } },
+            {"rescale", new string[] {"name" } }
         };
 
 
@@ -191,8 +192,9 @@ namespace Socnet
         private double getDoubleArgument(string key)
         {
             double retval = double.NaN;
-            double.TryParse(getStringArgument(key), out retval);
-            return retval;
+            if (double.TryParse(getStringArgument(key), out retval))
+                return retval;
+            return double.NaN;
         }
 
         // METHODS for FUNCTIONS
@@ -789,6 +791,32 @@ namespace Socnet
             double falsevalue = falsevalstr.Equals("") ? 0 : falsevalstr.Equals("keep") ? double.NaN : getDoubleArgument("falsevalue");
 
             return Functions.Dichotomize(structure, condition, threshold, truevalue, falsevalue);
+        }
+
+        public DataStructure? f_rescale()
+        {
+            DataStructure? structure = dataset.GetStructureByName(getStringArgument("name"));
+            if (structure == null)
+            {
+                response.Add("!Error: Structure not found");
+                return null;
+            }
+            if (!(structure is Matrix))
+            {
+                response.Add("!Error: Can only rescale Matrix objects at the moment");
+                return null;
+            }
+            double min = getDoubleArgument("min"), max = getDoubleArgument("max");
+            response.Add("Min value: " + min + ", max:" + max);
+            min = (double.IsNaN(min)) ? 0 : min;
+            max = (double.IsNaN(max)) ? 1 : max;
+            if (min>=max)
+            {
+                response.Add("!Error: 'max' (" + max + ") must be larger than 'min (" + min + ")");
+                return null;
+            }
+            bool incldiag = (getStringArgument("incldiag").Length > 0 && getStringArgument("incldiag").ToLower()[0] == 'y');
+            return Functions.Rescale(structure, min, max, incldiag);
         }
     }
 }
