@@ -226,7 +226,7 @@ namespace Socnet
             try
             {
                 Directory.SetCurrentDirectory(dir);
-                response.Add("Setting working directory: " + dir);
+                response.Add("Setting working directory: " + Directory.GetCurrentDirectory());
             }
             catch (Exception e)
             {
@@ -236,14 +236,21 @@ namespace Socnet
 
         public void f_dir()
         {
-            string[] dirs = Directory.GetDirectories(Directory.GetCurrentDirectory(),"*",SearchOption.TopDirectoryOnly);
-            string[] files = Directory.GetFiles(Directory.GetCurrentDirectory());
-            response.Add("'" + Directory.GetCurrentDirectory() + "':");
-            foreach (string dir in dirs)
-                response.Add(" /" + Path.GetFileName(dir) + "/");
-            foreach (string file in files)
+            try
             {
-                response.Add(" " + Path.GetFileName(file));
+                string[] dirs = Directory.GetDirectories(Directory.GetCurrentDirectory());
+                string[] files = Directory.GetFiles(Directory.GetCurrentDirectory());
+                response.Add("'" + Directory.GetCurrentDirectory() + "':");
+                foreach (string dir in dirs)
+                    response.Add(" /" + Path.GetFileName(dir) + "/");
+                foreach (string file in files)
+                {
+                    response.Add(" " + Path.GetFileName(file));
+                }
+            }
+            catch (Exception e)
+            {
+                response.Add("!Error: Could not list content of directory '" + Directory.GetCurrentDirectory() + "'. Make sure that it is not a symbolic link!");
             }
         }
 
