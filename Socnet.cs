@@ -20,6 +20,21 @@ Console.WriteLine();
 // Parse arguments and prepare
 string mode = "interactive", file = "", commands = "", args_error = "";
 bool verbose = true, echo = false;
+
+// Try setting initial working directory to current user: catch exception if not possible
+try
+{
+    var userDir = new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+    string userDirPath = userDir.FullName;
+    displayResponse(engine.executeCommand("setwd(dir=" + userDirPath + ")", true));
+
+}
+catch (Exception e)
+{
+    Console.WriteLine("Couldn't set current directory to user path: " + e.Message);
+}
+
+
 if (args != null && args.Length > 0)
 {
     int nbr_args = args.Length;
@@ -90,7 +105,7 @@ void startInteractiveMode()
 {
 //    List<string> responses;
     Console.WriteLine("Interactive mode (type 'quit' to quit, 'help' for help):");
-    Console.WriteLine("functions and parameter names: case-insensitive; data structure names: case-sensitive!");
+    //Console.WriteLine("functions and parameter names: case-insensitive; data structure names: case-sensitive!");
     //displayResponse(engine.executeCommand("load(type=matrix,file=data/galtung.txt)"));
     while (true)
     {
