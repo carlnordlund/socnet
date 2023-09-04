@@ -15,7 +15,7 @@ namespace Socnet
             { "nordlund", new List<string>() { "dnc","nul","com","reg","rre","cre","rfn","cfn", "denuci", "den", "denmin","pco" } }
         };
 
-        public static List<string> searchTypes = new List<string>() { "localopt", "exhaustive" };
+        public static List<string> searchTypes = new List<string>() { "localopt", "exhaustive", "localopt2" };
         public static List<string> gofMethods = new List<string>() { "hamming", "nordlund" };
 
         public static List<BMSolution> optimalSolutionsGlobal = new List<BMSolution>();
@@ -102,6 +102,13 @@ namespace Socnet
                 }
                 else if (searchTypeName.Equals("exhaustive"))
                     searchHeuristic = doExhaustiveSearch;
+                else if (searchTypeName.Equals("localopt2"))
+                {
+                    // Preparing the Ljubljana localopt search heuristic with stochastic properties
+                    log("Ok - prepping localopt2");
+                    searchHeuristic = doLocalOpt2Search;
+
+                }
                 else
                 {
                     return "!Error - Search heuristic '" + searchTypeName + "' not implemented";
@@ -230,6 +237,11 @@ namespace Socnet
             stopwatch.Stop();
             optimalSolutionsGlobal.AddRange(optimalSolutionsThisSearch);
             stopwatch.Stop();
+        }
+
+        public static void doLocalOpt2Search()
+        {
+            log("Ok - in doLocalOpt2Search()");
         }
 
         public static void doLocalOptSearch()

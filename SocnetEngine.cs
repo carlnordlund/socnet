@@ -481,7 +481,7 @@ namespace Socnet
             string searchType = getStringArgument("searchtype");
             if (searchType == "" || !Blockmodeling.searchTypes.Contains(searchType))
             {
-                response.Add("!Error: Search type not recognized/set (parameter: searchtype");
+                response.Add("!Error: Search type '" + searchType + "' not recognized (check 'searchtype' parameter)");
                 return;
             }
 
