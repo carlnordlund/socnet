@@ -88,7 +88,7 @@ namespace Socnet
                 log("Method: " + gofMethodName);
 
                 searchTypeName = "" + searchParams["searchtype"] as string;
-                if (searchTypeName.Equals("localopt"))
+                if (searchTypeName.Equals("localopt") || searchTypeName.Equals("ljubljana"))
                 {
                     searchHeuristic = doLocalOptSearch;
                     nbrRestarts = (searchParams.ContainsKey("nbrrestarts") && searchParams["nbrrestarts"] is int && (int)searchParams["nbrrestarts"]! > 0) ? (int)searchParams["nbrrestarts"]! : 10;
@@ -102,10 +102,10 @@ namespace Socnet
                 }
                 else if (searchTypeName.Equals("exhaustive"))
                     searchHeuristic = doExhaustiveSearch;
-                else if (searchTypeName.Equals("localopt2"))
+                else if (searchTypeName.Equals("ljubljana"))
                 {
                     // Preparing the Ljubljana localopt search heuristic with stochastic properties
-                    log("Ok - prepping localopt2");
+                    log("Ok - prepping ljubljana localopt");
                     searchHeuristic = doLjubljanaSearch;
 
                 }
@@ -242,6 +242,159 @@ namespace Socnet
         public static void doLjubljanaSearch()
         {
             log("Ok - in doLjubljanaSearch()");
+            stopwatch.Reset();
+            // Init the worst GoF, for initializing each search/run
+            double bestGofStartValue = (maximizeGof) ? double.NegativeInfinity : double.PositiveInfinity;
+            double bestGofThisRun, bestGofAllRuns, bestGofAllBlockimages = bestGofStartValue;
+            Partition partition = new Partition(matrix!.actorset, "ljubjana");
+
+            // Prepare lists for storing best solutions for individual blockimage and individual runs
+            List<BMSolution> bestSolutionsThisBlockimage = new List<BMSolution>();
+            List<BMSolution> bestSolutionsThisRun = new List<BMSolution>();
+            List<BMSolution> checkNeighborsOfThese = new List<BMSolution>();
+            // List for storing the Solutions/partitions I should check in next iteration
+            List<BMSolution> checkNextIteration = new List<BMSolution>();
+
+            // Loop through blockimages, in random order
+            blockimages = GenerateRandomOrderBy(blockimages);
+            int nbrPositions;
+            foreach (BlockImage blockimage in blockimages)
+            {
+                bestGofAllRuns = bestGofStartValue;
+                bestSolutionsThisBlockimage.Clear();
+
+                // Init partition, find suitable start partition
+                nbrPositions = blockimage.nbrPositions;
+                partition.createClusters(nbrPositions);
+
+                // Loop through individual runs, each with new optimal starting position
+                for (int run = 0; run < nbrRestarts; run++)
+                {
+                    bestGofThisRun = bestGofStartValue;
+                    bestSolutionsThisRun.Clear();
+
+                    // Just to make sure I'm not working backwards
+                    checkedPartString.Clear();
+
+                    // Find good start position
+                    Partition tempPartition = new Partition(partition);
+                    BMSolution tempSolution;
+                    //double bestGofTemp = bestGofStartValue;
+                    for (int i = 0; i < nbrRandomStart; i++)
+                    {
+                        tempPartition.setRandomPartition(minClusterSize, random);
+                        tempSolution = gofMethod!(matrix, blockimage, tempPartition);
+                        if ((maximizeGof && tempSolution.gofValue > bestGofThisRun) || (!maximizeGof && tempSolution.gofValue < bestGofThisRun))
+                        {
+                            partition = tempPartition;
+                            bestGofThisRun = tempSolution.gofValue;
+                        }
+                    }
+                    // partition now has the one with best GoF
+                    tempSolution = gofMethod!(matrix, blockimage, partition);
+                    bestSolutionsThisRun.Add(tempSolution);
+                    checkNeighborsOfThese.Clear();
+                    checkNeighborsOfThese.Add(tempSolution);
+                    bool abortThisRun = false;
+                    
+
+                    // Iterate steps within each run
+                    for (int iter = 0; iter < maxNbrIterations && !abortThisRun; iter++)
+                    {
+                        checkNextIteration.Clear();
+                        foreach (BMSolution currentSolution in checkNeighborsOfThese)
+                        {
+                            bool foundBetterWhileMoving = false;
+                            int c1, c2;
+                            Actor actor;
+                            partition.setPartitionByPartArray(currentSolution.partarray);
+                            int[] c1random = createRandomizedRange(0, nbrPositions);
+                            int[] c2random = createRandomizedRange(0, nbrPositions);
+                            for (int c1i = 0; c1i < nbrPositions && !foundBetterWhileMoving; c1i++)
+                            {
+                                c1 = c1random[c1i];
+                                // Gonna move an actor from c1 to c2, but if c1 has minClusterSize, can't move, so continue with next
+                                if (partition.clusters[c1].actors.Count == minClusterSize)
+                                    continue;
+                                for (int c2i = 0; c2i < nbrPositions && !foundBetterWhileMoving; c2i++)
+                                {
+                                    c2 = c2random[c2i];
+                                    if (c1 != c2)
+                                    {
+                                        int[] a1random = createRandomizedRange(0, partition.clusters[c1].actors.Count);
+                                        for (int ai = 0; ai < partition.clusters[c1].actors.Count; ai++)
+                                        {
+                                            actor = partition.clusters[c1].actors[ai];
+                                            partition.moveActor(actor, c1, c2);
+                                            if (checkedPartString.Contains(partition.GetPartString()))
+                                            {
+                                                partition.moveActor(actor, c2, c1);
+                                                continue;
+                                            }
+                                            BMSolution neighSolution = gofMethod(matrix, blockimage, partition);
+                                            if ((maximizeGof && neighSolution.gofValue > bestGofThisRun) || (!maximizeGof && neighSolution.gofValue < bestGofThisRun))
+                                            {
+                                                bestGofThisRun = neighSolution.gofValue;
+                                                bestSolutionsThisRun.Clear();
+                                                bestSolutionsThisRun.Add(neighSolution);
+                                                checkNextIteration.Clear();
+                                                checkNextIteration.Add(neighSolution);
+                                                foundBetterWhileMoving = true;
+                                                checkedPartString.Add(partition.GetPartString());
+                                                continue;
+                                            }
+                                            else if (neighSolution.gofValue==bestGofThisRun)
+                                            {
+                                                bestSolutionsThisRun.Add(neighSolution);
+                                                checkNextIteration.Add(neighSolution);
+                                                checkedPartString.Add(partition.GetPartString());
+                                            }
+                                            partition.moveActor(actor, c2, c1);
+
+                                        }
+                                        
+                                    }
+                                }
+                            }
+                        }
+                        if (checkNextIteration.Count > 0)
+                        {
+                            // Ok - gone through neighboring partitions and found at least one more promising
+                            checkNeighborsOfThese.Clear();
+                            checkNeighborsOfThese.AddRange(checkNextIteration);
+                        }
+                        else
+                        {
+                            abortThisRun = true;
+                            break;
+                        }
+                    }
+                    if ((maximizeGof && bestGofThisRun > bestGofAllRuns) || (!maximizeGof && bestGofThisRun < bestGofAllRuns))
+                    {
+                        bestSolutionsThisBlockimage.Clear();
+                        bestSolutionsThisBlockimage.AddRange(bestSolutionsThisRun);
+                        bestGofAllRuns = bestGofThisRun;
+                    }
+                    else if (bestGofThisRun == bestGofAllRuns)
+                    {
+                        bestSolutionsThisBlockimage.AddRange(bestSolutionsThisRun);
+                    }
+                }
+                // All runs done for this blockimage
+                if ((maximizeGof && bestGofAllRuns >= bestGofAllBlockimages) || (!maximizeGof && bestGofAllRuns <= bestGofAllBlockimages))
+                {
+                    if (bestGofAllRuns != bestGofAllBlockimages)
+                        optimalSolutionsGlobal.Clear();
+                    optimalSolutionsGlobal.AddRange(bestSolutionsThisBlockimage);
+                    bestGofAllBlockimages = bestGofAllRuns;
+                }
+            }
+            stopwatch.Stop();
+        }
+
+        private static int[] createRandomizedRange(int v1, int v2)
+        {
+            return Enumerable.Range(v1, v2).OrderBy(x => random.Next()).ToArray();
         }
 
         public static void doLocalOptSearch()
