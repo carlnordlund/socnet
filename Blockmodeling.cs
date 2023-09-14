@@ -90,7 +90,8 @@ namespace Socnet
                 searchTypeName = "" + searchParams["searchtype"] as string;
                 if (searchTypeName.Equals("localopt") || searchTypeName.Equals("ljubljana"))
                 {
-                    searchHeuristic = doLocalOptSearch;
+                    searchHeuristic = (searchTypeName.Equals("localopt")) ? doLocalOptSearch : doLjubljanaSearch;
+                    //searchHeuristic = doLocalOptSearch;
                     nbrRestarts = (searchParams.ContainsKey("nbrrestarts") && searchParams["nbrrestarts"] is int && (int)searchParams["nbrrestarts"]! > 0) ? (int)searchParams["nbrrestarts"]! : 10;
                     maxNbrIterations = (searchParams.ContainsKey("maxiterations") && searchParams["maxiterations"] is int && (int)searchParams["maxiterations"]! > 0) ? (int)searchParams["maxiterations"]! : 25;
                     nbrRandomStart = (searchParams.ContainsKey("nbrrandomstart") && searchParams["nbrrandomstart"] is int && (int)searchParams["nbrrandomstart"]! > 0) ? (int)searchParams["nbrrandomstart"]!:5;
@@ -214,16 +215,6 @@ namespace Socnet
                         log("Timeout: more than " + maxElapsedMilliseconds + " milliseconds passed.");
                         log("Blockimage: " + blockimage.Name + " (" + blockimagesDone + "/" + blockimages.Count + ")");
                         log("Partition: " + partition.GetPartString("") + " (testindex=" + testindex + ")");
-                        //double shareDone = (double)blockimagesDone / (double)blockimages.Count;
-                        //log("Blockimage: " + blockimage.Name + " (" + (int)(100 * (double)blockimagesDone / (double)blockimages.Count) + "%) - Run:" + run + " - Iteration:" + iter);
-                        //if (shareDone > 0)
-                        //{
-                        //    double estimatedTimeToFinish = stopwatch.ElapsedMilliseconds / shareDone;
-                        //    log(" : try setting 'maxtime=" + ((int)estimatedTimeToFinish + 10) + "'");
-                        //}
-                        // Possible to estimate how long it will take based on the above?
-
-
                         timeoutAbort = true;
                         return;
                     }
@@ -242,7 +233,7 @@ namespace Socnet
         public static void doLjubljanaSearch()
         {
             log("Ok - in doLjubljanaSearch()");
-            stopwatch.Reset();
+            stopwatch.Restart();
             // Init the worst GoF, for initializing each search/run
             double bestGofStartValue = (maximizeGof) ? double.NegativeInfinity : double.PositiveInfinity;
             double bestGofThisRun, bestGofAllRuns, bestGofAllBlockimages = bestGofStartValue;
@@ -267,14 +258,16 @@ namespace Socnet
                 nbrPositions = blockimage.nbrPositions;
                 partition.createClusters(nbrPositions);
 
+                // Only clear checkedPartString between separate blockimages
+                // Otherwise, each run might identify the correct solution
+                checkedPartString.Clear();
+
                 // Loop through individual runs, each with new optimal starting position
                 for (int run = 0; run < nbrRestarts; run++)
                 {
                     bestGofThisRun = bestGofStartValue;
                     bestSolutionsThisRun.Clear();
 
-                    // Just to make sure I'm not working backwards
-                    checkedPartString.Clear();
 
                     // Find good start position
                     Partition tempPartition = new Partition(partition);
@@ -286,7 +279,8 @@ namespace Socnet
                         tempSolution = gofMethod!(matrix, blockimage, tempPartition);
                         if ((maximizeGof && tempSolution.gofValue > bestGofThisRun) || (!maximizeGof && tempSolution.gofValue < bestGofThisRun))
                         {
-                            partition = tempPartition;
+                            //partition = tempPartition;
+                            partition.setPartitionByPartArray(tempPartition.partArray);
                             bestGofThisRun = tempSolution.gofValue;
                         }
                     }
@@ -322,9 +316,9 @@ namespace Socnet
                                     if (c1 != c2)
                                     {
                                         int[] a1random = createRandomizedRange(0, partition.clusters[c1].actors.Count);
-                                        for (int ai = 0; ai < partition.clusters[c1].actors.Count; ai++)
+                                        for (int ai = 0; ai < partition.clusters[c1].actors.Count && !foundBetterWhileMoving; ai++)
                                         {
-                                            actor = partition.clusters[c1].actors[ai];
+                                            actor = partition.clusters[c1].actors[a1random[ai]];
                                             partition.moveActor(actor, c1, c2);
                                             if (checkedPartString.Contains(partition.GetPartString()))
                                             {
@@ -599,7 +593,7 @@ namespace Socnet
                                             neighborPartString = neighborPartition.GetPartString();
                                             if (!checkedPartString.Contains(neighborPartString))
                                             {
-                                                checkedPartString.Add(neighborPartString);
+                                                
                                                 if (neighborPartition.CheckMinimumClusterSize(minClusterSize))
                                                 {
                                                     BMSolution neighTest = gofMethod(matrix, blockimage, neighborPartition);
@@ -607,6 +601,7 @@ namespace Socnet
                                                     bool betterGof = ((maximizeGof && neighTest.gofValue > bestGofThisRun) || (!maximizeGof && neighTest.gofValue < bestGofThisRun));
                                                     if (betterGof)
                                                     {
+                                                        checkedPartString.Add(neighborPartString);
                                                         //log("Better gof - update bestGofThisRun, skip more moving");
                                                         foundBetterWhileMoving = true;
                                                         checkNextIteration.Clear();

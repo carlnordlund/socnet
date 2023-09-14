@@ -640,6 +640,7 @@ namespace Socnet
                 List<BlockModel> blockmodels = Blockmodeling.generateBlockmodelStructuresFromBMSolutions();
                 foreach (BlockModel bm in blockmodels)
                     response.Add(dataset.StoreStructure(bm));
+                response.Add("Goodness-of-fit (1st BlockModel): " + blockmodels[0].gof + " (" + blockmodels[0].gofMethod + ")");
             }
             else if (status.Equals("timeout"))
             {
