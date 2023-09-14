@@ -93,8 +93,8 @@ namespace Socnet
                     searchHeuristic = (searchTypeName.Equals("localopt")) ? doLocalOptSearch : doLjubljanaSearch;
                     //searchHeuristic = doLocalOptSearch;
                     nbrRestarts = (searchParams.ContainsKey("nbrrestarts") && searchParams["nbrrestarts"] is int && (int)searchParams["nbrrestarts"]! > 0) ? (int)searchParams["nbrrestarts"]! : 10;
-                    maxNbrIterations = (searchParams.ContainsKey("maxiterations") && searchParams["maxiterations"] is int && (int)searchParams["maxiterations"]! > 0) ? (int)searchParams["maxiterations"]! : 25;
-                    nbrRandomStart = (searchParams.ContainsKey("nbrrandomstart") && searchParams["nbrrandomstart"] is int && (int)searchParams["nbrrandomstart"]! > 0) ? (int)searchParams["nbrrandomstart"]!:5;
+                    maxNbrIterations = (searchParams.ContainsKey("maxiterations") && searchParams["maxiterations"] is int && (int)searchParams["maxiterations"]! > 0) ? (int)searchParams["maxiterations"]! : 50;
+                    nbrRandomStart = (searchParams.ContainsKey("nbrrandomstart") && searchParams["nbrrandomstart"] is int && (int)searchParams["nbrrandomstart"]! > 0) ? (int)searchParams["nbrrandomstart"]!:50;
                     doSwitching = (searchParams.ContainsKey("doswitching") && searchParams["doswitching"]!=null && searchParams["doswitching"] is string && ((string)searchParams["doswitching"]!).Length > 0 && ((string)searchParams["doswitching"]!).ToLower()[0] == 'y');
                     log("nbrrestarts: " + nbrRestarts);
                     log("maxiterations: " + maxNbrIterations);
@@ -322,6 +322,7 @@ namespace Socnet
                                             partition.moveActor(actor, c1, c2);
                                             if (checkedPartString.Contains(partition.GetPartString()))
                                             {
+                                                // Already checked this (and its a good one) so don't allow going that path
                                                 partition.moveActor(actor, c2, c1);
                                                 continue;
                                             }
@@ -334,6 +335,7 @@ namespace Socnet
                                                 checkNextIteration.Clear();
                                                 checkNextIteration.Add(neighSolution);
                                                 foundBetterWhileMoving = true;
+                                                // Storing as checked.. But hmm...
                                                 checkedPartString.Add(partition.GetPartString());
                                                 continue;
                                             }
