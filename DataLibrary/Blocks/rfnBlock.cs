@@ -51,7 +51,7 @@ namespace Socnet.DataLibrary.Blocks
                 maxActor = null;
                 maxVal = 0;
                 foreach (Actor colActor in colCluster.actors)
-                    if (rowActor!=colActor && matrix.Get(rowActor,colActor)>maxVal)
+                    if (rowActor != colActor && matrix.Get(rowActor, colActor) > maxVal)
                     {
                         maxVal = matrix.Get(rowActor, colActor);
                         maxActor = colActor;

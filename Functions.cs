@@ -13,7 +13,6 @@ namespace Socnet
 {
     public static class Functions
     {
-        //public static List<string> idealBlockNames = new List<string>() { "dnc", "nul", "com", "reg", "rre", "cre", "rfn", "cfn", "denuci", "den", "denmin", "pco", "sumreg", "meanreg", "maxreg", "vcom" };
 
         public static Dictionary<int, string> indexToIdealBlockName = new Dictionary<int, string>() {
             { 0, "dnc" },
@@ -27,7 +26,9 @@ namespace Socnet
             { 8, "denuci" },
             { 9, "den" },
             { 10, "denmin" },
-            { 11, "pco" }
+            { 11, "pco" },
+            { 12, "pcdd" },
+            { 13, "cpdd" }
         };
 
         public static List<string> conditionAbbrs = new List<string>() { "gt","ge","lt","le","eq","ne" };

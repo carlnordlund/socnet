@@ -12,6 +12,10 @@ Console.WriteLine(engine.versionString);
 Console.WriteLine("Developed by Carl Nordlund - carl.nordlund@liu.se");
 Console.WriteLine("Part of the Nordint.net project: https://nordint.net");
 Console.WriteLine();
+Console.WriteLine("How to cite Socnet.se:");
+Console.WriteLine("Nordlund, C. (2023). Socnet.se: The Blockmodeling Console App [computer software]. Available from https://socnet.se");
+Console.WriteLine("How to cite specific methods, type in 'citeinfo()'.");
+Console.WriteLine();
 
 
 
@@ -104,7 +108,7 @@ else
 void startInteractiveMode()
 {
 //    List<string> responses;
-    Console.WriteLine("Interactive mode (type 'quit' to quit, 'help' for help):");
+    Console.WriteLine("Entering interactive mode (type 'quit' to quit, 'help' for help):");
     //Console.WriteLine("functions and parameter names: case-insensitive; data structure names: case-sensitive!");
     //displayResponse(engine.executeCommand("load(type=matrix,file=data/galtung.txt)"));
     while (true)

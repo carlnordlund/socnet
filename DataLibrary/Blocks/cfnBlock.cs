@@ -60,7 +60,7 @@ namespace Socnet.DataLibrary.Blocks
                     triplets.Add(new Triple(0, 1, (double)(nbrRows - ((rowCluster == colCluster) ? 1 : 0))));
                 else
                     foreach (Actor rowActor in rowCluster.actors)
-                        triplets.Add(new Triple(matrix.Get(rowActor, colActor), (colActor == maxActor) ? 1 : 0, 1));
+                        triplets.Add(new Triple(matrix.Get(rowActor, colActor), (rowActor == maxActor) ? 1 : 0, 1));
             }
             return triplets;
         }
