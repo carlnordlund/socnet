@@ -778,7 +778,7 @@ namespace Socnet
             return bm;
         }
 
-        internal static List<BlockModel> generateBlockmodelStructuresFromBMSolutions()
+        internal static List<BlockModel> generateBlockmodelStructuresFromBMSolutions(string outname = "")
         {
             List<BlockModel> blockmodels = new List<BlockModel>();
             int index = 0;
@@ -788,12 +788,15 @@ namespace Socnet
                 partition.createClusters(solution.blockimage.nbrPositions);
                 partition.setPartitionByPartArray(solution.partarray);
                 string partString = partition.GetPartString();
-                partition.Name = "part_" + index + "_" + solution.matrix.Name + "_" + solution.blockimage.Name;
+                string basename = (outname.Length > 0) ? outname : "bm_" + solution.matrix.Name + "_" + solution.blockimage.Name;
+
+
+                partition.Name = "part_" + solution.matrix.Name + "_" + solution.blockimage.Name + "_" + index;
 
 
 
-                string bmName = "bm_" + solution.matrix.Name + "_" + solution.blockimage.Name + "_" + index;
-                BlockModel blockmodel = new BlockModel(bmName, solution.matrix, solution.blockimage, partition, solution.blockindices,solution.gofValue, solution.criteriaFunction);
+                string bmName = basename + "_" + index;
+                BlockModel blockmodel = new BlockModel(bmName, solution.matrix, solution.blockimage, partition, solution.blockindices, solution.gofValue, solution.criteriaFunction);
                 blockmodels.Add(blockmodel);
                 index++;
             }

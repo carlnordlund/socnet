@@ -10,8 +10,9 @@ namespace Socnet
 {
     public static class SocnetIO
     {
+        public static char[] quotechars = new char[] { '"', '\'' };
 
-        internal static string SaveDataStructure(List<string> response, Dataset dataset, string name, string filepath, string sep = "\t")
+        internal static string SaveDataStructure(List<string> response, Dataset dataset, string name, string filepath, string sep="\t")
         {
             DataStructure? structure = dataset.GetStructureByName(name);
             if (structure == null)
@@ -186,121 +187,130 @@ namespace Socnet
         }
 
 
-        internal static string LoadDataStructure(List<string> response, Dataset dataset, string filepath, string type, string name)
+        internal static string LoadDataStructure(List<string> response, Dataset dataset, string filepath, string type, string name, string sep = "\t")
         {
-            if (!File.Exists(filepath))
-                return "!Error: File '" + filepath + "' not found";
-            string[]? lines = readAllLines(filepath, response);
-            if (lines == null)
-                return "!Error: File '" + filepath + "' seems empty";
-            //string filename = Path.GetFileNameWithoutExtension(filepath);
-            string dsname = (name.Length == 0) ? Path.GetFileNameWithoutExtension(filepath) : name;
-            if (type.Equals("matrix"))
+            try
             {
-                ActorsAndData aod = parseActorsAndData(lines);
-                if (aod.error)
-                    return aod.errorMsg;
-                if (aod.rowLabels.Length != aod.colLabels.Length)
-                    return "!Error: Label size mismatch for rows and columns";
-                for (int i = 0; i < aod.rowLabels.Length; i++)
-                    if (!aod.rowLabels[i].Equals(aod.colLabels[i]))
-                        return "!Error: Matrix label mismatch: '" + aod.rowLabels[i] + "' vs '" + aod.colLabels[i] + "'";
-                Actorset? actorset = dataset.GetActorsetByLabels(aod.rowLabels);
-                if (actorset == null)
+                if (!File.Exists(filepath))
+                    return "!Error: File '" + filepath + "' not found";
+                string[]? lines = readAllLines(filepath, response);
+                if (lines == null)
+                    return "!Error: File '" + filepath + "' seems empty";
+                //string filename = Path.GetFileNameWithoutExtension(filepath);
+                string dsname = (name.Length == 0) ? Path.GetFileNameWithoutExtension(filepath) : name;
+                char sepchar = (sep.Length == 1) ? sep[0] : '\t';
+
+                if (type.Equals("matrix"))
                 {
-                    actorset = dataset.CreateActorsetByLabels(aod.rowLabels);
+                    ActorsAndData aod = parseActorsAndData(lines, sepchar);
+                    if (aod.error)
+                        return aod.errorMsg;
+                    if (aod.rowLabels.Length != aod.colLabels.Length)
+                        return "!Error: Label size mismatch for rows and columns";
+                    for (int i = 0; i < aod.rowLabels.Length; i++)
+                        if (!aod.rowLabels[i].Equals(aod.colLabels[i]))
+                            return "!Error: Matrix label mismatch: '" + aod.rowLabels[i] + "' vs '" + aod.colLabels[i] + "'";
+                    Actorset? actorset = dataset.GetActorsetByLabels(aod.rowLabels);
                     if (actorset == null)
-                        return "!Error: Couldn't create Actorset from labels";
-                    actorset.Name = dsname + "_actors";
-                    response.Add(dataset.StoreStructure(actorset));
+                    {
+                        actorset = dataset.CreateActorsetByLabels(aod.rowLabels);
+                        if (actorset == null)
+                            return "!Error: Couldn't create Actorset from labels";
+                        actorset.Name = dsname + "_actors";
+                        response.Add(dataset.StoreStructure(actorset));
+                    }
+                    Matrix matrix = new Matrix(actorset, dsname, "F2");
+                    matrix.installData(aod.rowLabels, aod.data);
+                    response.Add(dataset.StoreStructure(matrix));
                 }
-                Matrix matrix = new Matrix(actorset, dsname, "F2");
-                matrix.installData(aod.rowLabels, aod.data);
-                response.Add(dataset.StoreStructure(matrix));
-            }
-            else if (type.Equals("table"))
-            {
-                ActorsAndData aod = parseActorsAndData(lines);
-                if (aod.error)
-                    return aod.errorMsg;
-                Actorset? rowActorset = dataset.GetActorsetByLabels(aod.rowLabels);
-                Actorset? colActorset = dataset.GetActorsetByLabels(aod.colLabels);
-                //bool addRowActorset = false, addColActorset = false;
-                if (rowActorset == null)
+                else if (type.Equals("table"))
                 {
-                    // Doesn't exist, so try creating
-                    rowActorset = dataset.CreateActorsetByLabels(aod.rowLabels);
+                    ActorsAndData aod = parseActorsAndData(lines, sepchar);
+                    if (aod.error)
+                        return aod.errorMsg;
+                    Actorset? rowActorset = dataset.GetActorsetByLabels(aod.rowLabels);
+                    Actorset? colActorset = dataset.GetActorsetByLabels(aod.colLabels);
+                    //bool addRowActorset = false, addColActorset = false;
                     if (rowActorset == null)
-                        // Nope, didn't work - give error and abort
-                        return "!Error: Couldn't create Actorset from row labels";
-                    // If I am here, this means I got a rowActorset, which might or might not already be stored
-                    response.Add(dataset.StoreStructure(rowActorset));
-                    //addRowActorset = true;
-                }
-                if (colActorset == null)
-                {
-                    // Doesn't exist, so try creating
-                    colActorset = dataset.CreateActorsetByLabels(aod.colLabels);
+                    {
+                        // Doesn't exist, so try creating
+                        rowActorset = dataset.CreateActorsetByLabels(aod.rowLabels);
+                        if (rowActorset == null)
+                            // Nope, didn't work - give error and abort
+                            return "!Error: Couldn't create Actorset from row labels";
+                        // If I am here, this means I got a rowActorset, which might or might not already be stored
+                        response.Add(dataset.StoreStructure(rowActorset));
+                        //addRowActorset = true;
+                    }
                     if (colActorset == null)
-                        // Nope, didn't work - give error and abort
-                        return "!Error: Couldn't create Actorset from column labels";
-                    // If I am here, this means I got a colActorset, which might or might not already be stored
-                    response.Add(dataset.StoreStructure(colActorset));
+                    {
+                        // Doesn't exist, so try creating
+                        colActorset = dataset.CreateActorsetByLabels(aod.colLabels);
+                        if (colActorset == null)
+                            // Nope, didn't work - give error and abort
+                            return "!Error: Couldn't create Actorset from column labels";
+                        // If I am here, this means I got a colActorset, which might or might not already be stored
+                        response.Add(dataset.StoreStructure(colActorset));
+                    }
+                    Table table = new Table(rowActorset, colActorset, dsname, "F2");
+                    table.installData(aod.rowLabels, aod.colLabels, aod.data);
+                    response.Add(dataset.StoreStructure(table));
                 }
-                Table table = new Table(rowActorset, colActorset, dsname, "F2");
-                table.installData(aod.rowLabels, aod.colLabels, aod.data);
-                response.Add(dataset.StoreStructure(table));
-            }
-            else if (type.Equals("partition"))
-            {
-                ActorsAndData aod = parseActorsAndData(lines);
-                if (aod.error)
-                    return aod.errorMsg;
-                Actorset? actorset = dataset.GetActorsetByLabels(aod.rowLabels);
-                if (actorset == null)
+                else if (type.Equals("partition"))
                 {
-                    actorset = dataset.CreateActorsetByLabels(aod.rowLabels);
+                    ActorsAndData aod = parseActorsAndData(lines, sepchar);
+                    if (aod.error)
+                        return aod.errorMsg;
+                    Actorset? actorset = dataset.GetActorsetByLabels(aod.rowLabels);
                     if (actorset == null)
-                        return "!Error: Couldn't create Actorset from first row labels";
-                    response.Add(dataset.StoreStructure(actorset));
+                    {
+                        actorset = dataset.CreateActorsetByLabels(aod.rowLabels);
+                        if (actorset == null)
+                            return "!Error: Couldn't create Actorset from first row labels";
+                        response.Add(dataset.StoreStructure(actorset));
+                    }
+                    Partition partition = new Partition(actorset, dsname);
+                    int[] partArray = new int[actorset.Count];
+                    int maxIndex = -1;
+                    for (int r = 0; r < actorset.Count; r++)
+                    {
+                        partArray[r] = (int)aod.data[r, 0];
+                        if (partArray[r] < 0)
+                            return "!Error: Cluster index can't be negative";
+                        maxIndex = (partArray[r] > maxIndex) ? partArray[r] : maxIndex;
+                    }
+                    partition.createClusters(maxIndex + 1);
+                    partition.setPartitionByPartArray(partArray);
+                    response.Add(dataset.StoreStructure(partition));
                 }
-                Partition partition = new Partition(actorset, dsname);
-                int[] partArray = new int[actorset.Count];
-                int maxIndex = -1;
-                for (int r=0;r<actorset.Count;r++)
+                else if (type.Equals("blockimage"))
                 {
-                    partArray[r] = (int)aod.data[r, 0];
-                    if (partArray[r] < 0)
-                        return "!Error: Cluster index can't be negative";
-                    maxIndex = (partArray[r] > maxIndex) ? partArray[r] : maxIndex;
+                    string[] positionNames = lines[0].TrimStart(sepchar).Split(sepchar);
+                    int nbrPositions = positionNames.Length;
+                    if (lines.Length - 1 != nbrPositions)
+                    {
+                        return "!Error: Row/col mismatch for blockimage file";
+                    }
+                    BlockImage blockimage = new BlockImage(dsname, nbrPositions);
+                    for (int r = 0; r < nbrPositions; r++)
+                    {
+                        blockimage.positionNames[r] = positionNames[r];
+                        string[] cells = lines[r + 1].Split('\t');
+                        for (int c = 0; c < nbrPositions; c++)
+                            blockimage.setBlockByPattern(r, c, cells[c + 1]);
+                        // Do rest here...
+                    }
+                    blockimage.checkMultiblocked();
+                    response.Add(dataset.StoreStructure(blockimage));
                 }
-                partition.createClusters(maxIndex + 1);
-                partition.setPartitionByPartArray(partArray);
-                response.Add(dataset.StoreStructure(partition));
+                else
+                    return "!Error: Type '" + type + "' not recognized";
+                return "Loading data structure: OK";
             }
-            else if (type.Equals("blockimage"))
+            catch(Exception e)
             {
-                string[] positionNames = lines[0].TrimStart('\t').Split('\t');
-                int nbrPositions = positionNames.Length;
-                if (lines.Length - 1 != nbrPositions)
-                {
-                    return "!Error: Row/col mismatch for blockimage file";
-                }
-                BlockImage blockimage = new BlockImage(dsname, nbrPositions);
-                for (int r=0;r<nbrPositions;r++)
-                {
-                    blockimage.positionNames[r] = positionNames[r];
-                    string[] cells = lines[r + 1].Split('\t');
-                    for (int c=0;c<nbrPositions;c++)
-                        blockimage.setBlockByPattern(r, c, cells[c + 1]);
-                    // Do rest here...
-                }
-                blockimage.checkMultiblocked();
-                response.Add(dataset.StoreStructure(blockimage));
+                return "!Error: " + e.Message;
             }
-            else
-                return "!Error: Type '" + type + "' not recognized";
-            return "Loading data structure: OK";
         }
 
         private static ActorsAndData parseActorsAndData(string[] lines, char separator = '\t')
@@ -309,7 +319,8 @@ namespace Socnet
             try
             {
                 string[] colLabels = lines[0].TrimStart(separator).Split(separator);
-                int nbrCols = colLabels.Length - (lines[0][0] != separator ? 1 : 0);
+                stripQuotes(colLabels);
+                int nbrCols = colLabels.Length;
                 int nbrRows = lines.Length - 1;
                 string[] rowLabels = new string[nbrRows];
                 double[,] data = new double[nbrRows, nbrCols];
@@ -320,6 +331,7 @@ namespace Socnet
                     for (int c = 0; c < nbrCols; c++)
                         Double.TryParse(cells[c + 1], out data[r, c]);
                 }
+                stripQuotes(rowLabels);
                 actorsAndData.rowLabels = rowLabels;
                 actorsAndData.colLabels = colLabels;
                 actorsAndData.data = data;
@@ -330,6 +342,12 @@ namespace Socnet
                 actorsAndData.errorMsg = "!Error: " + e.Message;
             }
             return actorsAndData;
+        }
+
+        private static void stripQuotes(string[] colLabels)
+        {
+            for (int i = 0; i < colLabels.Length; i++)
+                colLabels[i] = colLabels[i].Trim(quotechars);
         }
 
         public static string[]? readAllLines(string filename, List<string> response)

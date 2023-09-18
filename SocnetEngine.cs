@@ -256,27 +256,27 @@ namespace Socnet
 
         public void f_load()
         {
-            response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), getStringArgument("type"), getStringArgument("name")));
+            response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), getStringArgument("type"), getStringArgument("name"), getStringArgument("sep")));
         }
 
         public void f_loadmatrix()
         {
-            response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "matrix", getStringArgument("name")));
+            response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "matrix", getStringArgument("name"), getStringArgument("sep")));
         }
 
         public void f_loadtable()
         {
-            response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "table", getStringArgument("name")));
+            response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "table", getStringArgument("name"), getStringArgument("sep")));
         }
 
         public void f_loadblockimage()
         {
-            response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "blockimage", getStringArgument("name")));
+            response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "blockimage", getStringArgument("name"), getStringArgument("sep")));
         }
 
         public void f_loadpartition()
         {
-            response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "partition", getStringArgument("name")));
+            response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "partition", getStringArgument("name"), getStringArgument("sep")));
         }
 
         public void f_save()
@@ -637,7 +637,8 @@ namespace Socnet
             if (status.Equals("ok"))
             {
                 response.Add("Execution time (ms):" + Blockmodeling.stopwatch.ElapsedMilliseconds);
-                List<BlockModel> blockmodels = Blockmodeling.generateBlockmodelStructuresFromBMSolutions();
+                List<BlockModel> blockmodels = Blockmodeling.generateBlockmodelStructuresFromBMSolutions(getStringArgument("outname"));
+
                 foreach (BlockModel bm in blockmodels)
                     response.Add(dataset.StoreStructure(bm));
                 response.Add("Goodness-of-fit (1st BlockModel): " + blockmodels[0].gof + " (" + blockmodels[0].gofMethod + ")");
@@ -691,6 +692,8 @@ namespace Socnet
         public void f_bmextract()
         {
             // "blockmodel", "type"
+            string outname = getStringArgument("outname");
+            bool autoname = (outname.Length == 0);
 
             DataStructure? blockmodel = dataset.GetStructureByName(getStringArgument("blockmodel"), typeof(BlockModel));
             if (blockmodel == null)
@@ -702,20 +705,27 @@ namespace Socnet
             if (type.Equals("blockimage"))
             {
                 BlockImage bi = ((BlockModel)blockmodel).ExtractBlockimage();
-                bi.Name = dataset.GetAutoName(bi.Name);
+                bi.Name = (autoname) ? dataset.GetAutoName(bi.Name) : outname;
                 response.Add(dataset.StoreStructure(bi));
                 //return bi;
             }
             else if (type.Equals("matrix"))
             {
                 Matrix bmMatrix = ((BlockModel)blockmodel).GetBlockModelMatrix();
+                if (!autoname)
+                {
+                    bmMatrix.Name = outname;
+                    bmMatrix.actorset.Name = "actors_" + outname;
+                }
                 response.Add(dataset.StoreStructure(bmMatrix.actorset));
                 response.Add(dataset.StoreStructure(bmMatrix));
-                //return ((BlockModel)blockmodel).GetBlockModelMatrix();
             }
             else if (type.Equals("partition"))
             {
-                response.Add(dataset.StoreStructure(((BlockModel)blockmodel).partition));
+                Partition partition = ((BlockModel)blockmodel).partition;
+                if (!autoname)
+                    partition.Name = outname;
+                response.Add(dataset.StoreStructure(partition));
             }
         }
 
