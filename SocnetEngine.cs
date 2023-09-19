@@ -217,23 +217,26 @@ namespace Socnet
 
         public void f_citeinfo()
         {
-            response.Add("For direct blockmodeling using the 'nordlund' method (i.e. weighted correlation coefficients), please cite:");
-            response.Add("Nordlund, C. (2020). Direct blockmodeling of valued and binary networks: A dichotomization-free approach. Social Networks, 61, pp. 128-143. doi:10.1016/j.socnet.2019.10.004");
+            response.Add("This Socnet.se software client:");
+            response.Add("  Nordlund, C. (2023). Socnet.se: The Blockmodeling Console App [computer software]. Available from https://socnet.se");
             response.Add(" ");
-            response.Add("For correlation-based core-periphery approach that either ignores inter-categorical blocks or uses the 'denuci(d)' ideal blocks, please cite:");
-            response.Add("Borgatti, S.P., Everett, M.G. (2000). Models of core/periphery structures. Social Networks, 21(4), pp. 375-395. doi:10.1016/S0378-8733(99)00019-2");
+            response.Add("Direct blockmodeling using the 'nordlund' method (i.e. weighted correlation coefficients):");
+            response.Add("  https://doi.org/10.1016/j.socnet.2019.10.004");
             response.Add(" ");
-            response.Add("For correlation-based core-periphery approach using 'pco(p)' ideal blocks for intra-core and/or 'den(d)' or 'denmin(d)' ideal blocks for inter-categorical ties, please cite:");
-            response.Add("Nordlund, C. (2023). Retrofitting the Borgatti-Everett core-periphery heuristic: Novel density blocks and the p-core. Manuscript in preparation.");
+            response.Add("Correlation-based core-periphery approach, ignoring inter-categorical blocks or uses the 'denuci(d)' ideal blocks:");
+            response.Add("  https://doi.org/10.1016/S0378-8733(99)00019-2");
             response.Add(" ");
-            response.Add("For power-relational core-periphery approach with core dominance and/or peripheral dependency (i.e. 'powerrelational' argument in 'coreperi'), please cite:");
-            response.Add("Nordlund, C. (2018). Power-relational core-periphery structures: Peripheral dependency and core dominance in binary and valued networks. Network Science, 6(3), pp. 348-369. doi:10.1017/nws.2018.15");
+            response.Add("Correlation-based core-periphery approach using 'pco(p)' for intra-core and/or 'den(d)' or 'denmin(d)' for inter-categorical ties:");
+            response.Add("  Nordlund, C. (n.d.). Retrofitting the Borgatti-Everett core-periphery heuristic: Novel density blocks and the p-core. (Manuscript in preparation).");
             response.Add(" ");
-            response.Add("For direct generalized blockmodeling using Hamming distances as penalty function, I recommend that you cite:");
-            response.Add("Doreian, P., Batagelj, V., Ferligoj, A. (2004). Generalized blockmodeling. Cambridge, MA: Cambridge University Press.");
+            response.Add("Power-relational core-periphery approach with core dominance and/or peripheral dependency (i.e. 'powerrelational' argument in 'coreperi'):");
+            response.Add("  https://doi.org/10.1017/nws.2018.15");
+            response.Add(" ");
+            response.Add("Direct generalized blockmodeling using 'hamming' distances as penalty function:");
+            response.Add("  https://doi.org/10.1017/CBO9780511584176");
             response.Add(" ");
             response.Add("For valued blockmodeling as proposed by Aleš Žiberna, please cite:");
-            response.Add("Žiberna, A. (2007). Generalized blockmodeling of valued networks. Social Networks, 29(1), pp. 105-126. doi:10.1016/j.socnet.2006.04.002");
+            response.Add("  https://doi.org/10.1016/j.socnet.2006.04.002");
         }
 
 
@@ -589,9 +592,6 @@ namespace Socnet
             else if (statusInitMsg[0] == '!')
                 response.Add(statusInitMsg);
             Blockmodeling.logLines.Clear();
-                
-
-
         }
 
         public BlockModel? f_bmtest()

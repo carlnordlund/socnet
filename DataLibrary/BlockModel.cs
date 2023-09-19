@@ -68,6 +68,7 @@ namespace Socnet.DataLibrary
 
         internal List<string> DisplayBlockmodel()
         {
+            double median = Functions.GetMedianValue(matrix);
             List<string> lines = new List<string>();
             int nbrClusters = partition.clusters.Length;
             lines.Add("+" + new string('-', partition.actorset.Count + nbrClusters - 1) + "+");
@@ -84,7 +85,7 @@ namespace Socnet.DataLibrary
                         foreach (Actor colActor in partition.clusters[c].actors)
                         {
                             if (rowActor != colActor)
-                                line += (matrix.Get(rowActor, colActor) > 0) ? "X" : " ";
+                                line += (matrix.Get(rowActor, colActor) > median) ? "X" : " ";
                             else
                                 line += @"\";
 

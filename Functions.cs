@@ -482,5 +482,42 @@ namespace Socnet
             return v;
         }
 
+        internal static double GetMedianValue(DataStructure structure, bool incldiag=false)
+        {
+            List<double> values = GetAllValues(structure, incldiag);
+            values.Sort();
+            int size = values.Count;
+            if (size % 2 == 0)
+                return values[size / 2] + values[(size / 2) - 1];
+            else
+                return values[size / 2];
+        }
+
+        private static List<double> GetAllValues(DataStructure structure, bool incldiag)
+        {
+            List<double> values = new List<double>();
+            if (structure is Matrix)
+            {
+                Matrix mat = (Matrix)structure;
+                foreach (Actor rowActor in mat.actorset.actors)
+                    foreach (Actor colActor in mat.actorset.actors)
+                        if (rowActor != colActor || incldiag)
+                            values.Add(mat.Get(rowActor, colActor));
+            }
+            else if (structure is Table)
+            {
+                Table table = (Table)structure;
+                foreach (Actor rowActor in table.rowActorset.actors)
+                    foreach (Actor colActor in table.colActorset.actors)
+                        values.Add(table.Get(rowActor, colActor));
+            }
+            else if (structure is Vector)
+            {
+                Vector vec = (Vector)structure;
+                foreach (Actor actor in vec.actorset.actors)
+                    values.Add(vec.Get(actor));
+            }
+            return values;
+        }
     }
 }
