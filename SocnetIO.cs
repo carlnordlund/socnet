@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Socnet.DataLibrary;
+using System.Text.Json.Nodes;
 
 namespace Socnet
 {
@@ -75,6 +76,91 @@ namespace Socnet
             //}
 
             return "Partition '" + partition.Name + "' saved: " + filepath;
+        }
+
+        internal static string SaveBlockModel(BlockModel blockmodel, string file)
+        {
+            Matrix bmMatrix = blockmodel.GetBlockModelMatrix();
+            Actorset bmActorset = bmMatrix.actorset;
+            string actorLabels = "[" + string.Join(',', bmActorset.GetActorLabelArray("\"")) + "]";
+            int nbrActors = bmActorset.Count;
+            string partstring = blockmodel.partition.GetPartString(",");
+            BlockImage bi = blockmodel.blockimage;
+            int nbrPosBi = bi.nbrPositions;
+            double gof = blockmodel.gof;
+            string gofmethod = blockmodel.gofMethod;
+
+            string json = @"{""type"":""list"",""attributes"":{""names"":{""type"":""character"",""attributes"":{},""value"":[""matrix"",""partition"",""blockimage"",""gof"",""gofmethod""]}},""value"":[{""type"":""integer"",""attributes"":{""dim"":{""type"":""integer"",""attributes"":{},""value"":";
+
+            json += "[" + nbrActors + "," + nbrActors + "]";
+
+            json += @"},""dimnames"":{""type"":""list"",""attributes"":{},""value"":[{""type"":""character"",""attributes"":{},""value"":";
+
+            json += actorLabels;
+
+            json += @"},{""type"":""character"",""attributes"":{},""value"":";
+
+            json += actorLabels;
+
+            json += @"}]}},""value"":";
+
+            double[,] matrix2dArray = new double[nbrActors, nbrActors];
+            foreach (Actor rowActor in bmActorset.actors)
+                foreach (Actor colActor in bmActorset.actors)
+                    matrix2dArray[rowActor.index, colActor.index] = bmMatrix.Get(rowActor, colActor);
+            double[] matrix1dArray = new double[nbrActors * nbrActors];
+            int index = 0;
+            for (int c=0;c<nbrActors;c++)
+                for (int r=0;r<nbrActors;r++)
+                {
+                    matrix1dArray[index] = matrix2dArray[r, c];
+                    index++;
+                }
+            json += "[" + string.Join(',', matrix1dArray) + "]";
+
+            json += @"},{""type"":""double"",""attributes"":{},""value"":";
+
+            json += "[" + partstring + "]";
+
+            json += @"},{""type"":""character"",""attributes"":{""dim"":{""type"":""integer"",""attributes"":{},""value"":";
+
+            json += "[" + nbrPosBi + "," + nbrPosBi + "]";
+
+            json += @"}},""value"":";
+
+            List<string> biContent = new List<string>();
+            List<string> cellStuff = new List<string>();
+            for (int c=0;c<nbrPosBi;c++)
+                for (int r=0;r<nbrPosBi;r++)
+                {
+                    cellStuff.Clear();
+                    for (int i = 0; i < bi.blocks![r,c].Count;i++)
+                    {
+                        cellStuff.Add(bi.blocks![r, c][i].Name);
+                    }
+                    string stuff = string.Join(';', cellStuff);
+                    biContent.Add("\"" + stuff + "\"");
+                }
+            json += "[" + string.Join(',', biContent) + "]";
+
+            json += @"},{""type"":""double"",""attributes"":{},""value"":";
+            json += "[" + gof + "]";
+
+            json += @"},{""type"":""character"",""attributes"":{},""value"":";
+
+            json += "[\"" + gofmethod + "\"]";
+            json += @"}]}";
+
+            try
+            {
+                File.WriteAllText(file, json);
+            }
+            catch (Exception e)
+            {
+                return "!Error: Could not save file '" + file + "'";
+            }
+
+            return "Saved BlockModel to '" + file + "' as JSON for R (use library 'jsonlite' and 'unserializeJSON()' to get this into a useful R object)";
         }
 
         private static string SaveMatrix(Matrix matrix, string filepath, string sep)

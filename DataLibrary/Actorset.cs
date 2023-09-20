@@ -70,5 +70,13 @@ namespace Socnet.DataLibrary
             }
         }
 
+        internal string[] GetActorLabelArray(string quote="")
+        {
+            recreateLabelAndIndexToActor();
+            string[] actorLabels = new string[Count];
+            for (int i = 0; i < Count; i++)
+                actorLabels[i] = quote + indexToActor[i].Name + quote;
+            return actorLabels;
+        }
     }
 }

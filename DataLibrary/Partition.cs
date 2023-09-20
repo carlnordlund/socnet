@@ -115,7 +115,7 @@ namespace Socnet.DataLibrary
             return false;
         }
 
-        internal string GetPartString(string sep = ";")
+        public string GetPartString(string sep = ";")
         {
             return String.Join(sep, partArray);
         }

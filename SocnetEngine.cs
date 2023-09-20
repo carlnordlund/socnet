@@ -33,6 +33,7 @@ namespace Socnet
             {"loadblockimage", new string[] {"file" } },
             {"loadpartition", new string[] {"file" } },
             {"loadedgelist", new string[] {"file", "col1","col2" } },
+            {"saveblockmodel", new string[] {"name", "file"} },
             {"setwd", new string[] {"dir" } },
             {"view", new string[] {"name" } },
             {"delete", new string[] {"name" } },
@@ -277,6 +278,7 @@ namespace Socnet
             catch (Exception e)
             {
                 response.Add("!Error: Could not list content of directory '" + Directory.GetCurrentDirectory() + "'. Make sure that it is not a symbolic link!");
+                response.Add(e.Message);
             }
         }
 
@@ -308,6 +310,19 @@ namespace Socnet
         public void f_save()
         {
             response.Add(SocnetIO.SaveDataStructure(response, dataset, getStringArgument("name"), getStringArgument("file")));
+        }
+
+        public void f_saveblockmodel()
+        {
+            response.Add("Saving blockmodel as json for R");
+            string name = getStringArgument("name");
+            DataStructure? structure = dataset.GetStructureByName(getStringArgument("name"), typeof(BlockModel));
+            if (structure == null)
+            {
+                response.Add("!Error: No BlockModel named '" + name + "'");
+                return;
+            }
+            response.Add(SocnetIO.SaveBlockModel((BlockModel)structure, getStringArgument("file")));
         }
 
         public void f_loadscript()
