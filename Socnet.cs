@@ -10,16 +10,13 @@ Console.WriteLine("Socnet - Network analysis in C#");
 Console.WriteLine("===============================");
 Console.WriteLine(engine.versionString);
 Console.WriteLine("Developed by Carl Nordlund - carl.nordlund@liu.se");
-Console.WriteLine("Part of the Nordint.net project: https://nordint.net");
+Console.WriteLine("Socnet.se was supported by NordForsk through the funding to The Network Dynamics of Ethnic Integration, project number 105147");
+Console.WriteLine("Nordint.net: https://nordint.net");
 Console.WriteLine();
 Console.WriteLine("How to cite Socnet.se:");
 Console.WriteLine("Nordlund, C. (2023). Socnet.se: The Blockmodeling Console App [computer software]. Available from https://socnet.se");
 Console.WriteLine("How to cite specific methods, type in 'citeinfo()'.");
 Console.WriteLine();
-
-
-
-
 
 // Parse arguments and prepare
 string mode = "interactive", file = "", commands = "", args_error = "";

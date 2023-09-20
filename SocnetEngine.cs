@@ -581,6 +581,8 @@ namespace Socnet
 
             return partition;
         }
+
+
         public void f_coreperi()
         {
             response.Add("Init and running corr-based core-peri");
