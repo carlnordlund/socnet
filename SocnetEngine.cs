@@ -47,7 +47,8 @@ namespace Socnet
             {"coreperi", new string[] {"network", "searchtype" } },
             {"dichotomize", new string[] {"name", "condition", "threshold" } },
             {"symmetrize", new string[] {"name", "method" } },
-            {"rescale", new string[] {"name" } }
+            {"rescale", new string[] {"name" } },
+            {"set", new string[] {"name","row","col","value" } }
         };
 
 
@@ -406,6 +407,80 @@ namespace Socnet
             response.AddRange(structure.View);
         }
 
+        public void f_set()
+        {
+            string name = getStringArgument("name");
+            DataStructure? structure = dataset.GetStructureByName(name);
+            if (structure == null)
+            {
+                response.Add("!Error: Structure '" + name + "' not found");
+                return;
+            }
+            int row = getIntegerArgument("row"), col = getIntegerArgument("col");
+            if (row < 0 || col < 0)
+            {
+                response.Add("!Error: 'row' and/or 'col' arguments not integers");
+                return;
+            }
+            string valstr = getStringArgument("value");
+            if (valstr.Length==0)
+            {
+                response.Add("!Error: Could not parse 'value' argument");
+                return;
+            }
+            double val = double.NaN;
+            if (structure is Matrix || structure is Table)
+            {
+                val = getDoubleArgument("value");
+                if (double.IsNaN(val))
+                {
+                    response.Add("!Error: Could not parse 'value' as number");
+                    return;
+                }
+
+            }
+            if (structure is Matrix)
+            {
+                Matrix matrix = (Matrix)structure;
+                if (row < matrix.data.GetLength(0) && col < matrix.data.GetLength(1))
+                {
+                    matrix.data[row, col] = val;
+                    return;
+                }
+                response.Add("!Error: 'row' or 'col' index out of range");
+            }
+            else if (structure is Table)
+            {
+                Table table = (Table)structure;
+                if (row < table.data.GetLength(0) && col < table.data.GetLength(1))
+                {
+                    table.data[row, col] = val;
+                    return;
+                }
+                response.Add("!Error: 'row' or 'col' index out of range");
+            }
+            else if (structure is BlockImage)
+            {
+                BlockImage blockimage = (BlockImage)structure;
+                if (blockimage.blocks == null)
+                {
+                    response.Add("!Error: Blockimage has null blocks");
+                    return;
+                }
+                if (row < blockimage.blocks.GetLength(0) && col < blockimage.blocks.GetLength(1))
+                {
+                    blockimage.setBlockByPattern(row, col, valstr);
+                    return;
+                }
+                response.Add("!Error: 'row' or 'col' index out of range");
+            }
+            else
+            {
+                response.Add("!Error: Not implemented for this structure");
+            }
+        }
+
+
 
         public BlockImage? f_blockimage()
         {
@@ -582,6 +657,7 @@ namespace Socnet
             searchParams["maxtime"] = getIntegerArgument("maxtime");
             searchParams["nbrrandomstart"] = getIntegerArgument("nbrrandomstart");
             searchParams["doswitching"] = getStringArgument("doswitching");
+            searchParams["minnbrbetter"] = getIntegerArgument("minnbrbetter");
 
             string statusInitMsg = Blockmodeling.InitializeSearch(searchParams);
             if (statusInitMsg.Equals("ok"))
@@ -676,6 +752,7 @@ namespace Socnet
             searchParams["maxtime"] = getIntegerArgument("maxtime");
             searchParams["nbrrandomstart"] = getIntegerArgument("nbrrandomstart");
             searchParams["doswitching"] = getStringArgument("doswitching");
+            searchParams["minnbrbetter"] = getIntegerArgument("minnbrbetter");
 
             string statusInitMsg = Blockmodeling.InitializeSearch(searchParams);
             if (statusInitMsg.Equals("ok"))
@@ -690,7 +767,8 @@ namespace Socnet
             string status = Blockmodeling.StartSearch();
             if (status.Equals("ok"))
             {
-                response.Add("Execution time (ms):" + Blockmodeling.stopwatch.ElapsedMilliseconds);
+                long executionTime = Blockmodeling.stopwatch.ElapsedMilliseconds;
+                response.Add("Execution time (ms):" + executionTime);
                 List<BlockModel> blockmodels = Blockmodeling.generateBlockmodelStructuresFromBMSolutions(getStringArgument("outname"));
 
                 foreach (BlockModel bm in blockmodels)
@@ -749,23 +827,24 @@ namespace Socnet
             string outname = getStringArgument("outname");
             bool autoname = (outname.Length == 0);
 
-            DataStructure? blockmodel = dataset.GetStructureByName(getStringArgument("blockmodel"), typeof(BlockModel));
-            if (blockmodel == null)
+            DataStructure? structure = dataset.GetStructureByName(getStringArgument("blockmodel"), typeof(BlockModel));
+            if (structure == null)
             {
                 response.Add("!Error: Blockmodel not found");
                 return;
             }
+            BlockModel blockmodel = (BlockModel)structure;
             string type = getStringArgument("type");
             if (type.Equals("blockimage"))
             {
-                BlockImage bi = ((BlockModel)blockmodel).ExtractBlockimage();
+                BlockImage bi = blockmodel.ExtractBlockimage();
                 bi.Name = (autoname) ? dataset.GetAutoName(bi.Name) : outname;
                 response.Add(dataset.StoreStructure(bi));
                 //return bi;
             }
             else if (type.Equals("matrix"))
             {
-                Matrix bmMatrix = ((BlockModel)blockmodel).GetBlockModelMatrix();
+                Matrix bmMatrix = blockmodel.GetBlockModelMatrix();
                 if (!autoname)
                 {
                     bmMatrix.Name = outname;
@@ -776,10 +855,14 @@ namespace Socnet
             }
             else if (type.Equals("partition"))
             {
-                Partition partition = ((BlockModel)blockmodel).partition;
+                Partition partition = blockmodel.partition;
                 if (!autoname)
                     partition.Name = outname;
                 response.Add(dataset.StoreStructure(partition));
+            }
+            else if (type.Equals("gof"))
+            {
+                response.Add(blockmodel.gof + " (" + blockmodel.gofMethod + ")");
             }
         }
 

@@ -31,9 +31,10 @@ namespace Socnet
         public static string gofMethodName = "";
 
         public static int minClusterSize = 1;
-        public static int nbrRestarts = 10;
-        public static int maxNbrIterations = 25;
-        public static int nbrRandomStart = 5;
+        public static int nbrRestarts = 50;
+        public static int maxNbrIterations = 100;
+        public static int nbrRandomStart = 50;
+        public static int minNbrBetter = 5;
 
         public static Boolean doSwitching = true;
 
@@ -92,14 +93,20 @@ namespace Socnet
                 {
                     searchHeuristic = (searchTypeName.Equals("localopt")) ? doLocalOptSearch : doLjubljanaSearch;
                     //searchHeuristic = doLocalOptSearch;
-                    nbrRestarts = (searchParams.ContainsKey("nbrrestarts") && searchParams["nbrrestarts"] is int && (int)searchParams["nbrrestarts"]! > 0) ? (int)searchParams["nbrrestarts"]! : 100;
-                    maxNbrIterations = (searchParams.ContainsKey("maxiterations") && searchParams["maxiterations"] is int && (int)searchParams["maxiterations"]! > 0) ? (int)searchParams["maxiterations"]! : 50;
+                    nbrRestarts = (searchParams.ContainsKey("nbrrestarts") && searchParams["nbrrestarts"] is int && (int)searchParams["nbrrestarts"]! > 0) ? (int)searchParams["nbrrestarts"]! : 50;
+                    maxNbrIterations = (searchParams.ContainsKey("maxiterations") && searchParams["maxiterations"] is int && (int)searchParams["maxiterations"]! > 0) ? (int)searchParams["maxiterations"]! : 100;
                     nbrRandomStart = (searchParams.ContainsKey("nbrrandomstart") && searchParams["nbrrandomstart"] is int && (int)searchParams["nbrrandomstart"]! > 0) ? (int)searchParams["nbrrandomstart"]!:50;
+                    
+                    minNbrBetter = (searchParams.ContainsKey("minnbrbetter") && searchParams["minnbrbetter"] is int && (int)searchParams["minnbrbetter"]! > 0) ? (int)searchParams["minnbrbetter"]! : 5;
                     doSwitching = (searchParams.ContainsKey("doswitching") && searchParams["doswitching"]!=null && searchParams["doswitching"] is string && ((string)searchParams["doswitching"]!).Length > 0 && ((string)searchParams["doswitching"]!).ToLower()[0] == 'y');
                     log("nbrrestarts: " + nbrRestarts);
                     log("maxiterations: " + maxNbrIterations);
                     log("nbrrandomstart: " + nbrRandomStart);
-                    log("doswitching: " + ((doSwitching) ? "yes" : "no"));
+                    if (searchHeuristic == doLocalOptSearch)
+                        log("doswitching: " + ((doSwitching) ? "yes" : "no"));
+                    else
+                        log("minnbrbetter: " + minNbrBetter);
+
                 }
                 else if (searchTypeName.Equals("exhaustive"))
                     searchHeuristic = doExhaustiveSearch;
@@ -315,6 +322,7 @@ namespace Socnet
                                     c2 = c2random[c2i];
                                     if (c1 != c2)
                                     {
+                                        int nbrBetterFound = 0;
                                         int[] a1random = createRandomizedRange(0, partition.clusters[c1].actors.Count);
                                         for (int ai = 0; ai < partition.clusters[c1].actors.Count && !foundBetterWhileMoving; ai++)
                                         {
@@ -334,10 +342,12 @@ namespace Socnet
                                                 bestSolutionsThisRun.Add(neighSolution);
                                                 checkNextIteration.Clear();
                                                 checkNextIteration.Add(neighSolution);
-                                                foundBetterWhileMoving = true;
                                                 // Storing as checked.. But hmm...
                                                 checkedPartString.Add(partition.GetPartString());
-                                                continue;
+                                                nbrBetterFound++;
+                                                if (nbrBetterFound >= minNbrBetter)
+                                                    foundBetterWhileMoving = true;
+                                                //continue;
                                             }
                                             else if (neighSolution.gofValue==bestGofThisRun)
                                             {
