@@ -90,7 +90,7 @@ namespace Socnet
             double gof = blockmodel.gof;
             string gofmethod = blockmodel.gofMethod;
 
-            string json = @"{""type"":""list"",""attributes"":{""names"":{""type"":""character"",""attributes"":{},""value"":[""matrix"",""partition"",""blockimage"",""gof"",""gofmethod""]}},""value"":[{""type"":""integer"",""attributes"":{""dim"":{""type"":""integer"",""attributes"":{},""value"":";
+            string json = @"{""type"":""list"",""attributes"":{""names"":{""type"":""character"",""attributes"":{},""value"":[""matrix"",""partition"",""blockimage"",""gof"",""gofmethod""]}},""value"":[{""type"":""double"",""attributes"":{""dim"":{""type"":""integer"",""attributes"":{},""value"":";
 
             json += "[" + nbrActors + "," + nbrActors + "]";
 
@@ -118,7 +118,7 @@ namespace Socnet
                 }
             json += "[" + string.Join(',', matrix1dArray) + "]";
 
-            json += @"},{""type"":""double"",""attributes"":{},""value"":";
+            json += @"},{""type"":""integer"",""attributes"":{},""value"":";
 
             json += "[" + partstring + "]";
 
