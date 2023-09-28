@@ -693,6 +693,7 @@ namespace Socnet
         public static BMSolution binaryHamming(Matrix matrix, BlockImage blockimage, Partition partition)
         {
             int nbrPos = blockimage.nbrPositions;
+            Matrix idealMatrix = new Matrix(matrix.actorset, "idealmatrix", "N0");
             int[,] blockindices = new int[nbrPos, nbrPos];
             double penalty = 0, currentBlockPenalty, bestBlockPenalty;
             for (int r=0; r<nbrPos;r++)
@@ -701,7 +702,7 @@ namespace Socnet
                     bestBlockPenalty = int.MaxValue;
                     for (int i=0; i<blockimage.blocks![r,c].Count;i++)
                     {
-                        currentBlockPenalty = blockimage.GetBlock(r, c, i).getPenaltyHamming(matrix, partition.clusters[r], partition.clusters[c]);
+                        currentBlockPenalty = blockimage.GetBlock(r, c, i).getPenaltyHamming(matrix, partition.clusters[r], partition.clusters[c], idealMatrix);
                         if (currentBlockPenalty < bestBlockPenalty)
                         {
                             bestBlockPenalty = currentBlockPenalty;
@@ -722,10 +723,11 @@ namespace Socnet
         public static BMSolution nordlund2020(Matrix matrix, BlockImage blockimage, Partition partition)
         {
             int nbrPos = blockimage.nbrPositions;
+            Matrix idealMatrix = new Matrix(matrix.actorset, "idealmatrix", "N0");
             List<Triple> triples = new List<Triple>();
             for (int r = 0; r < nbrPos; r++)
                 for (int c = 0; c < nbrPos; c++)
-                    triples.AddRange(blockimage.GetBlock(r, c).getTripletList(matrix, partition.clusters[r], partition.clusters[c]));
+                    triples.AddRange(blockimage.GetBlock(r, c).getTripletList(matrix, partition.clusters[r], partition.clusters[c], idealMatrix));
 
             // Testing that the total weight of all triplets is equal to the total size of cells
             // Good to do this test when implementing new correlation-based blocks, to make sure their relative
@@ -741,7 +743,7 @@ namespace Socnet
 
             try
             {
-                return new BMSolution(matrix, blockimage, new int[nbrPos, nbrPos], partition.GetPartArrayCopy(), Functions.correlateTriplets(triples), "nordlund");
+                return new BMSolution(matrix, blockimage, new int[nbrPos, nbrPos], partition.GetPartArrayCopy(), Functions.correlateTriplets(triples), "nordlund", idealMatrix);
             }
             catch (Exception e)
             {
@@ -830,13 +832,14 @@ namespace Socnet
     public struct BMSolution
     {
         public Matrix matrix;
+        public Matrix? idealMatrix;
         public BlockImage blockimage;
         public int[,] blockindices;
         public int[] partarray;
         public double gofValue;
         public string criteriaFunction;
 
-        public BMSolution(Matrix matrix, BlockImage blockimage, int[,] blockindices, int[] partarray, double gofValue, string criteriaFunction)
+        public BMSolution(Matrix matrix, BlockImage blockimage, int[,] blockindices, int[] partarray, double gofValue, string criteriaFunction, Matrix? idealMatrix = null)
         {
             this.matrix = matrix;
             this.blockimage = blockimage;
@@ -844,6 +847,7 @@ namespace Socnet
             this.partarray = partarray;
             this.gofValue = gofValue;
             this.criteriaFunction = criteriaFunction;
+            this.idealMatrix = idealMatrix;
         }
 
         //BMSolution(matrix, blockimage, new int[nbrPos, nbrPos], partition.GetPartArrayCopy(), Functions.correlateTriplets(triples), "nordlund");

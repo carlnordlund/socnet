@@ -11,12 +11,12 @@ namespace Socnet.DataLibrary.Blocks
         public string Name = "";
         public int primeIndex;
 
-        public virtual double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster)
+        public virtual double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix idealMatrix)
         {
             return 0;
         }
 
-        public virtual List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster)
+        public virtual List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix idealMatrix)
         {
             return new List<Triple>();
         }

@@ -34,13 +34,16 @@ namespace Socnet.DataLibrary.Blocks
             return new denuciBlock(this.d);
         }
 
-        public override List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster)
+        public override List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix idealMatrix)
         {
             List<Triple> triplets = new List<Triple>();
             foreach (Actor rowActor in rowCluster.actors)
                 foreach (Actor colActor in colCluster.actors)
                     if (rowActor != colActor)
+                    {
                         triplets.Add(new Triple(matrix.Get(rowActor, colActor), d, 1));
+                        idealMatrix.Set(rowActor, colActor, d);
+                    }
             return triplets;
         }
 

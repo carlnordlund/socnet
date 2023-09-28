@@ -19,18 +19,24 @@ namespace Socnet.DataLibrary.Blocks
             return new cfnBlock();
         }
 
-        public override double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster)
+        public override double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix idealMatrix)
         {
             double nr = rowCluster.actors.Count, nc = colCluster.actors.Count;
             double sum_row, sum_tot = 0, pc = 0;
             foreach (Actor colActor in colCluster.actors)
             {
                 sum_row = 0;
+                bool foundFirst = false;
                 foreach (Actor rowActor in rowCluster.actors)
                     if (rowActor != colActor && matrix.Get(rowActor, colActor) > 0)
                     {
                         sum_tot++;
                         sum_row++;
+                        if (!foundFirst)
+                        {
+                            idealMatrix.Set(rowActor, colActor, 1);
+                            foundFirst = true;
+                        }
                     }
                 if (sum_row > 0)
                     pc++;
@@ -38,7 +44,7 @@ namespace Socnet.DataLibrary.Blocks
             return sum_tot - pc + (nc - pc) * nr;
         }
 
-        public override List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster)
+        public override List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix idealMatrix)
         {
             List<Triple> triplets = new List<Triple>();
             if (rowCluster == colCluster && rowCluster.actors.Count == 1)
@@ -59,8 +65,11 @@ namespace Socnet.DataLibrary.Blocks
                 if (maxActor == null)
                     triplets.Add(new Triple(0, 1, (double)(nbrRows - ((rowCluster == colCluster) ? 1 : 0))));
                 else
+                {
+                    idealMatrix.Set(maxActor, colActor, 1);
                     foreach (Actor rowActor in rowCluster.actors)
                         triplets.Add(new Triple(matrix.Get(rowActor, colActor), (rowActor == maxActor) ? 1 : 0, 1));
+                }
             }
             return triplets;
         }

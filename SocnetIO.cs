@@ -157,7 +157,7 @@ namespace Socnet
             }
             catch (Exception e)
             {
-                return "!Error: Could not save file '" + file + "'";
+                return "!Error: Could not save file '" + file + "'; " + e.Message;
             }
 
             return "Saved BlockModel to '" + file + "' as JSON for R (use library 'jsonlite' and 'unserializeJSON()' to get this into a useful R object)";

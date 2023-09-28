@@ -17,7 +17,7 @@ namespace Socnet.DataLibrary.Blocks
             primeIndex = 12;
         }
 
-        public override List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster)
+        public override List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix idealMatrix)
         {
             List<Triple> triplets = new List<Triple>();
             if (rowCluster == colCluster && rowCluster.actors.Count == 1)
