@@ -712,7 +712,7 @@ namespace Socnet
                     penalty += bestBlockPenalty;
                 }
 
-            return new BMSolution(matrix, blockimage, blockindices, partition.GetPartArrayCopy(), penalty, "hamming");
+            return new BMSolution(matrix, blockimage, blockindices, partition.GetPartArrayCopy(), penalty, "hamming", idealMatrix);
         }
 
         //public static BMSolution ziberna2007(Matrix matrix, BlockImage blockimage, Partition partition)
@@ -778,6 +778,7 @@ namespace Socnet
         internal static BlockModel? GetHypotheticalBlockmodel(Matrix network, BlockImage blockimage, Partition partition, string gofMethod)
         {
             BMSolution solution;
+            //Matrix idealMatrix = new Matrix(network.actorset, "idealmatrix", "N0");
             if (gofMethod.Equals("nordlund"))
                 solution = nordlund2020(network, blockimage, partition);
             else if (gofMethod.Equals("hamming"))
@@ -786,7 +787,7 @@ namespace Socnet
                 return null;
             // Ok - got solution, now convert to Blockmodel
             string bmName = "bm_" + solution.matrix.Name + "_" + solution.blockimage.Name + "_" + partition.Name;
-            BlockModel bm = new BlockModel(bmName, network, blockimage, partition, solution.blockindices, solution.gofValue, solution.criteriaFunction);
+            BlockModel bm = new BlockModel(bmName, network, blockimage, partition, solution.blockindices, solution.gofValue, solution.criteriaFunction, solution.idealMatrix);
             return bm;
         }
 
@@ -808,7 +809,7 @@ namespace Socnet
 
 
                 string bmName = basename + "_" + index;
-                BlockModel blockmodel = new BlockModel(bmName, solution.matrix, solution.blockimage, partition, solution.blockindices, solution.gofValue, solution.criteriaFunction);
+                BlockModel blockmodel = new BlockModel(bmName, solution.matrix, solution.blockimage, partition, solution.blockindices, solution.gofValue, solution.criteriaFunction, solution.idealMatrix);
                 blockmodels.Add(blockmodel);
                 index++;
             }
@@ -832,14 +833,14 @@ namespace Socnet
     public struct BMSolution
     {
         public Matrix matrix;
-        public Matrix? idealMatrix;
+        public Matrix idealMatrix;
         public BlockImage blockimage;
         public int[,] blockindices;
         public int[] partarray;
         public double gofValue;
         public string criteriaFunction;
 
-        public BMSolution(Matrix matrix, BlockImage blockimage, int[,] blockindices, int[] partarray, double gofValue, string criteriaFunction, Matrix? idealMatrix = null)
+        public BMSolution(Matrix matrix, BlockImage blockimage, int[,] blockindices, int[] partarray, double gofValue, string criteriaFunction, Matrix idealMatrix)
         {
             this.matrix = matrix;
             this.blockimage = blockimage;

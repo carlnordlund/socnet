@@ -854,21 +854,24 @@ namespace Socnet
             string type = getStringArgument("type");
             if (type.Equals("blockimage"))
             {
-                BlockImage bi = blockmodel.ExtractBlockimage();
+                BlockImage bi = blockmodel.blockimage;
                 bi.Name = (autoname) ? dataset.GetAutoName(bi.Name) : outname;
                 response.Add(dataset.StoreStructure(bi));
                 //return bi;
             }
             else if (type.Equals("matrix"))
             {
-                Matrix bmMatrix = blockmodel.GetBlockModelMatrix();
+                Matrix bmMatrix = blockmodel.bmMatrix;
+                Matrix bmIdealMatrix = blockmodel.bmIdealMatrix;
                 if (!autoname)
                 {
                     bmMatrix.Name = outname;
                     bmMatrix.actorset.Name = "actors_" + outname;
+                    bmIdealMatrix.Name = outname + "_ideal";
                 }
                 response.Add(dataset.StoreStructure(bmMatrix.actorset));
                 response.Add(dataset.StoreStructure(bmMatrix));
+                response.Add(dataset.StoreStructure(bmIdealMatrix));
             }
             else if (type.Equals("partition"))
             {

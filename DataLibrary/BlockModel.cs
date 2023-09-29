@@ -12,7 +12,10 @@ namespace Socnet.DataLibrary
         public BlockImage blockimage;
         public Partition partition;
 
-        //public Matrix idealMatrix;
+        public Matrix idealMatrix;
+
+        public Matrix bmIdealMatrix, bmMatrix;
+
 
         public int[,] blockIndices;
         //public string partString;
@@ -20,19 +23,49 @@ namespace Socnet.DataLibrary
         public string gofMethod;
         public int[,] blockPenalties;
 
-        public BlockModel(string name, Matrix matrix, BlockImage blockimage, Partition partition, int[,] blockIndices, double gof, string gofMethod)
+        public BlockModel(string name, Matrix matrix, BlockImage blockimage, Partition partition, int[,] blockIndices, double gof, string gofMethod, Matrix idealMatrix)
         {
             this.Name = name;
             this.matrix = matrix;
-            this.blockimage = blockimage;
+            if (!blockimage.multiBlocked)
+                this.blockimage = blockimage;
+            else
+                this.blockimage= new BlockImage(blockimage, blockIndices);
             this.partition = partition;
             this.blockIndices = blockIndices;
             //this.partString = partString;
             this.gof = Math.Round(gof, 4);
             this.gofMethod = gofMethod;
+            this.idealMatrix = idealMatrix;
+
+            createBlockmodelMatrices();
         }
 
-
+        private void createBlockmodelMatrices()
+        {
+            Actorset bmActorset = new Actorset(this.Name + "_actors");
+            int nbrPositions = partition.clusters.Length;
+            Dictionary<Actor, Actor> actorIndexMap = new Dictionary<Actor, Actor>();
+            int index = 0;
+            for (int i = 0; i < nbrPositions; i++)
+            {
+                foreach (Actor actor in partition.clusters[i].actors)
+                {
+                    Actor bmActor = new Actor(i + "_" + actor.Name, index);
+                    bmActorset.actors.Add(bmActor);
+                    actorIndexMap.Add(actor, bmActor);
+                    index++;
+                }
+            }
+            bmMatrix = new Matrix(bmActorset, this.Name + "_matrix", matrix.Cellformat);
+            bmIdealMatrix = new Matrix(bmActorset, this.Name + "_idealmatrix", "N0");
+            foreach (Actor rowActor in matrix.actorset.actors)
+                foreach (Actor colActor in matrix.actorset.actors)
+                {
+                    bmMatrix.Set(actorIndexMap[rowActor], actorIndexMap[colActor], matrix.Get(rowActor, colActor));
+                    bmIdealMatrix.Set(actorIndexMap[rowActor], actorIndexMap[colActor], idealMatrix.Get(rowActor, colActor));
+                }
+        }
 
         internal override void GetContent(List<string> content)
         {

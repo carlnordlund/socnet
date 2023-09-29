@@ -80,7 +80,7 @@ namespace Socnet
 
         internal static string SaveBlockModel(BlockModel blockmodel, string file)
         {
-            Matrix bmMatrix = blockmodel.GetBlockModelMatrix();
+            Matrix bmMatrix = blockmodel.bmMatrix;
             Actorset bmActorset = bmMatrix.actorset;
             string actorLabels = "[" + string.Join(',', bmActorset.GetActorLabelArray("\"")) + "]";
             int nbrActors = bmActorset.Count;
