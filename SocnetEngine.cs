@@ -833,6 +833,8 @@ namespace Socnet
             }
             response.Add("Blockmodel:");
             response.AddRange(bm.DisplayBlockmodel());
+            response.Add("Ideal blockmodel:");
+            response.AddRange(bm.DisplayBlockmodel("ideal",'1','0'));
             response.Add("Blockimage:");
             response.AddRange(bm.DisplayBlockimage());
             response.Add("Goodness-of-fit: " + bm.gof + " (" + bm.gofMethod + ")");

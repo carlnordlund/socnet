@@ -99,13 +99,17 @@ namespace Socnet.DataLibrary
             return lines;
         }
 
-        internal List<string> DisplayBlockmodel()
+        internal List<string> DisplayBlockmodel(string type = "matrix", char tieChar = 'X', char noTieChar=' ')
         {
-            double median = Functions.GetMedianValue(matrix);
             List<string> lines = new List<string>();
+            Matrix? displayMatrix = (type.Equals("matrix")) ? matrix : (type.Equals("ideal")) ? idealMatrix : null;
+            if (displayMatrix == null)
+                return lines;
+            double median = Functions.GetMedianValue(displayMatrix);
             int nbrClusters = partition.clusters.Length;
             lines.Add("+" + new string('-', partition.actorset.Count + nbrClusters - 1) + "+");
             string line = "";
+            double val = 0;
             for (int r = 0; r < nbrClusters; r++)
             {
 
@@ -117,8 +121,9 @@ namespace Socnet.DataLibrary
                     {
                         foreach (Actor colActor in partition.clusters[c].actors)
                         {
+                            val = displayMatrix.Get(rowActor, colActor);
                             if (rowActor != colActor)
-                                line += (matrix.Get(rowActor, colActor) > median) ? "X" : " ";
+                                line += (val > median) ? tieChar : (double.IsNaN(val)) ? "." : noTieChar;
                             else
                                 line += @"\";
 
@@ -127,7 +132,7 @@ namespace Socnet.DataLibrary
 
                     }
                     //line = line.TrimEnd('|');
-                    line += "\t"+ r + "_" + rowActor.Name;
+                    line += "\t" + r + "_" + rowActor.Name;
                     lines.Add(line);
                 }
                 if (r < nbrClusters)

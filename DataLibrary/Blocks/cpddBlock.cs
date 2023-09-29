@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 namespace Socnet.DataLibrary.Blocks
 {
@@ -41,8 +42,11 @@ namespace Socnet.DataLibrary.Blocks
                 if (maxActor == null)
                     triplets.Add(new Triple(0, 1, 0.5 * (double)(nbrRows - ((rowCluster == colCluster) ? 1 : 0))));
                 else
+                {
+                    idealMatrix.Set(maxActor, colActor, 1);
                     foreach (Actor rowActor in rowCluster.actors)
                         triplets.Add(new Triple(matrix.Get(rowActor, colActor), (rowActor == maxActor) ? 1 : 0, 0.5));
+                }
             }
 
             // Checking row-regular (half weight)
@@ -51,11 +55,16 @@ namespace Socnet.DataLibrary.Blocks
 
             foreach (Actor rowActor in rowCluster.actors)
             {
+                maxActor = null;
                 maxVal = double.NegativeInfinity;
                 foreach (Actor colActor in colCluster.actors)
                     if (rowActor != colActor && matrix.Get(rowActor, colActor) > maxVal)
+                    {
                         maxVal = matrix.Get(rowActor, colActor);
+                        maxActor = colActor;
+                    }
                 triplets.Add(new Triple(maxVal, 1, w));
+                idealMatrix.Set(rowActor, maxActor!, 1);
             }
             return triplets;
         }

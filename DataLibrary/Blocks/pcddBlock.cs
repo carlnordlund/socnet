@@ -40,8 +40,11 @@ namespace Socnet.DataLibrary.Blocks
                 if (maxActor == null)
                     triplets.Add(new Triple(0, 1, 0.5 * (double)(nbrCols - ((rowCluster == colCluster) ? 1 : 0))));
                 else
+                {
+                    idealMatrix.Set(rowActor, maxActor, 1);
                     foreach (Actor colActor in colCluster.actors)
                         triplets.Add(new Triple(matrix.Get(rowActor, colActor), (colActor == maxActor) ? 1 : 0, 0.5));
+                }
             }
 
             // Checking col-regular (half weight)
@@ -50,11 +53,16 @@ namespace Socnet.DataLibrary.Blocks
 
             foreach (Actor colActor in colCluster.actors)
             {
+                maxActor = null;
                 maxVal = double.NegativeInfinity;
                 foreach (Actor rowActor in rowCluster.actors)
                     if (rowActor != colActor && matrix.Get(rowActor, colActor) > maxVal)
+                    {
                         maxVal = matrix.Get(rowActor, colActor);
+                        maxActor = rowActor;
+                    }
                 triplets.Add(new Triple(maxVal, 1, w));
+                idealMatrix.Set(maxActor!, colActor, 1);
             }
             return triplets;
         }
