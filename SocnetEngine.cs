@@ -805,6 +805,8 @@ namespace Socnet
         public void f_bmview()
         {
             BlockModel bm;
+            bool showIdealMatrix = (getStringArgument("ideal").Length > 0 && getStringArgument("ideal")[0] == 'y');
+            bool valueGradient = (getStringArgument("valuegradient").Length > 0 && getStringArgument("valuegradient")[0] == 'y');
             string name = getStringArgument("blockmodel");
             if (name.Length==0)
             {
@@ -832,9 +834,13 @@ namespace Socnet
                 bm = (BlockModel)structure;
             }
             response.Add("Blockmodel:");
-            response.AddRange(bm.DisplayBlockmodel());
-            response.Add("Ideal blockmodel:");
-            response.AddRange(bm.DisplayBlockmodel("ideal",'1','0'));
+            response.AddRange(bm.DisplayBlockmodelMatrix(valueGradient));
+            if (showIdealMatrix)
+            {
+                response.Add("Ideal blockmodel:");
+                response.AddRange(bm.DisplayIdealMatrix());
+                //response.AddRange(bm.DisplayBlockmodel("ideal", '1', '0'));
+            }
             response.Add("Blockimage:");
             response.AddRange(bm.DisplayBlockimage());
             response.Add("Goodness-of-fit: " + bm.gof + " (" + bm.gofMethod + ")");

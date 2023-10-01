@@ -99,13 +99,27 @@ namespace Socnet.DataLibrary
             return lines;
         }
 
-        internal List<string> DisplayBlockmodel(string type = "matrix", char tieChar = 'X', char noTieChar=' ')
+        internal List<string> DisplayBlockmodelMatrix(bool valueGradient=false)
+        {
+            string gradient = (valueGradient) ? " .:-=+*#%@" : "";
+            return DisplayBlockmodel(matrix,'X',' ', gradient);
+        }
+
+        internal List<string> DisplayIdealMatrix()
+        {
+            return DisplayBlockmodel(idealMatrix, '1', '0');
+        }
+
+        internal List<string> DisplayBlockmodel(Matrix displayMatrix, char tieChar = 'X', char noTieChar=' ', string gradient="")
         {
             List<string> lines = new List<string>();
-            Matrix? displayMatrix = (type.Equals("matrix")) ? matrix : (type.Equals("ideal")) ? idealMatrix : null;
             if (displayMatrix == null)
                 return lines;
-            double median = Functions.GetMedianValue(displayMatrix);
+            bool withGradient = (gradient.Length > 0);
+
+
+            double median = Functions.GetMedianValue(displayMatrix), max = Functions.GetMaxValue(displayMatrix, false);
+            double div = (withGradient) ? (max + 1) / gradient.Length : 0;
             int nbrClusters = partition.clusters.Length;
             lines.Add("+" + new string('-', partition.actorset.Count + nbrClusters - 1) + "+");
             string line = "";
@@ -123,7 +137,15 @@ namespace Socnet.DataLibrary
                         {
                             val = displayMatrix.Get(rowActor, colActor);
                             if (rowActor != colActor)
-                                line += (val > median) ? tieChar : (double.IsNaN(val)) ? "." : noTieChar;
+                            {
+                                if (withGradient)
+                                {
+                                    
+                                    line += (gradient[(int)(val/div)]);
+                                }
+                                else
+                                    line += (val > median) ? tieChar : (double.IsNaN(val)) ? "." : noTieChar;
+                            }
                             else
                                 line += @"\";
 
@@ -131,7 +153,6 @@ namespace Socnet.DataLibrary
                         line += "|";
 
                     }
-                    //line = line.TrimEnd('|');
                     line += "\t" + r + "_" + rowActor.Name;
                     lines.Add(line);
                 }
