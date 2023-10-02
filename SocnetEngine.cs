@@ -808,7 +808,6 @@ namespace Socnet
         {
             BlockModel bm;
             bool showIdealMatrix = (getStringArgument("ideal").Length > 0 && getStringArgument("ideal")[0] == 'y');
-            bool valueGradient = (getStringArgument("valuegradient").Length > 0 && getStringArgument("valuegradient")[0] == 'y');
             string name = getStringArgument("blockmodel");
             if (name.Length==0)
             {
@@ -836,7 +835,7 @@ namespace Socnet
                 bm = (BlockModel)structure;
             }
             response.Add("Blockmodel:");
-            response.AddRange(bm.DisplayBlockmodelMatrix(valueGradient));
+            response.AddRange(bm.DisplayBlockmodelMatrix());
             if (showIdealMatrix)
             {
                 response.Add("Ideal blockmodel:");

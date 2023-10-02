@@ -73,7 +73,10 @@ namespace Socnet.DataLibrary.Blocks
                 rowObj.Value.Sort((s1, s2) => s2.value.CompareTo(s1.value));
 
                 for (int k = 0; k < kr; k++)
+                {
                     triplets.Add(new Triple(rowObj.Value[k].value, 1, 0.5));
+                    idealMatrix.Set(rowObj.Value[k].from, rowObj.Value[k].to, 1);
+                }
                 for (int k = (int)Math.Ceiling(kr); k < rowObj.Value.Count; k++)
                     triplets.Add(new Triple(rowObj.Value[k].value, rowObj.Value[k].value, 0.5));
             }
@@ -82,7 +85,10 @@ namespace Socnet.DataLibrary.Blocks
             {
                 colObj.Value.Sort((s1, s2) => s2.value.CompareTo(s1.value));
                 for (int k = 0; k < kc; k++)
+                {
                     triplets.Add(new Triple(colObj.Value[k].value, 1, 0.5));
+                    idealMatrix.Set(colObj.Value[k].from, colObj.Value[k].to, 1);
+                }
                 for (int k = (int)Math.Ceiling(kc); k < colObj.Value.Count; k++)
                     triplets.Add(new Triple(colObj.Value[k].value, colObj.Value[k].value, 0.5));
             }

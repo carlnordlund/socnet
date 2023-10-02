@@ -369,12 +369,15 @@ namespace Socnet
 
         public static double GetMinValue(Matrix matrix, bool incldiag=false)
         {
-            double min = double.MaxValue;
+            double min = double.MaxValue, val = 0;
             foreach (Actor rowActor in matrix.actorset.actors)
                 foreach (Actor colActor in matrix.actorset.actors)
                     if (rowActor != colActor || incldiag)
-                        if (matrix.Get(rowActor, colActor) < min)
-                            min = matrix.Get(rowActor, colActor);
+                    {
+                        val = matrix.Get(rowActor, colActor);
+                        if (!double.IsNaN(val) && val < min)
+                            min = val;
+                    }
             return min;
         }
 
@@ -387,12 +390,14 @@ namespace Socnet
         
         public static double GetMaxValue(Matrix matrix, bool incldiag=false)
         {
-            double max = double.MinValue;
+            double max = double.MinValue, val = 0;
             foreach (Actor rowActor in matrix.actorset.actors)
                 foreach (Actor colActor in matrix.actorset.actors)
-                    if (rowActor != colActor || incldiag)
-                        if (matrix.Get(rowActor, colActor) > max)
-                            max = matrix.Get(rowActor, colActor);
+                    if (rowActor != colActor || incldiag) {
+                        val = matrix.Get(rowActor, colActor);
+                        if (!double.IsNaN(val) &&  val > max)
+                            max = val;
+                    }
             return max;
         }
 
@@ -501,7 +506,7 @@ namespace Socnet
                 Matrix mat = (Matrix)structure;
                 foreach (Actor rowActor in mat.actorset.actors)
                     foreach (Actor colActor in mat.actorset.actors)
-                        if (rowActor != colActor || incldiag)
+                        if (rowActor != colActor || incldiag && !double.IsNaN(mat.Get(rowActor, colActor)))
                             values.Add(mat.Get(rowActor, colActor));
             }
             else if (structure is Table)

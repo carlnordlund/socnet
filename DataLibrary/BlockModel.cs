@@ -99,10 +99,9 @@ namespace Socnet.DataLibrary
             return lines;
         }
 
-        internal List<string> DisplayBlockmodelMatrix(bool valueGradient=false)
+        internal List<string> DisplayBlockmodelMatrix()
         {
-            string gradient = (valueGradient) ? " .:-=+*#%@" : "";
-            return DisplayBlockmodel(matrix,'X',' ', gradient);
+            return DisplayBlockmodel(matrix,'X',' ');
         }
 
         internal List<string> DisplayIdealMatrix()
@@ -110,16 +109,15 @@ namespace Socnet.DataLibrary
             return DisplayBlockmodel(idealMatrix, '1', '0');
         }
 
-        internal List<string> DisplayBlockmodel(Matrix displayMatrix, char tieChar = 'X', char noTieChar=' ', string gradient="")
+        internal List<string> DisplayBlockmodel(Matrix displayMatrix, char tieChar = 'X', char noTieChar=' ')
         {
             List<string> lines = new List<string>();
             if (displayMatrix == null)
                 return lines;
-            bool withGradient = (gradient.Length > 0);
 
+            double max = Functions.GetMaxValue(displayMatrix, false);
+            double median = (max == 1) ? 0.5 : Functions.GetMedianValue(displayMatrix);
 
-            double median = Functions.GetMedianValue(displayMatrix), max = Functions.GetMaxValue(displayMatrix, false);
-            double div = (withGradient) ? (max + 1) / gradient.Length : 0;
             int nbrClusters = partition.clusters.Length;
             lines.Add("+" + new string('-', partition.actorset.Count + nbrClusters - 1) + "+");
             string line = "";
@@ -138,13 +136,7 @@ namespace Socnet.DataLibrary
                             val = displayMatrix.Get(rowActor, colActor);
                             if (rowActor != colActor)
                             {
-                                if (withGradient)
-                                {
-                                    
-                                    line += (gradient[(int)(val/div)]);
-                                }
-                                else
-                                    line += (val > median) ? tieChar : (double.IsNaN(val)) ? "." : noTieChar;
+                                line += (val > median) ? tieChar : (double.IsNaN(val)) ? "." : noTieChar;
                             }
                             else
                                 line += @"\";
