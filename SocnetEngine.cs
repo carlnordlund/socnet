@@ -634,6 +634,8 @@ namespace Socnet
                     response.Add("!Error: Power-relational pattern '" + powerrelational + "' not recognized; use 'dep', 'dom' or 'depdom'");
                     return;
                 }
+                cpbi.Name = "cp" + powerrelational;
+                
 
             }
             else if (intercat !="")
