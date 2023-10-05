@@ -12,11 +12,12 @@ namespace Socnet
         public static Dictionary<string, List<string>> availableBlocks = new Dictionary<string, List<string>>()
         {
             { "hamming", new List<string>() { "dnc","nul","com","reg","rre","cre","rfn","cfn", "den", "denmin" } },
-            { "nordlund", new List<string>() { "dnc","nul","com","reg","rre","cre","rfn","cfn", "denuci", "den", "denmin","pco","cpdd","pcdd" } }
+            { "nordlund", new List<string>() { "dnc","nul","com","reg","rre","cre","rfn","cfn", "denuci", "den", "denmin","pco","cpdd","pcdd" } },
+            { "ziberna", new List<string>() { "dnc","nul","com","maxreg","meanreg","sumreg" } }
         };
 
         public static List<string> searchTypes = new List<string>() { "localopt", "exhaustive", "ljubljana" };
-        public static List<string> gofMethods = new List<string>() { "hamming", "nordlund" };
+        public static List<string> gofMethods = new List<string>() { "hamming", "nordlund", "ziberna" };
 
         public static List<BMSolution> optimalSolutionsGlobal = new List<BMSolution>();
         public static HashSet<string> checkedPartString = new HashSet<string>();
@@ -74,11 +75,11 @@ namespace Socnet
                     maximizeGof = false;
 
                 }
-                //else if (gofMethodName.Equals("ziberna"))
-                //{
-                //    gofMethod = ziberna2007;
-                //    maximizeGof = false;
-                //}
+                else if (gofMethodName.Equals("ziberna"))
+                {
+                    gofMethod = ziberna2007;
+                    maximizeGof = false;
+                }
                 else if (gofMethodName.Equals("nordlund"))
                 {
                     gofMethod = nordlund2020;
@@ -115,7 +116,6 @@ namespace Socnet
                     // Preparing the Ljubljana localopt search heuristic with stochastic properties
                     log("Ok - prepping ljubljana localopt");
                     searchHeuristic = doLjubljanaSearch;
-
                 }
                 else
                 {
@@ -690,6 +690,7 @@ namespace Socnet
             return shuffledList;
         }
 
+
         public static BMSolution binaryHamming(Matrix matrix, BlockImage blockimage, Partition partition)
         {
             int nbrPos = blockimage.nbrPositions;
@@ -715,10 +716,10 @@ namespace Socnet
             return new BMSolution(matrix, blockimage, blockindices, partition.GetPartArrayCopy(), penalty, "hamming", idealMatrix);
         }
 
-        //public static BMSolution ziberna2007(Matrix matrix, BlockImage blockimage, Partition partition)
-        //{
-        //    return new BMSolution(matrix, blockimage, new int[blockimage.nbrPositions, blockimage.nbrPositions], partition.GetPartArrayCopy(), 0, "ziberna");
-        //}
+        public static BMSolution ziberna2007(Matrix matrix, BlockImage blockimage, Partition partition)
+        {
+            return new BMSolution(matrix, blockimage, new int[blockimage.nbrPositions, blockimage.nbrPositions], partition.GetPartArrayCopy(), 0, "ziberna", new Matrix(matrix.actorset, "", matrix.Cellformat));
+        }
 
         public static BMSolution nordlund2020(Matrix matrix, BlockImage blockimage, Partition partition)
         {

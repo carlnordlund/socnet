@@ -21,6 +21,11 @@ namespace Socnet.DataLibrary.Blocks
             return new List<Triple>();
         }
 
+        public virtual double getPenaltyZiberna(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix idealmatrix)
+        {
+            return 0;
+        }
+
         public abstract _Block cloneBlock();
 
         public virtual void initArgValue(double v)
