@@ -15,9 +15,11 @@ namespace Socnet
     public class SocnetEngine
     {
 
-        public string versionString = "Version 1.0 (September 2023)";
+        public string versionString = "Version 1.1 (October 2023)";
         Dataset dataset;
         char[] trimChars = new Char[] { ' ', '"', '\'' };
+
+        public string userDirectoryPath = "";
 
         public List<string> response = new List<string>();
 
@@ -225,7 +227,7 @@ namespace Socnet
             response.Add("Direct blockmodeling using the 'nordlund' method (i.e. weighted correlation coefficients):");
             response.Add("  https://doi.org/10.1016/j.socnet.2019.10.004");
             response.Add(" ");
-            response.Add("Correlation-based core-periphery approach, ignoring inter-categorical blocks or uses the 'denuci(d)' ideal blocks:");
+            response.Add("Correlation-based core-periphery approach, ignoring inter-categorical blocks or using the 'denuci(d)' ideal blocks:");
             response.Add("  https://doi.org/10.1016/S0378-8733(99)00019-2");
             response.Add(" ");
             response.Add("Correlation-based core-periphery approach using 'pco(p)' for intra-core and/or 'den(d)' or 'denmin(d)' for inter-categorical ties:");
@@ -236,9 +238,6 @@ namespace Socnet
             response.Add(" ");
             response.Add("Direct generalized blockmodeling using 'hamming' distances as penalty function:");
             response.Add("  https://doi.org/10.1017/CBO9780511584176");
-            response.Add(" ");
-            response.Add("For valued blockmodeling as proposed by Aleš Žiberna, please cite:");
-            response.Add("  https://doi.org/10.1016/j.socnet.2006.04.002");
         }
 
 
@@ -252,7 +251,15 @@ namespace Socnet
             string dir = getStringArgument("dir");
             try
             {
-                Directory.SetCurrentDirectory(dir);
+                if (dir.Equals("user"))
+                {
+                    if (userDirectoryPath.Length > 0)
+                        Directory.SetCurrentDirectory(userDirectoryPath);
+                }
+                else
+                {
+                    Directory.SetCurrentDirectory(dir);
+                }
                 response.Add("Setting working directory: " + Directory.GetCurrentDirectory());
             }
             catch (Exception e)

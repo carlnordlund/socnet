@@ -26,13 +26,10 @@ bool verbose = true, echo = false;
 try
 {
     var userDir = new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
-    string userDirPath = userDir.FullName;
-    displayResponse(engine.executeCommand("setwd(dir=" + userDirPath + ")", true));
-
+    engine.userDirectoryPath = userDir.FullName;
 }
-catch (Exception e)
+catch (Exception)
 {
-    Console.WriteLine("Couldn't set current directory to user path: " + e.Message);
 }
 
 

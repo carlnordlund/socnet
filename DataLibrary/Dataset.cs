@@ -87,7 +87,10 @@ namespace Socnet.DataLibrary
             foreach (KeyValuePair<string,DataStructure> obj in structures)
                 if (obj.Value == structure)
                 {
-                    // Ok - this Data structure object already exists in the structures. Give error etc
+                    // Ok - this Data structure object already exists in the structures, possibly with a different name.
+                    // So delete that key first and just move on.
+                    structures.Remove(obj.Key);
+                    break;
                     return "!Error - Structure '" + structure.Name + "' already exists under name '" + obj.Key + "'";
                 }
 
@@ -118,6 +121,7 @@ namespace Socnet.DataLibrary
             }
             // If I have reached here, then either an autoname has been given (proof)
             // or There is other DS with same name. So just store.
+            // The below will add: works identical to structures.Add(structure.Name, structure)
             structures[structure.Name] = structure;
             return "Stored structure '" + structure.Name + "' (" + structure.GetType().Name + ")";
         }
