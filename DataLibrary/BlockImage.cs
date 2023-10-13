@@ -53,19 +53,6 @@ namespace Socnet.DataLibrary
             }
         }
 
-
-        public _Block[,]? getPickedBlocks(int[,] blockindices)
-        {
-            if (blockindices.GetLength(0)!=nbrPositions || blockindices.GetLength(1)!=nbrPositions)
-                return null;
-            _Block[,] retBlocks = new _Block[nbrPositions, nbrPositions];
-            for (int r = 0; r < nbrPositions; r++)
-                for (int c = 0; c < nbrPositions; c++)
-                    if (blockindices[r, c] < blocks![r, c].Count)
-                        retBlocks[r, c] = blocks[r, c][blockindices[r, c]];
-            return retBlocks;
-        }
-
         public bool hasBlocks()
         {
             if (blocks == null)
@@ -193,8 +180,6 @@ namespace Socnet.DataLibrary
                 }
             }
             multiBlocked = false;
-
         }
-
     }
 }

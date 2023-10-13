@@ -36,22 +36,6 @@ namespace Socnet.DataLibrary
             this.indexToActor = new Dictionary<int, Actor>();
         }
 
-        //public Actor? GetOrAddActorByLabel(string label)
-        //{
-        //    // Proper label entered?
-        //    if (label == null || label.Length < 1)
-        //        // No: return null;
-        //        return null;
-        //    Actor? actor = GetActorByLabel(label);
-        //    if (actor == null)
-        //    {
-        //        actor = new Actor(label);
-        //        actors.Add(actor);
-        //        labelToActor.Add(label, actor);
-        //    }
-        //    return actor;
-        //}
-
         internal Actor? GetActorByLabel(string label)
         {
             if (labelToActor.ContainsKey(label))

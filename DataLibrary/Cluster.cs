@@ -28,16 +28,6 @@ namespace Socnet.DataLibrary
                 actors.Remove(actor);
         }
 
-        public void sortByIndex()
-        {
-            actors = actors.OrderBy(o => o.index).ToList();
-        }
-
-        public void sortByLabel()
-        {
-            actors = actors.OrderBy(o => o.Name).ToList();
-        }
-
         public void clear()
         {
             actors.Clear();

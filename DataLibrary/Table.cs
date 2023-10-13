@@ -64,8 +64,5 @@ namespace Socnet.DataLibrary
                 for (int c = 0; c < colLabels.Length; c++)
                     Set(rowIndexToActor[r], colIndexToActor[c], data[r, c]);
         }
-
-
-
     }
 }

@@ -18,7 +18,6 @@ namespace Socnet.DataLibrary
 
 
         public int[,] blockIndices;
-        //public string partString;
         public double gof;
         public string gofMethod;
         public int[,] blockPenalties;
@@ -28,12 +27,17 @@ namespace Socnet.DataLibrary
             this.Name = name;
             this.matrix = matrix;
             if (!blockimage.multiBlocked)
+            {
                 this.blockimage = blockimage;
+                this.blockIndices = blockIndices;
+            }
             else
-                this.blockimage= new BlockImage(blockimage, blockIndices);
+            {
+                this.blockimage = new BlockImage(blockimage, blockIndices);
+                this.blockIndices = new int[blockIndices.Length, blockIndices.Length];
+            }
             this.partition = partition;
-            this.blockIndices = blockIndices;
-            //this.partString = partString;
+            
             this.gof = Math.Round(gof, 4);
             this.gofMethod = gofMethod;
             this.idealMatrix = idealMatrix;
@@ -127,7 +131,6 @@ namespace Socnet.DataLibrary
 
                 foreach (Actor rowActor in partition.clusters[r].actors)
                 {
-                    //line = r + "_" + rowActor.Name + "\t";
                     line = "|";
                     for (int c = 0; c < nbrClusters; c++)
                     {
@@ -140,10 +143,8 @@ namespace Socnet.DataLibrary
                             }
                             else
                                 line += @"\";
-
                         }
                         line += "|";
-
                     }
                     line += "\t" + r + "_" + rowActor.Name;
                     lines.Add(line);
@@ -153,63 +154,5 @@ namespace Socnet.DataLibrary
             }
             return lines;
         }
-
-        internal BlockImage ExtractBlockimage()
-        {
-            if (!blockimage.multiBlocked)
-                return blockimage;
-            // It is multiblocked, so create new Blockimage based on this
-
-            BlockImage bi = new BlockImage(blockimage, blockIndices);
-            return bi;
-
-        }
-
-        internal Partition ExtractPartition()
-        {
-            return partition;
-        }
-
-
-        internal Actorset GetBlockModelActorset()
-        {
-            Actorset actorset = new Actorset("actorset_" + this.Name);
-            int nbrClusters = partition.clusters.Length;
-            int index = 0;
-            for (int i = 0; i < nbrClusters; i++)
-            {
-                foreach (Actor actor in partition.clusters[i].actors)
-                {
-                    actorset.actors.Add(new Actor(i + "_" + actor.Name, index));
-                    index++;
-                }
-            }
-            return actorset;
-        }
-
-
-        internal Matrix GetBlockModelMatrix()
-        {
-            Actorset bmActorset = new Actorset(this.Name + "_actors");
-            int nbrPositions = partition.clusters.Length;
-            Dictionary<Actor, Actor> actorIndexMap = new Dictionary<Actor, Actor>();
-            int index = 0;
-            for (int i=0;i<nbrPositions;i++)
-            {
-                foreach (Actor actor in partition.clusters[i].actors)
-                {
-                    Actor bmActor = new Actor(i + "_" + actor.Name, index);
-                    bmActorset.actors.Add(bmActor);
-                    actorIndexMap.Add(actor,bmActor);
-                    index++;
-                }
-            }
-            Matrix bmMatrix = new Matrix(bmActorset, this.Name + "_matrix", matrix.Cellformat);
-            foreach (Actor rowActor in matrix.actorset.actors)
-                foreach (Actor colActor in matrix.actorset.actors)
-                    bmMatrix.Set(actorIndexMap[rowActor], actorIndexMap[colActor], matrix.Get(rowActor, colActor));
-            return bmMatrix;
-        }
-
     }
 }

@@ -19,7 +19,7 @@ namespace Socnet.DataLibrary.Blocks
             return new cfnBlock();
         }
 
-        public override double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix idealMatrix)
+        public override double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix=null)
         {
             double nr = rowCluster.actors.Count, nc = colCluster.actors.Count;
             double sum_row, sum_tot = 0, pc = 0;
@@ -32,7 +32,7 @@ namespace Socnet.DataLibrary.Blocks
                     {
                         sum_tot++;
                         sum_row++;
-                        if (!foundFirst)
+                        if (idealMatrix != null && !foundFirst)
                         {
                             idealMatrix.Set(rowActor, colActor, 1);
                             foundFirst = true;
@@ -44,7 +44,7 @@ namespace Socnet.DataLibrary.Blocks
             return sum_tot - pc + (nc - pc) * nr;
         }
 
-        public override List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix idealMatrix)
+        public override List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix = null)
         {
             List<Triple> triplets = new List<Triple>();
             if (rowCluster == colCluster && rowCluster.actors.Count == 1)
@@ -66,13 +66,13 @@ namespace Socnet.DataLibrary.Blocks
                     triplets.Add(new Triple(0, 1, (double)(nbrRows - ((rowCluster == colCluster) ? 1 : 0))));
                 else
                 {
-                    idealMatrix.Set(maxActor, colActor, 1);
+                    if (idealMatrix != null)
+                        idealMatrix.Set(maxActor, colActor, 1);
                     foreach (Actor rowActor in rowCluster.actors)
                         triplets.Add(new Triple(matrix.Get(rowActor, colActor), (rowActor == maxActor) ? 1 : 0, 1));
                 }
             }
             return triplets;
         }
-
     }
 }

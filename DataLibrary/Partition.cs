@@ -51,8 +51,6 @@ namespace Socnet.DataLibrary
             this.nbrClusters = nbrClusters;
         }
 
-
-
         internal override void GetContent(List<string> content)
         {
             content.Add("Actorset:" + actorset.Name);

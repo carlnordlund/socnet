@@ -8,12 +8,10 @@ namespace Socnet.DataLibrary
 {
     public class Dataset : DataStructure
     {
-        //public List<DataStructure> structures;
         public Dictionary<string, DataStructure> structures;
 
         public Dataset()
         {
-            //structures = new List<DataStructure>();
             structures = new Dictionary<string, DataStructure>();
         }
 
@@ -33,7 +31,6 @@ namespace Socnet.DataLibrary
                 return null;
             DataStructure structure;
             foreach (KeyValuePair<string,DataStructure> obj in structures)
-            //foreach (DataStructure structure in structures)
             {
                 structure = obj.Value;
                 if (structure is Actorset)
@@ -88,10 +85,9 @@ namespace Socnet.DataLibrary
                 if (obj.Value == structure)
                 {
                     // Ok - this Data structure object already exists in the structures, possibly with a different name.
-                    // So delete that key first and just move on.
+                    // So delete that key first and just move on - later on the new structure with the new name will be stored
                     structures.Remove(obj.Key);
                     break;
-                    return "!Error - Structure '" + structure.Name + "' already exists under name '" + obj.Key + "'";
                 }
 
             if (structure.Name.Length == 0) {
@@ -133,11 +129,9 @@ namespace Socnet.DataLibrary
 
         public DataStructure? GetStructureByName(string name, Type? type = null)
         {
-            // If 'name' exists in structures and (type either null or same as that found), return structure
             if (structures.ContainsKey(name) && (type == null || structures[name].GetType() == type))
                 return structures[name];
             else
-                // Otherwise return null: nothing found
                 return null;
         }
 
@@ -177,7 +171,6 @@ namespace Socnet.DataLibrary
             return "Deleted all structures";
         }
 
-
         private List<DataStructure> getStructuresByActorset(Actorset actorset)
         {
             List<DataStructure> dependents = new List<DataStructure>();
@@ -189,6 +182,5 @@ namespace Socnet.DataLibrary
                     dependents.Add(obj.Value);
             return dependents;
         }
-
     }
 }

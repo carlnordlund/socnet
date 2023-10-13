@@ -19,7 +19,7 @@ namespace Socnet.DataLibrary.Blocks
             return new rfnBlock();
         }
 
-        public override double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix idealMatrix)
+        public override double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix = null)
         {
             double nr = rowCluster.actors.Count, nc = colCluster.actors.Count;
             double sum_row, sum_tot = 0, pr = 0;
@@ -34,7 +34,8 @@ namespace Socnet.DataLibrary.Blocks
                         sum_row++;
                         if (!foundFirst)
                         {
-                            idealMatrix.Set(rowActor, colActor, 1);
+                            if (idealMatrix != null)
+                                idealMatrix.Set(rowActor, colActor, 1);
                             foundFirst = true;
                         }
                     }
@@ -44,7 +45,7 @@ namespace Socnet.DataLibrary.Blocks
             return sum_tot - pr + (nr - pr) * nc;
         }
 
-        public override List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix idealMatrix)
+        public override List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix = null)
         {
             List<Triple> triplets = new List<Triple>();
             if (rowCluster == colCluster && rowCluster.actors.Count == 1)
@@ -66,7 +67,8 @@ namespace Socnet.DataLibrary.Blocks
                     triplets.Add(new Triple(0, 1, (double)(nbrCols - ((rowCluster == colCluster) ? 1 : 0))));
                 else
                 {
-                    idealMatrix.Set(rowActor, maxActor, 1);
+                    if (idealMatrix != null)
+                        idealMatrix.Set(rowActor, maxActor, 1);
                     foreach (Actor colActor in colCluster.actors)
                         triplets.Add(new Triple(matrix.Get(rowActor, colActor), (colActor == maxActor) ? 1 : 0, 1));
                 }

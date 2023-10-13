@@ -11,7 +11,6 @@ namespace Socnet.DataLibrary
         public string Name = "";
         public string Cellformat = "";
 
-
         public string DataType
         {
             get { return this.GetType().Name; }
@@ -36,7 +35,5 @@ namespace Socnet.DataLibrary
         internal abstract string GetSize();
 
         internal abstract void GetContent(List<string> content);
-
     }
-
 }

@@ -35,10 +35,9 @@ namespace Socnet.DataLibrary.Blocks
             return new denminBlock(this.d);
         }
 
-        public override List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix idealMatrix)
+        public override List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix = null)
         {
             List<Triple> triplets = new List<Triple>();
-            //List<double> observedList = new List<double>();
             List<Edge> observedEdges = new List<Edge>();
             foreach (Actor rowActor in rowCluster.actors)
                 foreach (Actor colActor in colCluster.actors)
@@ -51,22 +50,22 @@ namespace Socnet.DataLibrary.Blocks
             int i1 = (int)Math.Round((double)nbrCells * d);
             int i0 = nbrCells - i1;
             observedEdges.Sort((s1, s2) => s2.value.CompareTo(s1.value));
-            //observedList.Sort();
-            //observedList.Reverse();
             for (int i = 0; i < i1; i++)
             {
                 triplets.Add(new Triple(observedEdges[i].value, 1, 1));
-                idealMatrix.Set(observedEdges[i].from, observedEdges[i].to, 1);
+                if (idealMatrix != null)
+                    idealMatrix.Set(observedEdges[i].from, observedEdges[i].to, 1);
             }
             for (int i = i1; i < nbrCells; i++)
             {
                 triplets.Add(new Triple(observedEdges[i].value, observedEdges[i].value, 1));
-                idealMatrix.Set(observedEdges[i].from, observedEdges[i].to, observedEdges[i].value);
+                if (idealMatrix != null)
+                    idealMatrix.Set(observedEdges[i].from, observedEdges[i].to, observedEdges[i].value);
             }
             return triplets;
         }
 
-        public override double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix idealMatrix)
+        public override double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix = null)
         {
             int sum = 0;
             int nbrCells = rowCluster.actors.Count * (colCluster.actors.Count - ((rowCluster == colCluster) ? 1 : 0));
@@ -81,35 +80,19 @@ namespace Socnet.DataLibrary.Blocks
                             sum++;
                             if (i1 > 0)
                             {
-                                idealMatrix.Set(rowActor, colActor, 1);
+                                if (idealMatrix != null)
+                                    idealMatrix.Set(rowActor, colActor, 1);
                                 i1--;
                             }
-                            else
+                            else if (idealMatrix != null)
                                 idealMatrix.Set(rowActor, colActor, matrix.Get(rowActor, colActor));
                         }
                     }
-            //return Math.Abs(sum - (int)Math.Round((double)nbrCells * d));
             i1 = (int)Math.Round((double)nbrCells * d);
             if (sum < i1)
                 return i1 - sum;
             return 0;
-
-            //int nbrCells = 0, sum = 0;
-            //foreach (Actor rowActor in rowCluster.actors)
-            //    foreach (Actor colActor in colCluster.actors)
-            //        if (rowActor != colActor)
-            //        {
-            //            nbrCells++;
-            //            sum += (matrix.Get(rowActor, colActor) > 0) ? 1 : 0;
-            //        }
-            //int minSum = (int)Math.Ceiling(nbrCells * d);
-            //if (sum < minSum)
-            //    return minSum - sum;
-            //return 0;
         }
-
-
-
 
         public override string ToString()
         {

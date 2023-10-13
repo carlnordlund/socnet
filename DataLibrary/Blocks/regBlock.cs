@@ -19,7 +19,7 @@ namespace Socnet.DataLibrary.Blocks
             return new regBlock();
         }
 
-        public override double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix idealMatrix)
+        public override double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix = null)
         {
             double pr = 0, pc = 0;
             double nr = rowCluster.actors.Count, nc = colCluster.actors.Count;
@@ -28,7 +28,8 @@ namespace Socnet.DataLibrary.Blocks
                     if (rowActor != colActor && matrix.Get(rowActor, colActor) > 0)
                     {
                         pr++;
-                        idealMatrix.Set(rowActor, colActor, 1);
+                        if (idealMatrix != null)
+                            idealMatrix.Set(rowActor, colActor, 1);
                         break;
                     }
 
@@ -37,13 +38,14 @@ namespace Socnet.DataLibrary.Blocks
                     if (rowActor != colActor && matrix.Get(rowActor, colActor) > 0)
                     {
                         pc++;
-                        idealMatrix.Set(rowActor, colActor, 1);
+                        if (idealMatrix != null)
+                            idealMatrix.Set(rowActor, colActor, 1);
                         break;
                     }
             return (nc - pc) * nr + (nr - pr) * nc;
         }
 
-        public override List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix idealMatrix)
+        public override List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix = null)
         {
             List<Triple> triplets = new List<Triple>();
             if (rowCluster == colCluster && rowCluster.actors.Count == 1)
@@ -63,7 +65,8 @@ namespace Socnet.DataLibrary.Blocks
                         maxActor = colActor;
                     }
                 triplets.Add(new Triple(maxVal, 1, w));
-                idealMatrix.Set(rowActor, maxActor!, 1);
+                if (idealMatrix != null)
+                    idealMatrix.Set(rowActor, maxActor!, 1);
             }
             foreach (Actor colActor in colCluster.actors)
             {
@@ -76,10 +79,10 @@ namespace Socnet.DataLibrary.Blocks
                         maxActor = rowActor;
                     }
                 triplets.Add(new Triple(maxVal, 1, w));
-                idealMatrix.Set(maxActor!, colActor, 1);
+                if (idealMatrix != null)
+                    idealMatrix.Set(maxActor!, colActor, 1);
             }
             return triplets;
         }
-
     }
 }

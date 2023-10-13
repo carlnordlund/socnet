@@ -11,20 +11,15 @@ namespace Socnet.DataLibrary.Blocks
         public string Name = "";
         public int primeIndex;
 
-        public virtual double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix idealMatrix)
+        public virtual double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix=null)
         {
             return 0;
         }
 
-        public virtual List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix idealMatrix)
+        public virtual List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix=null)
         {
             return new List<Triple>();
         }
-
-        //public virtual double getPenaltyZiberna(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix idealmatrix)
-        //{
-        //    return 0;
-        //}
 
         public abstract _Block cloneBlock();
 
