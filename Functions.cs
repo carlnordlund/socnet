@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Transactions;
-using Socnet.DataLibrary;
+﻿using Socnet.DataLibrary;
 using Socnet.DataLibrary.Blocks;
+using System.Text.RegularExpressions;
 
 namespace Socnet
 {
@@ -31,8 +24,8 @@ namespace Socnet
             { 13, "cpdd" }
         };
 
-        public static List<string> conditionAbbrs = new List<string>() { "gt","ge","lt","le","eq","ne" };
-        public static List<string> symmMethods = new List<string>() { "max","min","minnonzero","average","sum","difference","ut","lt" };
+        public static List<string> conditionAbbrs = new List<string>() { "gt", "ge", "lt", "le", "eq", "ne" };
+        public static List<string> symmMethods = new List<string>() { "max", "min", "minnonzero", "average", "sum", "difference", "ut", "lt" };
 
         internal static _Block? GetBlockInstance(string blockName)
         {
@@ -45,7 +38,7 @@ namespace Socnet
             if (!match.Success)
                 return null;
 
-            var objecttype = Type.GetType("Socnet.DataLibrary.Blocks." + match.Groups[1].Value +"Block");
+            var objecttype = Type.GetType("Socnet.DataLibrary.Blocks." + match.Groups[1].Value + "Block");
 
 
 
@@ -55,7 +48,7 @@ namespace Socnet
             if (instObj is _Block)
             {
                 _Block instBlock = (_Block)instObj;
-                if (match.Groups[3].Value.Length>0)
+                if (match.Groups[3].Value.Length > 0)
                 {
                     double v = 0;
                     if (double.TryParse(match.Groups[3].Value, out v))
@@ -104,11 +97,11 @@ namespace Socnet
             while (cont)
             {
                 bool increaseDone = false;
-                for (int r=0; r<k;r++)
-                    for (int c=0;c<k;c++)
+                for (int r = 0; r < k; r++)
+                    for (int c = 0; c < k; c++)
                     {
                         biIndexMatrix.data[r, c] = blockimageBase.GetBlock(r, c, indices[r, c]).primeIndex;
-                        if (!increaseDone && maxIndices[r,c]>1)
+                        if (!increaseDone && maxIndices[r, c] > 1)
                         {
                             indices[r, c]++;
                             if (indices[r, c] < maxIndices[r, c])
@@ -119,12 +112,12 @@ namespace Socnet
                     }
 
                 bool foundPerfectSE = false;
-                for (int a1=0;a1<k && !foundPerfectSE;a1++)
+                for (int a1 = 0; a1 < k && !foundPerfectSE; a1++)
                 {
-                    for (int a2= a1+1;a2<k && !foundPerfectSE; a2++)
+                    for (int a2 = a1 + 1; a2 < k && !foundPerfectSE; a2++)
                     {
                         bool foundError = false;
-                        for (int i=0; i<k && !foundError; i++)
+                        for (int i = 0; i < k && !foundError; i++)
                         {
                             if (biIndexMatrix.data[a1, 1] != biIndexMatrix.data[a2, 1] || biIndexMatrix.data[i, a1] != biIndexMatrix.data[i, a2])
                                 foundError = true;
@@ -164,7 +157,7 @@ namespace Socnet
 
             List<BlockImage> blockimages = new List<BlockImage>();
             int index = 0;
-            foreach (KeyValuePair<string,List<int[,]>> obj in isomorphDict)
+            foreach (KeyValuePair<string, List<int[,]>> obj in isomorphDict)
             {
                 foreach (int[,] data in obj.Value)
                 {
@@ -313,7 +306,7 @@ namespace Socnet
 
         internal static Table Dichotomize(Table table, string condition, double threshold, double truevalue, double falsevalue)
         {
-            Table dichTable = new Table(table.rowActorset,table.colActorset, "dich_" + condition + threshold + "_" + table.Name, table.Cellformat);
+            Table dichTable = new Table(table.rowActorset, table.colActorset, "dich_" + condition + threshold + "_" + table.Name, table.Cellformat);
             foreach (Actor rowActor in table.rowActorset.actors)
                 foreach (Actor colActor in table.colActorset.actors)
                     dichTable.Set(rowActor, colActor, Dichotomize(table.Get(rowActor, colActor), condition, threshold, truevalue, falsevalue));
@@ -342,7 +335,7 @@ namespace Socnet
                 return (double.IsNaN(falsevalue)) ? value : falsevalue;
         }
 
-        public static DataStructure? Rescale(DataStructure structure, double min, double max, bool incldiag=false)
+        public static DataStructure? Rescale(DataStructure structure, double min, double max, bool incldiag = false)
         {
             if (structure is Matrix)
                 return Rescale((Matrix)structure, min, max);
@@ -360,14 +353,14 @@ namespace Socnet
             return rescaled;
         }
 
-        public static double GetMinValue(DataStructure structure, bool incldiag=false)
+        public static double GetMinValue(DataStructure structure, bool incldiag = false)
         {
             if (structure is Matrix)
                 return GetMinValue((Matrix)structure, incldiag);
             return 0;
         }
 
-        public static double GetMinValue(Matrix matrix, bool incldiag=false)
+        public static double GetMinValue(Matrix matrix, bool incldiag = false)
         {
             double min = double.MaxValue, val = 0;
             foreach (Actor rowActor in matrix.actorset.actors)
@@ -381,21 +374,22 @@ namespace Socnet
             return min;
         }
 
-        public static double GetMaxValue(DataStructure structure, bool incldiag=false)
+        public static double GetMaxValue(DataStructure structure, bool incldiag = false)
         {
             if (structure is Matrix)
                 return GetMaxValue((Matrix)structure, incldiag);
             return 0;
         }
-        
-        public static double GetMaxValue(Matrix matrix, bool incldiag=false)
+
+        public static double GetMaxValue(Matrix matrix, bool incldiag = false)
         {
             double max = double.MinValue, val = 0;
             foreach (Actor rowActor in matrix.actorset.actors)
                 foreach (Actor colActor in matrix.actorset.actors)
-                    if (rowActor != colActor || incldiag) {
+                    if (rowActor != colActor || incldiag)
+                    {
                         val = matrix.Get(rowActor, colActor);
-                        if (!double.IsNaN(val) &&  val > max)
+                        if (!double.IsNaN(val) && val > max)
                             max = val;
                     }
             return max;
@@ -487,7 +481,7 @@ namespace Socnet
             return v;
         }
 
-        internal static double GetMedianValue(DataStructure structure, bool incldiag=false)
+        internal static double GetMedianValue(DataStructure structure, bool incldiag = false)
         {
             List<double> values = GetAllValues(structure, incldiag);
             values.Sort();

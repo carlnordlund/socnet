@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Socnet.DataLibrary.Blocks
+﻿namespace Socnet.DataLibrary.Blocks
 {
     public class cfnBlock : _Block
     {
@@ -19,7 +13,7 @@ namespace Socnet.DataLibrary.Blocks
             return new cfnBlock();
         }
 
-        public override double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix=null)
+        public override double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix = null)
         {
             double nr = rowCluster.actors.Count, nc = colCluster.actors.Count;
             double sum_row, sum_tot = 0, pc = 0;

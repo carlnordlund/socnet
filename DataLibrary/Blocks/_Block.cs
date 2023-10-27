@@ -1,22 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Socnet.DataLibrary.Blocks
+﻿namespace Socnet.DataLibrary.Blocks
 {
     public abstract class _Block
     {
         public string Name = "";
         public int primeIndex;
 
-        public virtual double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix=null)
+        public virtual double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix = null)
         {
             return 0;
         }
 
-        public virtual List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix=null)
+        public virtual List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix = null)
         {
             return new List<Triple>();
         }

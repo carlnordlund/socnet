@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Socnet.DataLibrary;
+﻿using Socnet.DataLibrary;
 using System.Text.RegularExpressions;
-using System.Net.Http;
-using System.Net;
-using socnet.Properties;
 
 
 namespace Socnet
@@ -62,7 +54,7 @@ namespace Socnet
             dataset.Name = "Untitled";
         }
 
-        public List<string> executeCommand(string command, bool clearResponse=false)
+        public List<string> executeCommand(string command, bool clearResponse = false)
         {
             if (clearResponse)
                 response.Clear();
@@ -163,7 +155,7 @@ namespace Socnet
                     response.AddRange(returnStructure.View);
                 return response;
             }
-            if (command.Trim().Length>0)
+            if (command.Trim().Length > 0)
                 response.Add("!Error: Syntax error!");
             return response;
         }
@@ -372,7 +364,7 @@ namespace Socnet
         {
             string oldName = getStringArgument("name"), newName = getStringArgument("newname");
             DataStructure? structure = dataset.GetStructureByName(oldName);
-            
+
             if (structure == null)
                 response.Add("!Error: Structure '" + oldName + "' not found");
             else
@@ -414,7 +406,7 @@ namespace Socnet
                     response.Add(obj.Value.DataType + "\t" + obj.Value.Name + "\t" + obj.Value.Size);
             else
                 foreach (KeyValuePair<string, DataStructure> obj in dataset.structures)
-                    if (obj.Value.GetType().Name.Equals(type,StringComparison.CurrentCultureIgnoreCase))
+                    if (obj.Value.GetType().Name.Equals(type, StringComparison.CurrentCultureIgnoreCase))
                         response.Add(obj.Value.DataType + "\t" + obj.Value.Name + "\t" + obj.Value.Size);
         }
 
@@ -422,7 +414,8 @@ namespace Socnet
         {
             string name = getStringArgument("name");
             DataStructure? structure = dataset.GetStructureByName(name);
-            if (structure == null) {
+            if (structure == null)
+            {
                 response.Add("!Error: Structure '" + name + "' not found");
                 return;
             }
@@ -445,7 +438,7 @@ namespace Socnet
                 return;
             }
             string valstr = getStringArgument("value");
-            if (valstr.Length==0)
+            if (valstr.Length == 0)
             {
                 response.Add("!Error: Could not parse 'value' argument");
                 return;
@@ -507,7 +500,7 @@ namespace Socnet
         public BlockImage? f_blockimage()
         {
             int nbrPositions = getIntegerArgument("size");
-            if (nbrPositions<2)
+            if (nbrPositions < 2)
             {
                 response.Add("!Error: Blockimage size must be at least 2");
                 return null;
@@ -614,12 +607,12 @@ namespace Socnet
             cpbi.setPositionName(1, "P");
             cpbi.setBlockByPattern(1, 1, "nul");
             string core = getStringArgument("core");
-            cpbi.setBlockByPattern(0, 0, (core.Length>2 && core.Substring(0, 3).Equals("pco")) ? core : "com");
-            
+            cpbi.setBlockByPattern(0, 0, (core.Length > 2 && core.Substring(0, 3).Equals("pco")) ? core : "com");
+
             string intercat = getStringArgument("intercat");
             string powerrelational = getStringArgument("powerrelational");
 
-            if (powerrelational!="")
+            if (powerrelational != "")
             {
                 if (powerrelational.Equals("dep"))
                 {
@@ -642,10 +635,10 @@ namespace Socnet
                     return;
                 }
                 cpbi.Name = "cp" + powerrelational;
-                
+
 
             }
-            else if (intercat !="")
+            else if (intercat != "")
             {
                 cpbi.setBlockByPattern(1, 0, intercat);
                 cpbi.setBlockByPattern(0, 1, intercat);
@@ -658,12 +651,12 @@ namespace Socnet
                 else
                     cpbi.setBlockByPattern(1, 0, "dnc");
                 string ctop = getStringArgument("ctop");
-                if (ctop!= "")
+                if (ctop != "")
                     cpbi.setBlockByPattern(0, 1, ctop);
                 else
                     cpbi.setBlockByPattern(0, 1, "dnc");
             }
-            
+
 
             if (!cpbi.hasBlocks())
             {
@@ -756,7 +749,7 @@ namespace Socnet
                 return;
             }
             string searchType = getStringArgument("searchtype");
-            if (searchType =="" || !Blockmodeling.searchTypes.Contains(searchType))
+            if (searchType == "" || !Blockmodeling.searchTypes.Contains(searchType))
             {
                 response.Add("!Error: Search type not recognized/set (parameter: searchtype");
                 return;
@@ -816,7 +809,7 @@ namespace Socnet
             BlockModel bm;
             bool showIdealMatrix = (getStringArgument("ideal").Length > 0 && getStringArgument("ideal")[0] == 'y');
             string name = getStringArgument("blockmodel");
-            if (name.Length==0)
+            if (name.Length == 0)
             {
                 List<DataStructure> structures = dataset.GetStructuresByType(typeof(BlockModel));
                 if (structures.Count == 1)
@@ -1001,7 +994,7 @@ namespace Socnet
             response.Add("Min value: " + min + ", max:" + max);
             min = (double.IsNaN(min)) ? 0 : min;
             max = (double.IsNaN(max)) ? 1 : max;
-            if (min>=max)
+            if (min >= max)
             {
                 response.Add("!Error: 'max' (" + max + ") must be larger than 'min (" + min + ")");
                 return null;

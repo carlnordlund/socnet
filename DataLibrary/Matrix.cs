@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Socnet.DataLibrary
+﻿namespace Socnet.DataLibrary
 {
     public class Matrix : DataStructure
     {
@@ -29,7 +23,7 @@ namespace Socnet.DataLibrary
             {
                 line = rowActor.Name;
                 foreach (Actor colActor in actorset.actors)
-                    line += "\t"+Get(rowActor, colActor);
+                    line += "\t" + Get(rowActor, colActor);
                 content.Add(line.TrimEnd('\t'));
             }
         }

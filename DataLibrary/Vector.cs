@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Socnet.DataLibrary
+﻿namespace Socnet.DataLibrary
 {
     public class Vector : DataStructure
     {
@@ -38,7 +32,7 @@ namespace Socnet.DataLibrary
         internal override void GetContent(List<string> content)
         {
             content.Add("Actorset:" + actorset.Name);
-            content.Add("actor"+"\t"+"value");
+            content.Add("actor" + "\t" + "value");
             foreach (Actor actor in actorset.actors)
                 content.Add(actor.Name + "\t" + Get(actor));
         }

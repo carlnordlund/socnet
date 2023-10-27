@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Socnet.DataLibrary.Blocks
+﻿namespace Socnet.DataLibrary.Blocks
 {
     public class comBlock : _Block
     {
@@ -24,7 +18,7 @@ namespace Socnet.DataLibrary.Blocks
             double penalty = 0;
             foreach (Actor rowActor in rowCluster.actors)
                 foreach (Actor colActor in colCluster.actors)
-                    if (rowActor!=colActor)
+                    if (rowActor != colActor)
                     {
                         penalty += (matrix.Get(rowActor, colActor) < 1) ? 1 : 0;
                         if (idealMatrix != null)

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Socnet.DataLibrary
+﻿namespace Socnet.DataLibrary
 {
     public class Dataset : DataStructure
     {
@@ -30,7 +24,7 @@ namespace Socnet.DataLibrary
             if (labels == null || labels.Length == 0)
                 return null;
             DataStructure structure;
-            foreach (KeyValuePair<string,DataStructure> obj in structures)
+            foreach (KeyValuePair<string, DataStructure> obj in structures)
             {
                 structure = obj.Value;
                 if (structure is Actorset)
@@ -81,7 +75,7 @@ namespace Socnet.DataLibrary
                 return "!Error - Can't store a null structure";
 
             // Does structure already exist? Perhaps under different name? Should only be one dict entry per object
-            foreach (KeyValuePair<string,DataStructure> obj in structures)
+            foreach (KeyValuePair<string, DataStructure> obj in structures)
                 if (obj.Value == structure)
                 {
                     // Ok - this Data structure object already exists in the structures, possibly with a different name.
@@ -90,7 +84,8 @@ namespace Socnet.DataLibrary
                     break;
                 }
 
-            if (structure.Name.Length == 0) {
+            if (structure.Name.Length == 0)
+            {
                 // Ok - has no name, give a new unique one. No need to check if already exists: doesn't
                 structure.Name = GetAutoName(structure.GetType().Name.ToLower());
             }
@@ -174,9 +169,9 @@ namespace Socnet.DataLibrary
         private List<DataStructure> getStructuresByActorset(Actorset actorset)
         {
             List<DataStructure> dependents = new List<DataStructure>();
-            foreach (KeyValuePair<string,DataStructure> obj in structures)
-                if (    (obj.Value is Matrix && ((Matrix)obj.Value).actorset == actorset) || 
-                        (obj.Value is Table && (((Table)obj.Value).colActorset==actorset || ((Table)obj.Value).rowActorset == actorset) ) ||
+            foreach (KeyValuePair<string, DataStructure> obj in structures)
+                if ((obj.Value is Matrix && ((Matrix)obj.Value).actorset == actorset) ||
+                        (obj.Value is Table && (((Table)obj.Value).colActorset == actorset || ((Table)obj.Value).rowActorset == actorset)) ||
                         (obj.Value is Partition && ((Partition)obj.Value).actorset == actorset)
                    )
                     dependents.Add(obj.Value);

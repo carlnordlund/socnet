@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Socnet.DataLibrary;
+﻿using Socnet.DataLibrary;
 
 namespace Socnet
 {
@@ -52,7 +47,7 @@ namespace Socnet
         public static long maxElapsedMilliseconds = 60000;
 
         public static bool timeoutAbort = false;
-        public static bool timeoutActive = true;        
+        public static bool timeoutActive = true;
 
         internal static string InitializeSearch(Dictionary<string, object?> searchParams)
         {
@@ -66,7 +61,7 @@ namespace Socnet
                 if (matrix == null)
                     return "!Error - 'network' is null";
                 log("Network: " + matrix.Name);
-                
+
                 gofMethodName = "" + searchParams["method"] as string;
                 if (gofMethodName.Equals("hamming"))
                 {
@@ -89,10 +84,10 @@ namespace Socnet
                     searchHeuristic = (searchTypeName.Equals("localopt")) ? doLocalOptSearch : doLjubljanaSearch;
                     nbrRestarts = (searchParams.ContainsKey("nbrrestarts") && searchParams["nbrrestarts"] is int && (int)searchParams["nbrrestarts"]! > 0) ? (int)searchParams["nbrrestarts"]! : 50;
                     maxNbrIterations = (searchParams.ContainsKey("maxiterations") && searchParams["maxiterations"] is int && (int)searchParams["maxiterations"]! > 0) ? (int)searchParams["maxiterations"]! : 100;
-                    nbrRandomStart = (searchParams.ContainsKey("nbrrandomstart") && searchParams["nbrrandomstart"] is int && (int)searchParams["nbrrandomstart"]! > 0) ? (int)searchParams["nbrrandomstart"]!:50;
-                    
+                    nbrRandomStart = (searchParams.ContainsKey("nbrrandomstart") && searchParams["nbrrandomstart"] is int && (int)searchParams["nbrrandomstart"]! > 0) ? (int)searchParams["nbrrandomstart"]! : 50;
+
                     minNbrBetter = (searchParams.ContainsKey("minnbrbetter") && searchParams["minnbrbetter"] is int && (int)searchParams["minnbrbetter"]! > 0) ? (int)searchParams["minnbrbetter"]! : 5;
-                    doSwitching = (searchParams.ContainsKey("doswitching") && searchParams["doswitching"]!=null && searchParams["doswitching"] is string && ((string)searchParams["doswitching"]!).Length > 0 && ((string)searchParams["doswitching"]!).ToLower()[0] == 'y');
+                    doSwitching = (searchParams.ContainsKey("doswitching") && searchParams["doswitching"] != null && searchParams["doswitching"] is string && ((string)searchParams["doswitching"]!).Length > 0 && ((string)searchParams["doswitching"]!).ToLower()[0] == 'y');
                     log("nbrrestarts: " + nbrRestarts);
                     log("maxiterations: " + maxNbrIterations);
                     log("nbrrandomstart: " + nbrRandomStart);
@@ -164,7 +159,7 @@ namespace Socnet
         {
             log("Doing exhaustive search");
             double bestGof = (maximizeGof) ? double.NegativeInfinity : double.PositiveInfinity;
-            
+
             // List for storing optimal solutions
             List<BMSolution> optimalSolutionsThisSearch = new List<BMSolution>();
             int blockimagesDone = 0;
@@ -184,7 +179,7 @@ namespace Socnet
                         continue;
 
                     BMSolution solution = gofMethod!(matrix, blockimage, partition);
-                    if ((maximizeGof && solution.gofValue >=bestGof) || (!maximizeGof && solution.gofValue <= bestGof))
+                    if ((maximizeGof && solution.gofValue >= bestGof) || (!maximizeGof && solution.gofValue <= bestGof))
                     {
                         if (solution.gofValue != bestGof)
                             optimalSolutionsThisSearch.Clear();
@@ -318,7 +313,7 @@ namespace Socnet
                                                 if (nbrBetterFound >= minNbrBetter)
                                                     foundBetterWhileMoving = true;
                                             }
-                                            else if (neighSolution.gofValue==bestGofThisRun)
+                                            else if (neighSolution.gofValue == bestGofThisRun)
                                             {
                                                 bestSolutionsThisRun.Add(neighSolution);
                                                 checkNextIteration.Add(neighSolution);
@@ -553,7 +548,7 @@ namespace Socnet
                                 }
                             }
                         }
-                        if (checkNextIteration.Count>0)
+                        if (checkNextIteration.Count > 0)
                         {
                             checkNeighborsOfThese.Clear();
                             checkNeighborsOfThese.AddRange(checkNextIteration);
@@ -565,7 +560,7 @@ namespace Socnet
                         }
 
                     }
-                    if ((maximizeGof && bestGofThisRun>bestGofAllRuns) || (!maximizeGof && bestGofThisRun<bestGofAllRuns))
+                    if ((maximizeGof && bestGofThisRun > bestGofAllRuns) || (!maximizeGof && bestGofThisRun < bestGofAllRuns))
                     {
                         bestSolutionsThisBlockimage.Clear();
                         bestSolutionsThisBlockimage.AddRange(bestSolutionsThisRun);

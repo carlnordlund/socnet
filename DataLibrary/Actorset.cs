@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Socnet.DataLibrary
+﻿namespace Socnet.DataLibrary
 {
     public class Actorset : DataStructure
     {
@@ -54,7 +48,7 @@ namespace Socnet.DataLibrary
             }
         }
 
-        internal string[] GetActorLabelArray(string quote="")
+        internal string[] GetActorLabelArray(string quote = "")
         {
             recreateLabelAndIndexToActor();
             string[] actorLabels = new string[Count];

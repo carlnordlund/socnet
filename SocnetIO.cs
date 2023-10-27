@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using Socnet.DataLibrary;
-using System.Text.Json.Nodes;
+﻿using Socnet.DataLibrary;
 
 namespace Socnet
 {
@@ -13,7 +6,7 @@ namespace Socnet
     {
         public static char[] quotechars = new char[] { '"', '\'' };
 
-        internal static string SaveDataStructure(List<string> response, Dataset dataset, string name, string filepath, string sep="\t")
+        internal static string SaveDataStructure(List<string> response, Dataset dataset, string name, string filepath, string sep = "\t")
         {
             DataStructure? structure = dataset.GetStructureByName(name);
             if (structure == null)
@@ -110,8 +103,8 @@ namespace Socnet
                     matrix2dArray[rowActor.index, colActor.index] = bmMatrix.Get(rowActor, colActor);
             double[] matrix1dArray = new double[nbrActors * nbrActors];
             int index = 0;
-            for (int c=0;c<nbrActors;c++)
-                for (int r=0;r<nbrActors;r++)
+            for (int c = 0; c < nbrActors; c++)
+                for (int r = 0; r < nbrActors; r++)
                 {
                     matrix1dArray[index] = matrix2dArray[r, c];
                     index++;
@@ -130,11 +123,11 @@ namespace Socnet
 
             List<string> biContent = new List<string>();
             List<string> cellStuff = new List<string>();
-            for (int c=0;c<nbrPosBi;c++)
-                for (int r=0;r<nbrPosBi;r++)
+            for (int c = 0; c < nbrPosBi; c++)
+                for (int r = 0; r < nbrPosBi; r++)
                 {
                     cellStuff.Clear();
-                    for (int i = 0; i < bi.blocks![r,c].Count;i++)
+                    for (int i = 0; i < bi.blocks![r, c].Count; i++)
                     {
                         cellStuff.Add(bi.blocks![r, c][i].Name);
                     }
@@ -187,12 +180,12 @@ namespace Socnet
             int nbrCols = filecells.GetLength(1);
             List<string> csvLines = new List<string>();
             string line = "";
-            for (int r=0;r<nbrRows;r++)
+            for (int r = 0; r < nbrRows; r++)
             {
                 line = "";
-                for (int c = 0; c < nbrCols-1; c++)
+                for (int c = 0; c < nbrCols - 1; c++)
                     line += filecells[r, c] + sep;
-                line += filecells[r, nbrCols-1];
+                line += filecells[r, nbrCols - 1];
                 csvLines.Add(line);
             }
             File.WriteAllLines(filepath, csvLines);
@@ -250,12 +243,12 @@ namespace Socnet
                     cells = lines[i].Split(sep);
                     a1 = actorset.GetActorByLabel(cells[col1]);
                     a2 = actorset.GetActorByLabel(cells[col2]);
-                    if (a1 == null || a2==null)
+                    if (a1 == null || a2 == null)
                     {
                         response.Add("!Error: Actor label not found (either '" + cells[col1] + "' or '" + cells[col2] + "')");
                         continue;
                     }
-                        
+
                     val = (colval > 0) ? double.Parse(cells[colval]) : 1;
                     matrix.Set(a1, a2, val);
                     if (symm)
@@ -393,7 +386,7 @@ namespace Socnet
                     return "!Error: Type '" + type + "' not recognized";
                 return "Loading data structure: OK";
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return "!Error: " + e.Message;
             }

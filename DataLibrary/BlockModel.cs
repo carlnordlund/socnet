@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Socnet.DataLibrary
+﻿namespace Socnet.DataLibrary
 {
     public class BlockModel : DataStructure
     {
@@ -37,7 +31,7 @@ namespace Socnet.DataLibrary
                 this.blockIndices = new int[blockIndices.Length, blockIndices.Length];
             }
             this.partition = partition;
-            
+
             this.gof = Math.Round(gof, 4);
             this.gofMethod = gofMethod;
             this.idealMatrix = idealMatrix;
@@ -93,7 +87,7 @@ namespace Socnet.DataLibrary
                 line += "\t" + blockimage.positionNames[c];
             lines.Add(line);
 
-            for (int r=0;r<nbrClusters;r++)
+            for (int r = 0; r < nbrClusters; r++)
             {
                 line = blockimage.positionNames[r];
                 for (int c = 0; c < nbrClusters; c++)
@@ -105,7 +99,7 @@ namespace Socnet.DataLibrary
 
         internal List<string> DisplayBlockmodelMatrix()
         {
-            return DisplayBlockmodel(matrix,'X',' ');
+            return DisplayBlockmodel(matrix, 'X', ' ');
         }
 
         internal List<string> DisplayIdealMatrix()
@@ -113,7 +107,7 @@ namespace Socnet.DataLibrary
             return DisplayBlockmodel(idealMatrix, '1', '0');
         }
 
-        internal List<string> DisplayBlockmodel(Matrix displayMatrix, char tieChar = 'X', char noTieChar=' ')
+        internal List<string> DisplayBlockmodel(Matrix displayMatrix, char tieChar = 'X', char noTieChar = ' ')
         {
             List<string> lines = new List<string>();
             if (displayMatrix == null)

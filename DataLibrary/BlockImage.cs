@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Socnet.DataLibrary.Blocks;
+﻿using Socnet.DataLibrary.Blocks;
 
 namespace Socnet.DataLibrary
 {
@@ -41,10 +36,11 @@ namespace Socnet.DataLibrary
             this.nbrPositions = template.nbrPositions;
             this.blocks = new List<_Block>[nbrPositions, nbrPositions];
             positionNames = new string[nbrPositions];
-            for (int r=0;r<nbrPositions;r++)
+            for (int r = 0; r < nbrPositions; r++)
             {
                 positionNames[r] = template.positionNames[r];
-                for (int c =0; c < nbrPositions; c++) {
+                for (int c = 0; c < nbrPositions; c++)
+                {
                     blocks[r, c] = new List<_Block>
                     {
                         template.blocks![r, c][blockindices[r, c]].cloneBlock()
@@ -165,10 +161,10 @@ namespace Socnet.DataLibrary
             this.nbrPositions = blockIndices.GetLength(0);
             blocks = new List<_Block>[nbrPositions, nbrPositions];
             positionNames = new string[nbrPositions];
-            for (int r=0;r<nbrPositions;r++)
+            for (int r = 0; r < nbrPositions; r++)
             {
                 positionNames[r] = "P" + r;
-                for (int c=0;c<nbrPositions;c++)
+                for (int c = 0; c < nbrPositions; c++)
                 {
                     this.blocks[r, c] = new List<_Block>();
                     if (Functions.indexToIdealBlockName.ContainsKey(blockIndices[r, c]))

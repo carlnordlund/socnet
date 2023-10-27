@@ -1,9 +1,4 @@
 ﻿using socnet.DataLibrary;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Socnet.DataLibrary.Blocks
 {
@@ -18,7 +13,7 @@ namespace Socnet.DataLibrary.Blocks
             primeIndex = 11;
         }
 
-        public pcoBlock(double p=0.5)
+        public pcoBlock(double p = 0.5)
         {
             Name = "pco";
             this.p = Functions.minMaxRange(p, 0, 1);

@@ -101,7 +101,7 @@ else
 
 void startInteractiveMode()
 {
-//    List<string> responses;
+    //    List<string> responses;
     Console.WriteLine("Entering interactive mode (type 'quit' to quit, 'help' for help):");
     //Console.WriteLine("functions and parameter names: case-insensitive; data structure names: case-sensitive!");
     //displayResponse(engine.executeCommand("load(type=matrix,file=data/galtung.txt)"));
@@ -121,7 +121,7 @@ void startInteractiveMode()
                 System.Environment.Exit(0);
                 break;
             }
-            if (input.Length>0)
+            if (input.Length > 0)
                 displayResponse(engine.executeCommand(input, true));
         }
     }

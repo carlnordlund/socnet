@@ -1,14 +1,4 @@
-﻿using Socnet.DataLibrary.Blocks;
-using Socnet.DataLibrary;
-using Socnet;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
-
-namespace Socnet.DataLibrary.Blocks
+﻿namespace Socnet.DataLibrary.Blocks
 {
     public class cpddBlock : _Block
     {

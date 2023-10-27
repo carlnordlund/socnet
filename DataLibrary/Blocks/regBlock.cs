@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Socnet.DataLibrary.Blocks
+﻿namespace Socnet.DataLibrary.Blocks
 {
     public class regBlock : _Block
     {
@@ -59,7 +53,7 @@ namespace Socnet.DataLibrary.Blocks
                 maxActor = null;
                 maxVal = double.NegativeInfinity;
                 foreach (Actor colActor in colCluster.actors)
-                    if (rowActor!=colActor && matrix.Get(rowActor,colActor)>maxVal)
+                    if (rowActor != colActor && matrix.Get(rowActor, colActor) > maxVal)
                     {
                         maxVal = matrix.Get(rowActor, colActor);
                         maxActor = colActor;
