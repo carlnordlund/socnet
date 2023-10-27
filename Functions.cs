@@ -31,6 +31,8 @@ namespace Socnet
         {
             //string pattern = @"^(([\w]+)\s*?=\s*?)?(\w+)(\((.*?)\))?$";
             //Match match = Regex.Match(command.Trim(), pattern);
+            Regex rgx = new Regex(@"[^a-zA-Z0-9\(\)\.]");
+            blockName = rgx.Replace(blockName, "");
 
             string pattern = @"^([\w]+)(\(([^\)]+)\))?";
 
