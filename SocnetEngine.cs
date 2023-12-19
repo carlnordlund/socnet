@@ -506,8 +506,20 @@ namespace Socnet
                 return null;
             }
             BlockImage bi = new BlockImage("", nbrPositions);
-            string pattern = getStringArgument("pattern"), content = getStringArgument("content");
-            if (pattern != "")
+            string type = getStringArgument("type"), pattern = getStringArgument("pattern"), content = getStringArgument("content");
+            if (type != "")
+            {
+                if (type.Equals("structural"))
+                    bi.setBlocksByPattern("nul;com");
+                else if (type.Equals("regular"))
+                    bi.setBlocksByPattern("nul;reg");
+                else
+                {
+                    response.Add("!Error: Type must be 'structural' or 'regular'");
+                    return null;
+                }
+            }
+            else if (pattern != "")
             {
                 bi.setBlocksByPattern(pattern);
             }

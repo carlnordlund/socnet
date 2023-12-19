@@ -45,6 +45,7 @@ namespace Socnet
 
         public static System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
         public static long maxElapsedMilliseconds = 60000;
+        public static long maxElapsedMillisecondsDefault = 300000;
 
         public static bool timeoutAbort = false;
         public static bool timeoutActive = true;
@@ -132,12 +133,29 @@ namespace Socnet
                 }
 
                 minClusterSize = (searchParams.ContainsKey("minclustersize") && searchParams["minclustersize"] is int && (int)searchParams["minclustersize"]! > 0) ? (int)searchParams["minclustersize"]! : minClusterSize;
-                maxElapsedMilliseconds = (searchParams.ContainsKey("maxtime") && searchParams["maxtime"] is int) ? (int)searchParams["maxtime"]! : maxElapsedMilliseconds;
-                timeoutActive = (maxElapsedMilliseconds > 0);
-
                 log("minclustersize: " + minClusterSize);
+
+                // Timeout active by default
+                timeoutActive = true;
+                if (searchParams.ContainsKey("maxtime") && searchParams["maxtime"] is int)
+                {
+                    // If maxtime=0: set to default; if maxtime = -1: deactivate timeout; otherwise use specified maxtime, converted to milliseconds
+                    double maxtime = 1000*(int)searchParams["maxtime"]!;
+                    if (maxtime == 0)
+                        maxElapsedMilliseconds = maxElapsedMillisecondsDefault;
+                    else if (maxtime < 0)
+                        timeoutActive = false;
+                    else
+                        maxElapsedMilliseconds = (long)maxtime;
+                }
+                else
+                {
+                    // 'maxtime' was not a parametter: set timeout to default
+                    maxElapsedMilliseconds = maxElapsedMillisecondsDefault;
+                }
+
                 if (timeoutActive)
-                    log("maxtime: " + maxElapsedMilliseconds + " (timeout active)");
+                    log("maxtime: " + maxElapsedMilliseconds + "ms (timeout active)");
                 else
                     log("maxtime: (timeout inactive)");
             }
