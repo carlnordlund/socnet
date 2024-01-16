@@ -3,7 +3,6 @@ using System.Runtime.Serialization;
 
 namespace DotNetMatrix
 {
-
     /// <summary>Eigenvalues and eigenvectors of a real matrix. 
     /// If A is symmetric, then A = V*D*V' where the eigenvalue matrix D is
     /// diagonal and the eigenvector matrix V is orthogonal.

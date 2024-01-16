@@ -2,54 +2,77 @@
 
 namespace Socnet
 {
+    /// <summary>
+    /// Static class for doing Blockmodeling analyses
+    /// </summary>
     public static class Blockmodeling
     {
+        // Specifies which ideal blocks that may be used for respective goodness-of-fit measure
         public static Dictionary<string, List<string>> availableBlocks = new Dictionary<string, List<string>>()
         {
             { "hamming", new List<string>() { "dnc","nul","com","reg","rre","cre","rfn","cfn", "den", "denmin" } },
             { "nordlund", new List<string>() { "dnc","nul","com","reg","rre","cre","rfn","cfn", "denuci", "den", "denmin","pco","cpdd","pcdd" } }
         };
 
+        // Specifies the types of search algorithms currently implemented
         public static List<string> searchTypes = new List<string>() { "localopt", "exhaustive", "ljubljana" };
+
+        // Specifies the types of goodness-of-fit measures currently implemented
         public static List<string> gofMethods = new List<string>() { "hamming", "nordlund" };
 
+        // For storing the optimal solutions found in a search
         public static List<BMSolution> optimalSolutionsGlobal = new List<BMSolution>();
+
+        // HashSet for keeping track of which partitions that have already been checked (for localopt algorithm)
         public static HashSet<string> checkedPartString = new HashSet<string>();
 
+        // Initialize delegate etc for the search algorithm to use
         public delegate void SearchHeuristic();
         public static SearchHeuristic? searchHeuristic;
         public static string searchTypeName = "";
 
+        // Initialize delegate etc for the goodness-of-fit measure to use
         public delegate BMSolution GofMethod(Matrix matrix, BlockImage blockimage, Partition partition);
         public static GofMethod? gofMethod;
         public static bool maximizeGof = false;
         public static string gofMethodName = "";
 
+        // Various search parameters for the various search algorithms
         public static int minClusterSize = 1;
         public static int nbrRestarts = 50;
         public static int maxNbrIterations = 100;
         public static int nbrRandomStart = 50;
         public static int minNbrBetter = 5;
 
+        // Boolean whether the pairwise switching step should be used in the localopt search algorithm
         public static Boolean doSwitching = true;
 
+        // Boolean to check whether a search initialization was successfully completed
         public static bool initializationOk = false;
 
         static Random random = new Random();
 
-
+        // Storage of loglines (mainly for debugging)
         public static List<string> logLines = new List<string>();
 
+        // Pointers to the Matrix and list of BlockImage objects that will be searched
         public static Matrix? matrix = null;
         public static List<BlockImage> blockimages = new List<BlockImage>();
 
+        // Initialize Stopwatch (for timeout feature) - default timeout at 5 minutes (300 seconds)
         public static System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-        public static long maxElapsedMilliseconds = 60000;
         public static long maxElapsedMillisecondsDefault = 300000;
+        public static long maxElapsedMilliseconds = 60000;
 
-        public static bool timeoutAbort = false;
+        // Boolean for whether timeout abort is active (default true), and whether it was triggered in the last run
         public static bool timeoutActive = true;
+        public static bool timeoutAbort = false;
 
+        /// <summary>
+        /// This method initializes a blockmodeling search
+        /// </summary>
+        /// <param name="searchParams">Dictionary with search parameters</param>
+        /// <returns>Status string: 'ok' or '!Error:" followed by error message</returns>
         internal static string InitializeSearch(Dictionary<string, object?> searchParams)
         {
             logLines.Clear();
@@ -68,7 +91,6 @@ namespace Socnet
                 {
                     gofMethod = binaryHamming;
                     maximizeGof = false;
-
                 }
                 else if (gofMethodName.Equals("nordlund"))
                 {
@@ -96,7 +118,6 @@ namespace Socnet
                         log("doswitching: " + ((doSwitching) ? "yes" : "no"));
                     else
                         log("minnbrbetter: " + minNbrBetter);
-
                 }
                 else if (searchTypeName.Equals("exhaustive"))
                     searchHeuristic = doExhaustiveSearch;
@@ -173,6 +194,9 @@ namespace Socnet
             return "ok";
         }
 
+        /// <summary>
+        /// The method for doing an exhaustive search, i.e. checking all possible partitions
+        /// </summary>
         public static void doExhaustiveSearch()
         {
             log("Doing exhaustive search");
@@ -224,6 +248,13 @@ namespace Socnet
             stopwatch.Stop();
         }
 
+        /// <summary>
+        /// The method implementing so-called 'ljubljana' local optimization search based on depth-first, moving to a new set of partitions only after
+        /// a minimum number of better partitions have been found.
+        /// This method has a stochastic element to it (contrary to 'localopt'): it randomly iterates through (all) neighboring partitions.
+        /// This method does not keep track of previously searched partition.
+        /// Switching (i.e. when two actors in two different clusters are swapped) is always turned off for this method.
+        /// </summary>
         public static void doLjubljanaSearch()
         {
             log("Ok - in doLjubljanaSearch()");
@@ -369,6 +400,7 @@ namespace Socnet
                 // All runs done for this blockimage
                 if ((maximizeGof && bestGofAllRuns >= bestGofAllBlockimages) || (!maximizeGof && bestGofAllRuns <= bestGofAllBlockimages))
                 {
+                    // If better solution found, store this instead
                     if (bestGofAllRuns != bestGofAllBlockimages)
                         optimalSolutionsGlobal.Clear();
                     optimalSolutionsGlobal.AddRange(bestSolutionsThisBlockimage);
@@ -378,11 +410,23 @@ namespace Socnet
             stopwatch.Stop();
         }
 
-        private static int[] createRandomizedRange(int v1, int v2)
+        /// <summary>
+        /// Generate an increemental integer vector with randomized order
+        /// </summary>
+        /// <param name="min">Minimum value (inclusive)</param>
+        /// <param name="max">Maximum value (inclusive)</param>
+        /// <returns>Returns an array of integers</returns>
+        private static int[] createRandomizedRange(int min, int max)
         {
-            return Enumerable.Range(v1, v2).OrderBy(x => random.Next()).ToArray();
+            return Enumerable.Range(min, max).OrderBy(x => random.Next()).ToArray();
         }
 
+        /// <summary>
+        /// The method implementing standard width-first local optimization search, moving to a new partition as soon as a better one is found.
+        /// Search is non-stochastic.
+        /// This method keeps track of already visited partittions in previous search rounds.
+        /// If the doswitching setting is set to true, switching (i.e. when two actors in two different clusters are swapped) is done in this method.
+        /// </summary>
         public static void doLocalOptSearch()
         {
             stopwatch.Restart();
@@ -447,7 +491,6 @@ namespace Socnet
                         break;
 
                     checkedPartString.Add(partition.GetPartString());
-
 
                     BMSolution solution = gofMethod!(matrix, blockimage, partition);
                     bestGofThisRun = solution.gofValue;
@@ -576,7 +619,6 @@ namespace Socnet
                             abortThisRun = true;
                             break;
                         }
-
                     }
                     if ((maximizeGof && bestGofThisRun > bestGofAllRuns) || (!maximizeGof && bestGofThisRun < bestGofAllRuns))
                     {
@@ -602,12 +644,24 @@ namespace Socnet
             stopwatch.Stop();
         }
 
+        /// <summary>
+        /// Randomizes the order of BlockImage object in a list
+        /// </summary>
+        /// <param name="blockimages">List of BlockImage objects</param>
+        /// <returns>A list of BlockImage objects where the order is randomly shuffled</returns>
         private static List<BlockImage> GenerateRandomOrderBy(List<BlockImage> blockimages)
         {
             var shuffledList = blockimages.OrderBy(_ => random.Next()).ToList();
             return shuffledList;
         }
 
+        /// <summary>
+        /// Goodness-of-fit function using Hamming distances, i.e. the number of inconsistencies as used in standard binary blockmodeling.
+        /// </summary>
+        /// <param name="matrix">The Matrix object for the network</param>
+        /// <param name="blockimage">The Blockimage object to test (could be multi-blocked)</param>
+        /// <param name="partition">The actor Partition to test</param>
+        /// <returns>Returns a BMSolution object with the solution for this particular test</returns>
         public static BMSolution binaryHamming(Matrix matrix, BlockImage blockimage, Partition partition)
         {
             int nbrPos = blockimage.nbrPositions;
@@ -633,6 +687,14 @@ namespace Socnet
             return new BMSolution(matrix, blockimage, blockindices, partition.GetPartArrayCopy(), penalty, "hamming", idealMatrix);
         }
 
+        /// <summary>
+        /// Goodness-of-fit function using the weighted correlation coefficient between ideal and observed blocks.
+        /// See Nordlund (2020) for details.
+        /// </summary>
+        /// <param name="matrix">The Matrix object for the network</param>
+        /// <param name="blockimage">The BlockImage object to test (if multi-blocked, only checking the first ideal blocks at each position)</param>
+        /// <param name="partition">The actor Partition to test.</param>
+        /// <returns>Returns a BMSolution object with the solution for this particular test</returns>
         public static BMSolution nordlund2020(Matrix matrix, BlockImage blockimage, Partition partition)
         {
             int nbrPos = blockimage.nbrPositions;
@@ -652,11 +714,19 @@ namespace Socnet
             return new BMSolution();
         }
 
+        /// <summary>
+        /// Method for adding a line to the internal log
+        /// </summary>
+        /// <param name="line">String line to add to the log</param>
         private static void log(string line)
         {
             logLines.Add(line);
         }
 
+        /// <summary>
+        /// Method to start the blockmodeling search (first checking that it has been properly initialized)
+        /// </summary>
+        /// <returns>Status string: 'ok' or '!Error:" followed by error message</returns>
         internal static string StartSearch()
         {
             if (!initializationOk)
@@ -672,6 +742,14 @@ namespace Socnet
             return "ok";
         }
 
+        /// <summary>
+        /// Method for hypothesis testing a specific partition
+        /// </summary>
+        /// <param name="network">The Matrix object for the network</param>
+        /// <param name="blockimage">The BlockImage to test (can be multi-blocked)</param>
+        /// <param name="partition">The Partition to test</param>
+        /// <param name="gofMethod">The goodness-of-fit method to use (as string)</param>
+        /// <returns>Returns a BlockModel object</returns>
         internal static BlockModel? GetHypotheticalBlockmodel(Matrix network, BlockImage blockimage, Partition partition, string gofMethod)
         {
             BMSolution solution;
@@ -687,6 +765,11 @@ namespace Socnet
             return bm;
         }
 
+        /// <summary>
+        /// Method for converting the BMSolutions stored in the optimalSolutions global into a listt of BlockModel objects
+        /// </summary>
+        /// <param name="outname">Base name for the BlockModel objects (optional)</param>
+        /// <returns>List of BlockModel objects</returns>
         internal static List<BlockModel> generateBlockmodelStructuresFromBMSolutions(string outname = "")
         {
             List<BlockModel> blockmodels = new List<BlockModel>();
@@ -699,10 +782,7 @@ namespace Socnet
                 string partString = partition.GetPartString();
                 string basename = (outname.Length > 0) ? outname : "bm_" + solution.matrix.Name + "_" + solution.blockimage.Name;
 
-
                 partition.Name = "part_" + solution.matrix.Name + "_" + solution.blockimage.Name + "_" + index;
-
-
 
                 string bmName = basename + "_" + index;
                 BlockModel blockmodel = new BlockModel(bmName, solution.matrix, solution.blockimage, partition, solution.blockindices, solution.gofValue, solution.criteriaFunction, solution.idealMatrix);
@@ -711,9 +791,11 @@ namespace Socnet
             }
             return blockmodels;
         }
-
     }
 
+    /// <summary>
+    /// Struct for storing triplet of double values (x, y, and weight w)
+    /// </summary>
     public struct Triple
     {
         public double x, y, w;
@@ -726,6 +808,9 @@ namespace Socnet
         }
     }
 
+    /// <summary>
+    /// Struct for storing a Blockmodel solution. Functions as a lighter static version of BlockModel objects
+    /// </summary>
     public struct BMSolution
     {
         public Matrix matrix;
@@ -746,9 +831,5 @@ namespace Socnet
             this.criteriaFunction = criteriaFunction;
             this.idealMatrix = idealMatrix;
         }
-
-        //BMSolution(matrix, blockimage, new int[nbrPos, nbrPos], partition.GetPartArrayCopy(), Functions.correlateTriplets(triples), "nordlund");
     }
-
-
 }

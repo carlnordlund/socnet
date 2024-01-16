@@ -1,7 +1,14 @@
 ﻿namespace Socnet.DataLibrary.Blocks
 {
+    /// <summary>
+    /// Class for the do-not-care (dnc) ideal block
+    /// I.e. the 'block' where any kind of pattern is allowed
+    /// </summary>
     public class dncBlock : _Block
     {
+        /// <summary>
+        /// Constructor for the do-not-care ideal block
+        /// </summary>
         public dncBlock()
         {
             Name = "dnc";

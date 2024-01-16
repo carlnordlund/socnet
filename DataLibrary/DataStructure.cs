@@ -1,7 +1,11 @@
 ﻿namespace Socnet.DataLibrary
 {
+    /// <summary>
+    /// Abstract class for a DataStructure
+    /// </summary>
     public abstract class DataStructure
     {
+        // Name and cell format for this data structure
         public string Name = "";
         public string Cellformat = "";
 

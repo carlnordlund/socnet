@@ -1,7 +1,14 @@
 ﻿namespace Socnet.DataLibrary.Blocks
 {
+    /// <summary>
+    /// Class for the core-to-periphery dependency-and-dominance ideal block
+    /// </summary>
     public class cpddBlock : _Block
     {
+        /// <summary>
+        /// Constructor for the core-to-periphery dependency-and-dominance ideal block as used in the power-relational core-periphery metric (Nordlund 2018)
+        /// This block is typically only used by the 'coreperi()' function in socnet.se when using the power-relational option
+        /// </summary>
         public cpddBlock()
         {
             Name = "cpdd";

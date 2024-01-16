@@ -1,23 +1,36 @@
 ﻿namespace Socnet.DataLibrary
 {
+    /// <summary>
+    /// Class for Partition, where the Actor objects of an Actorset are partitioned into non-overlapping clusters
+    /// </summary>
     public class Partition : DataStructure
     {
+        // Attributes for the Actorset, the array of Cluster objects, the partition array
         public Actorset actorset;
-        //public List<Cluster> clusters; // Better to have as an array?
         public Cluster[] clusters;
         public int[] partArray;
         int nbrActors, nbrClusters;
 
+        /// <summary>
+        /// Constructor for Partition object, providing the Actorset to use and the name of the Partition
+        /// Creates a blank partition, i.e. with no clusters
+        /// </summary>
+        /// <param name="actorset">Actorset that is partitioned here</param>
+        /// <param name="name">The name of this Partition object</param>
         public Partition(Actorset actorset, string name)
         {
             this.Name = name;
             this.actorset = actorset;
             clusters = new Cluster[0];
-            //clusters = new List<Cluster>();
             nbrActors = actorset.Count;
             partArray = new int[nbrActors];
         }
 
+        /// <summary>
+        /// Constructor for Partition objects, providing an existing Partition as a template to clone
+        /// The resulting partition has the same name as the existing one with _clone as postfix
+        /// </summary>
+        /// <param name="otherPartition">Existing Partition object to clone</param>
         public Partition(Partition otherPartition)
         {
             this.Name = otherPartition.Name + "_clone";
@@ -37,6 +50,10 @@
             }
         }
 
+        /// <summary>
+        /// Method to initialize a given number of (empty) clusters
+        /// </summary>
+        /// <param name="nbrClusters">Number of clusters</param>
         public void createClusters(int nbrClusters)
         {
             clusters = new Cluster[nbrClusters];
@@ -61,6 +78,9 @@
             return nbrClusters + " clusters;" + nbrActors + " actors";
         }
 
+        /// <summary>
+        /// Method to initialize a zero-partition, i.e. where all Actors are placed in the first cluster
+        /// </summary>
         internal void setZeroPartition()
         {
             // This is an initial partition, where all actors are placed in the first clusters
@@ -73,6 +93,9 @@
             }
         }
 
+        /// <summary>
+        /// Method to empty all clusters
+        /// </summary>
         private void emptyClusters()
         {
             foreach (Cluster cluster in clusters)
@@ -80,6 +103,11 @@
             partArray = new int[actorset.Count];
         }
 
+        /// <summary>
+        /// Method to 'increment' a partition: move an actor between two clusters in an incremental fashion so that all possible permutations will have been achieved
+        /// Primarily used for the exhaustive search algorithm (but doesn't check for minimum clustering size here)
+        /// </summary>
+        /// <returns>Returns true if successful in incrementing the partition. Returns false if reached the end, i.e. where all Actors were already in the 'last' cluster</returns>
         internal bool incrementPartition()
         {
             foreach (Actor actor in actorset.actors)
@@ -107,11 +135,21 @@
             return false;
         }
 
+        /// <summary>
+        /// Method returning a string representation of the specific cluster, consisting of cluster indices for each actor separated by semicolons
+        /// </summary>
+        /// <param name="sep">Character to separate cluster indices (optional; by default semicolon)</param>
+        /// <returns>Returns the so-called partition string</returns>
         public string GetPartString(string sep = ";")
         {
             return String.Join(sep, partArray);
         }
 
+        /// <summary>
+        /// Method to check that each cluster contain the minimum number of actors
+        /// </summary>
+        /// <param name="minClusterSize">Minimum number of Actors that each cluster must have</param>
+        /// <returns>Returns true if all clusters have the minimum number of Actor objects</returns>
         internal bool CheckMinimumClusterSize(int minClusterSize)
         {
             foreach (Cluster cluster in clusters)
@@ -120,6 +158,10 @@
             return true;
         }
 
+        /// <summary>
+        /// Method to retrieve a copy of the partition array
+        /// </summary>
+        /// <returns>Array representing this partition</returns>
         internal int[] GetPartArrayCopy()
         {
             int[] partArrayCopy = new int[partArray.Length];
@@ -129,6 +171,10 @@
             return partArrayCopy;
         }
 
+        /// <summary>
+        /// Method to set the current partition given the provided partition array
+        /// </summary>
+        /// <param name="partarray">The partition array where the cluster index of each actor is provided</param>
         internal void setPartitionByPartArray(int[] partarray)
         {
             emptyClusters();
@@ -141,6 +187,12 @@
             }
         }
 
+        /// <summary>
+        /// Method for setting a random partition
+        /// </summary>
+        /// <param name="minClusterSize">Minimum number of actors in each partition</param>
+        /// <param name="random">An instance of the Random class</param>
+        /// <returns>Returns the partition string for the set partition</returns>
         internal string setRandomPartition(int minClusterSize, Random random)
         {
             if (nbrClusters > 0)
@@ -155,11 +207,13 @@
                 }
                 recreatePartArrayFromClusters();
                 return GetPartString();
-
             }
             return "";
         }
 
+        /// <summary>
+        /// Method to recreate the internal partition array based on current cluster content
+        /// </summary>
         internal void recreatePartArrayFromClusters()
         {
             for (int i = 0; i < clusters.Length; i++)
@@ -167,6 +221,14 @@
                     partArray[actor.index] = i;
         }
 
+        /// <summary>
+        /// Method for switching two actors in different clusters with each other
+        /// I.e. Actor 1 in Cluster 1 is moved to Cluster 2, and Actor 2 in Cluster 2 is moved to Cluster 1
+        /// </summary>
+        /// <param name="a1">Actor 1</param>
+        /// <param name="c1">Cluster 1 that contains Actor 1</param>
+        /// <param name="a2">Actor 2</param>
+        /// <param name="c2">Cluster 2 that contains Actor 2</param>
         internal void switchActors(Actor a1, int c1, Actor a2, int c2)
         {
             clusters[c1].removeActor(a1);
@@ -177,6 +239,13 @@
             partArray[a2.index] = c1;
         }
 
+        /// <summary>
+        /// Method for moving an Actor from one cluster to another
+        /// I.e. Actor is moved from Cluster 1 to Cluster 2
+        /// </summary>
+        /// <param name="actor">Actor to move</param>
+        /// <param name="c1">Cluster 1 where the Actor originally is</param>
+        /// <param name="c2">Cluster 2 to where the Actor is to be moved</param>
         internal void moveActor(Actor actor, int c1, int c2)
         {
             clusters[c1].removeActor(actor);

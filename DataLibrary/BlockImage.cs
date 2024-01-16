@@ -2,6 +2,9 @@
 
 namespace Socnet.DataLibrary
 {
+    /// <summary>
+    /// Class for BlockImage object
+    /// </summary>
     public class BlockImage : DataStructure
     {
         public List<_Block>[,]? blocks;
@@ -9,7 +12,11 @@ namespace Socnet.DataLibrary
         public int nbrPositions;
         public bool multiBlocked = false;
 
-
+        /// <summary>
+        /// Constructor for BlockImage object, specifying its name and size
+        /// </summary>
+        /// <param name="name">Name of blockimage</param>
+        /// <param name="nbrPositions">Size of blockimage (i.e. number of positions/clusters)</param>
         public BlockImage(string name, int nbrPositions)
         {
             this.Name = name;
@@ -24,12 +31,23 @@ namespace Socnet.DataLibrary
             }
         }
 
+        /// <summary>
+        /// Method for setting the name of each position in the BlockImage
+        /// </summary>
+        /// <param name="positionIndex">Index of position</param>
+        /// <param name="positionName">Name of position</param>
         public void setPositionName(int positionIndex, string positionName)
         {
             if (positionIndex >= 0 && positionIndex < nbrPositions)
                 positionNames[positionIndex] = positionName;
         }
 
+        /// <summary>
+        /// Constructor for single-blocked BlockImage object, using existing BlockImage as template and the specific multi-blocked indices as input.
+        /// This is used when converting a given multiblocked BlockImage (such as used in freesearching) to a specific single-blocked BlockImage to store a result.
+        /// </summary>
+        /// <param name="template">The (typically multi-blocked) BlockImage that is used as a template</param>
+        /// <param name="blockindices">2d array indicating which of the blocks in the multiblocked template that should be used</param>
         public BlockImage(BlockImage template, int[,] blockindices)
         {
             this.Name = template.Name;
@@ -49,6 +67,10 @@ namespace Socnet.DataLibrary
             }
         }
 
+        /// <summary>
+        /// Method to check if the BlockImage has all blocks (i.e. at least one ideal Block object at each block position
+        /// </summary>
+        /// <returns>Returns true if there are at least one block in each block position</returns>
         public bool hasBlocks()
         {
             if (blocks == null)
@@ -84,6 +106,10 @@ namespace Socnet.DataLibrary
             content.Add("Multiblocked: " + multiBlocked);
         }
 
+        /// <summary>
+        /// Method to retrieve a list containing all unique block names in the block image
+        /// </summary>
+        /// <returns>List of all unique block names (string) in the BlockImage</returns>
         internal List<string> GetAllUniqueBlockNames()
         {
             List<string> blockNames = new List<string>();
@@ -100,11 +126,22 @@ namespace Socnet.DataLibrary
             return nbrPositions + "x" + nbrPositions;
         }
 
+        /// <summary>
+        /// Get the ideal Block at block position r,c, index i
+        /// </summary>
+        /// <param name="r">Block row in the block image</param>
+        /// <param name="c">Block column in the block image</param>
+        /// <param name="i">Index of the block (by default 0 for single-blocked BlockImage objects)</param>
+        /// <returns>Returns the ideal block</returns>
         internal _Block GetBlock(int r, int c, int i = 0)
         {
             return blocks![r, c][i];
         }
 
+        /// <summary>
+        /// Set the ideal block positions given a pattern string
+        /// </summary>
+        /// <param name="pattern">The pattern string of ideal blocks to populate the BlockImage</param>
         internal void setBlocksByPattern(string pattern)
         {
             blocks = new List<_Block>[nbrPositions, nbrPositions];
@@ -117,6 +154,11 @@ namespace Socnet.DataLibrary
             checkMultiblocked();
         }
 
+        /// <summary>
+        /// Set the ideal block positions given an array of block strings
+        /// Size of array should be size^2.
+        /// </summary>
+        /// <param name="blockCellContent">Array of block strings</param>
         internal void setBlocksByContentString(string[] blockCellContent)
         {
             blocks = new List<_Block>[nbrPositions, nbrPositions];
@@ -134,14 +176,22 @@ namespace Socnet.DataLibrary
             checkMultiblocked();
         }
 
+        /// <summary>
+        /// Set the ideal blocks at specific block row and block column to the provided block pattern
+        /// </summary>
+        /// <param name="r">Block row in the block image</param>
+        /// <param name="c">Block column in the block image</param>
+        /// <param name="pattern">String with semicolon-separated block names</param>
         internal void setBlockByPattern(int r, int c, string pattern)
         {
             blocks![r, c] = Functions.GetBlockInstances(pattern.Split(';'));
         }
 
 
-        // Check if this is multiblocked: if so, update multiblocked flag
-        // This is run when the blockimage is created/updated by pattern/content
+        /// <summary>
+        /// Check if this is multiblocked: if so, update multiblocked flag
+        /// This is run when the blockimage is created/updated by pattern/content
+        /// </summary>
         public void checkMultiblocked()
         {
             if (blocks == null)
@@ -154,6 +204,10 @@ namespace Socnet.DataLibrary
             multiBlocked = false;
         }
 
+        /// <summary>
+        /// Set blocks in single-blocked BlockImage by the provided prime indices of blocks
+        /// </summary>
+        /// <param name="blockIndices">2s array containing prime indices of ideal blocks</param>
         internal void setBlocksByPrimeIndices(int[,] blockIndices)
         {
             if (blockIndices == null)

@@ -1,7 +1,13 @@
 ﻿namespace Socnet.DataLibrary.Blocks
 {
+    /// <summary>
+    /// Class for the column-regular ideal block
+    /// </summary>
     public class creBlock : _Block
     {
+        /// <summary>
+        /// Constructor for the column-regular ideal block
+        /// </summary>
         public creBlock()
         {
             Name = "cre";

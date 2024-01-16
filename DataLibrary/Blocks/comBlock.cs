@@ -1,7 +1,13 @@
 ﻿namespace Socnet.DataLibrary.Blocks
 {
+    /// <summary>
+    /// Class for the complete ideal block
+    /// </summary>
     public class comBlock : _Block
     {
+        /// <summary>
+        /// Constructor for the complete ideal block
+        /// </summary>
         public comBlock()
         {
             Name = "com";

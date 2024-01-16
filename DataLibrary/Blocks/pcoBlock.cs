@@ -2,10 +2,16 @@
 
 namespace Socnet.DataLibrary.Blocks
 {
+    /// <summary>
+    /// Class for the p-core (proportional core) ideal block
+    /// </summary>
     public class pcoBlock : _Block
     {
         public double p;
 
+        /// <summary>
+        /// Constructor for the p-core ideal block, with 
+        /// </summary>
         public pcoBlock()
         {
             Name = "pco";
@@ -13,6 +19,9 @@ namespace Socnet.DataLibrary.Blocks
             primeIndex = 11;
         }
 
+        /// <summary>
+        /// Constructor for the p-core ideal block, setting the minimum intra-block proportion p
+        /// </summary>
         public pcoBlock(double p = 0.5)
         {
             Name = "pco";

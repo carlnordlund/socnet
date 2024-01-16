@@ -2,10 +2,17 @@
 
 namespace Socnet.DataLibrary.Blocks
 {
+    /// <summary>
+    /// Class for the density ideal block
+    /// </summary>
     public class denBlock : _Block
     {
+        // Parameter for the specific density for this block
         public double d;
 
+        /// <summary>
+        /// Constructor for the density ideal block. By default, the density value is set to 0.5.
+        /// </summary>
         public denBlock()
         {
             Name = "den";
@@ -13,6 +20,10 @@ namespace Socnet.DataLibrary.Blocks
             primeIndex = 9;
         }
 
+        /// <summary>
+        /// Constructor for the density ideal block, also setting the density (default 0.5)
+        /// </summary>
+        /// <param name="d">The specific density of this block</param>
         public denBlock(double d = 0.5)
         {
             Name = "den";
@@ -20,6 +31,10 @@ namespace Socnet.DataLibrary.Blocks
             primeIndex = 9;
         }
 
+        /// <summary>
+        /// Method to set the density of this density block
+        /// </summary>
+        /// <param name="v">The density of the block</param>
         public override void initArgValue(double v)
         {
             this.d = Functions.minMaxRange(v, 0, 1);

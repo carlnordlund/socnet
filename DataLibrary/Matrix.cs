@@ -1,10 +1,13 @@
 ﻿namespace Socnet.DataLibrary
 {
+    /// <summary>
+    /// Class for Matrix object
+    /// </summary>
     public class Matrix : DataStructure
     {
+        // The data in this matrix and the Actorset this Matrix is associated with
         public double[,] data;
         public Actorset actorset;
-
 
         internal override string GetSize()
         {
@@ -28,6 +31,12 @@
             }
         }
 
+        /// <summary>
+        /// Constructor for Matrix object
+        /// </summary>
+        /// <param name="actorset">The Actorset the Matrix is associated to</param>
+        /// <param name="name">The name of the Matrix</param>
+        /// <param name="cellformat">The number format of cell values in the data 2d array</param>
         public Matrix(Actorset actorset, string name, string cellformat)
         {
             this.actorset = actorset;
@@ -36,16 +45,34 @@
             this.Cellformat = cellformat;
         }
 
+        /// <summary>
+        /// Method to get a cell value
+        /// </summary>
+        /// <param name="rowActor">Row Actor</param>
+        /// <param name="colActor">Column Actor</param>
+        /// <returns>The data value in row and column</returns>
         public double Get(Actor rowActor, Actor colActor)
         {
             return data[rowActor.index, colActor.index];
         }
 
+        /// <summary>
+        /// Method to set a cell value
+        /// </summary>
+        /// <param name="rowActor">Row actor</param>
+        /// <param name="colActor">Column actor</param>
+        /// <param name="value">Value to set</param>
         public void Set(Actor rowActor, Actor colActor, double value)
         {
             data[rowActor.index, colActor.index] = value;
         }
 
+        /// <summary>
+        /// Support method for quickly installing content to a Matrix object
+        /// Used by SocnetIO when reading from files
+        /// </summary>
+        /// <param name="labels">Array of actor labels</param>
+        /// <param name="data">2d array of values</param>
         internal void installData(string[] labels, double[,] data)
         {
             // Given array with string labels, and a data.

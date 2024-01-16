@@ -1,7 +1,13 @@
 ﻿namespace Socnet.DataLibrary.Blocks
 {
+    /// <summary>
+    /// Class for the Ucinet-style density block, with common methods and attributes
+    /// </summary>
     public class denuciBlock : _Block
     {
+        /// <summary>
+        /// Constructor for the Ucinet-style density ideal block
+        /// </summary>
         public double d;
 
         public denuciBlock()
@@ -11,6 +17,9 @@
             primeIndex = 8;
         }
 
+        /// <summary>
+        /// Constructor for the Ucinet-style 'density' ideal block, setting the optimal 'density'
+        /// </summary>
         public denuciBlock(double d)
         {
             Name = "denuci";
@@ -18,6 +27,10 @@
             primeIndex = 8;
         }
 
+        /// <summary>
+        /// Method to set the 'density' of this Ucinet-style 'density' block
+        /// </summary>
+        /// <param name="v">The 'density' of the block, i.e. the value with which all tie values will be correlated with</param>
         public override void initArgValue(double v)
         {
             this.d = v;
@@ -46,6 +59,5 @@
         {
             return Name + "(" + d + ")";
         }
-
     }
 }

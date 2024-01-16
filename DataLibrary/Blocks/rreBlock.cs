@@ -1,8 +1,13 @@
 ﻿namespace Socnet.DataLibrary.Blocks
 {
+    /// <summary>
+    /// Class for the row-regular ideal block
+    /// </summary>
     public class rreBlock : _Block
     {
-
+        /// <summary>
+        /// Constructor for the row-regular ideal block
+        /// </summary>
         public rreBlock()
         {
             Name = "rre";

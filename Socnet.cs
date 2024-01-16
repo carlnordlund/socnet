@@ -9,12 +9,14 @@ Socnet.SocnetEngine engine = new Socnet.SocnetEngine();
 Console.WriteLine("Socnet - Network analysis in C#");
 Console.WriteLine("===============================");
 Console.WriteLine(engine.versionString);
-Console.WriteLine("Developed by Carl Nordlund - carl.nordlund@liu.se");
-Console.WriteLine("Socnet.se was supported by NordForsk through the funding to The Network Dynamics of Ethnic Integration, project number 105147");
+Console.WriteLine("Carl Nordlund - carl.nordlund@liu.se");
+Console.WriteLine("Socnet.se was supported by NordForsk through the funding to");
+Console.WriteLine("The Network Dynamics of Ethnic Integration, project number 105147");
 Console.WriteLine("Nordint.net: https://nordint.net");
 Console.WriteLine();
 Console.WriteLine("How to cite Socnet.se:");
-Console.WriteLine("Nordlund, C. (2023). Socnet.se: The Blockmodeling Console App [computer software]. Available from https://socnet.se");
+Console.WriteLine("Nordlund, C., Roy, C.  (2024). Socnet.se: The Blockmodeling Console App [computer software]. https://socnet.se");
+Console.WriteLine();
 Console.WriteLine("How to cite specific methods, type in 'citeinfo()'.");
 Console.WriteLine();
 

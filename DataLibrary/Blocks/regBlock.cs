@@ -1,7 +1,13 @@
 ﻿namespace Socnet.DataLibrary.Blocks
 {
+    /// <summary>
+    /// Class for the regular ideal block
+    /// </summary>
     public class regBlock : _Block
     {
+        /// <summary>
+        /// Constructor for the regular ideal block
+        /// </summary>
         public regBlock()
         {
             Name = "reg";

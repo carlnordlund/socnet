@@ -1,7 +1,13 @@
 ﻿namespace Socnet.DataLibrary.Blocks
 {
+    /// <summary>
+    /// Class for the null ideal block
+    /// </summary>
     public class nulBlock : _Block
     {
+        /// <summary>
+        /// Constructor for the null ideal block
+        /// </summary>
         public nulBlock()
         {
             Name = "nul";

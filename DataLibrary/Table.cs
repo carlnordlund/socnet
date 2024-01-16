@@ -1,5 +1,8 @@
 ﻿namespace Socnet.DataLibrary
 {
+    /// <summary>
+    /// Class for Table objects
+    /// </summary>
     public class Table : DataStructure
     {
         public double[,] data;

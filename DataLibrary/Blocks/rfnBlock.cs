@@ -1,7 +1,13 @@
 ﻿namespace Socnet.DataLibrary.Blocks
 {
+    /// <summary>
+    /// Class for the row-functional ideal block
+    /// </summary>
     public class rfnBlock : _Block
     {
+        /// <summary>
+        /// Constructor for the row-functional ideal block
+        /// </summary>
         public rfnBlock()
         {
             Name = "rfn";

@@ -1,7 +1,13 @@
 ﻿namespace Socnet.DataLibrary.Blocks
 {
+    /// <summary>
+    /// Class for the column-functional ideal block
+    /// </summary>
     public class cfnBlock : _Block
     {
+        /// <summary>
+        /// Constructor for the column-functional ideal block
+        /// </summary>
         public cfnBlock()
         {
             Name = "cfn";

@@ -1,5 +1,8 @@
 ﻿namespace Socnet.DataLibrary
 {
+    /// <summary>
+    /// Class for Vector objects
+    /// </summary>
     public class Vector : DataStructure
     {
         public double[] data;

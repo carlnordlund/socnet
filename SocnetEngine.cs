@@ -7,7 +7,7 @@ namespace Socnet
     public class SocnetEngine
     {
 
-        public string versionString = "Version 1.1 (October 2023)";
+        public string versionString = "Version 1.1 (January 2024)";
         Dataset dataset;
         char[] trimChars = new Char[] { ' ', '"', '\'' };
 

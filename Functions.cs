@@ -4,9 +4,12 @@ using System.Text.RegularExpressions;
 
 namespace Socnet
 {
+    /// <summary>
+    /// Static class containing various Functions used by Socnet.se
+    /// </summary>
     public static class Functions
     {
-
+        // Dictionary for ideal Blocks, mapping prime indices to their respective Block names
         public static Dictionary<int, string> indexToIdealBlockName = new Dictionary<int, string>() {
             { 0, "dnc" },
             { 1, "nul" },
@@ -24,13 +27,17 @@ namespace Socnet
             { 13, "cpdd" }
         };
 
+        // Lists with conditional statements and number transformations
         public static List<string> conditionAbbrs = new List<string>() { "gt", "ge", "lt", "le", "eq", "ne" };
         public static List<string> symmMethods = new List<string>() { "max", "min", "minnonzero", "average", "sum", "difference", "ut", "lt" };
 
+        /// <summary>
+        /// Method for creating an instance of a particular ideal Block object, based on its name
+        /// </summary>
+        /// <param name="blockName">Name of the ideal block</param>
+        /// <returns>Returns instance of this Block (or null if this does not exist)</returns>
         internal static _Block? GetBlockInstance(string blockName)
         {
-            //string pattern = @"^(([\w]+)\s*?=\s*?)?(\w+)(\((.*?)\))?$";
-            //Match match = Regex.Match(command.Trim(), pattern);
             Regex rgx = new Regex(@"[^a-zA-Z0-9\(\)\.]");
             blockName = rgx.Replace(blockName, "");
 
@@ -40,10 +47,8 @@ namespace Socnet
             if (!match.Success)
                 return null;
 
+            // Note: the function thus looks into the actual code, to see if this type exists in this namespace
             var objecttype = Type.GetType("Socnet.DataLibrary.Blocks." + match.Groups[1].Value + "Block");
-
-
-
             if (objecttype == null)
                 return null;
             var instObj = Activator.CreateInstance(objecttype);
@@ -61,6 +66,11 @@ namespace Socnet
             return null;
         }
 
+        /// <summary>
+        /// Method to generate list of Block instances, based on the names in the string array
+        /// </summary>
+        /// <param name="blockNames">String array containing the ideal block names</param>
+        /// <returns></returns>
         internal static List<_Block> GetBlockInstances(string[] blockNames)
         {
             List<_Block> blocks = new List<_Block>();
@@ -80,24 +90,38 @@ namespace Socnet
             return blocks;
         }
 
+        /// <summary>
+        /// Method for finding all non-isomorphic varieties of a particular multi-blocked BlockImage object
+        /// Returns a list of single-blocked BlockImage objects that are all non-isomorphic
+        /// </summary>
+        /// <param name="blockimageBase">The multi-blocked BlockImage object to use</param>
+        /// <returns>List of BlockImage objects</returns>
         internal static List<BlockImage> GetBlockImageVarieties(BlockImage blockimageBase)
         {
+            // Create a temporary Actorset containing the positions of the BlockImage
             int k = blockimageBase.nbrPositions;
             Actorset biActors = new Actorset("biActors");
             for (int i = 0; i < k; i++)
                 biActors.actors.Add(new Actor(blockimageBase.positionNames[i], i));
+
+            // Create a Matrix representing the BlockImage
             Matrix biIndexMatrix = new Matrix(biActors, "", "N0");
 
+            // Create a dictionary that will contain lists of potentially isomorphic BlockImages
             Dictionary<string, List<int[,]>> isomorphDict = new Dictionary<string, List<int[,]>>();
+
+            // Create 2d array containing the number of ideal blocks in each blockimage position
             int[,] maxIndices = new int[k, k];
             int[,] indices = new int[k, k];
             for (int r = 0; r < k; r++)
                 for (int c = 0; c < k; c++)
                     maxIndices[r, c] = blockimageBase.blocks![r, c].Count;
 
+            // Iterate through all potential single-block permutations of the given multi-blocked BlockImage
             bool cont = true;
             while (cont)
             {
+                // 'Increment' the Matrix object representing a single-blocked version of the BlockImage
                 bool increaseDone = false;
                 for (int r = 0; r < k; r++)
                     for (int c = 0; c < k; c++)
@@ -113,6 +137,8 @@ namespace Socnet
                         }
                     }
 
+                // See if there are at least 2 positions in this BlockImage matrix that are structurally equivalent (SE).
+                // If SE, then this particular blockimage should be excluded
                 bool foundPerfectSE = false;
                 for (int a1 = 0; a1 < k && !foundPerfectSE; a1++)
                 {
@@ -128,18 +154,24 @@ namespace Socnet
                             foundPerfectSE = true;
                     }
                 }
+
                 if (!foundPerfectSE)
                 {
+                    // The particular Matrix representation has no perfect SE positions
+                    // Then we can test for isomorphism: extract the eigenvalues, sort these and create a keystring for these eigenvalues
                     Dictionary<string, DataStructure> eigenData = Functions.Eigen2(biIndexMatrix);
                     double[] eigenvalues = ((Vector)eigenData["dmds"]).data;
                     Array.Sort(eigenvalues);
                     Array.Reverse(eigenvalues);
                     string keyString = ((Vector)eigenData["dmds"]).GetValueString();
 
+                    // Create a 2d array for this particular BlockImage
                     int[,] currentData = new int[k, k];
                     for (int r = 0; r < k; r++)
                         for (int c = 0; c < k; c++)
                             currentData[r, c] = (int)biIndexMatrix.data[r, c];
+                    
+                    // If there is no other potential Blockimage with the same EV keystring, we know that there are no other isomorphic blockimages, so simply add this
                     if (!isomorphDict.ContainsKey(keyString))
                     {
                         isomorphDict.Add(keyString, new List<int[,]>());
@@ -147,7 +179,10 @@ namespace Socnet
                     }
                     else
                     {
+                        // There are already other BlockImages with the same keystring. Check if any of these are truly isomorphic
                         bool foundIsomorphic = Functions.CheckForIsomorphism(currentData, isomorphDict[keyString]);
+
+                        // If none of the other BlockImage configurations with the same EV keystrings are isomorphic, add this to this keystring dictionary
                         if (!foundIsomorphic)
                             isomorphDict[keyString].Add(currentData);
                     }
@@ -156,7 +191,7 @@ namespace Socnet
                     cont = false;
             }
 
-
+            // Now, finally, create actual single-blocked BlockImage objects based on the non-isomorphic results that are stored
             List<BlockImage> blockimages = new List<BlockImage>();
             int index = 0;
             foreach (KeyValuePair<string, List<int[,]>> obj in isomorphDict)
@@ -172,6 +207,12 @@ namespace Socnet
             return blockimages;
         }
 
+        /// <summary>
+        /// Method for checking if a provided 2d array is isomorphic with any of the others provided
+        /// </summary>
+        /// <param name="currentData">2d array of values</param>
+        /// <param name="existingDataList">List of 2d array of values</param>
+        /// <returns>True if an isomorphic 2d matrix was found, false otherwise</returns>
         private static bool CheckForIsomorphism(int[,] currentData, List<int[,]> existingDataList)
         {
             int k = currentData.GetLength(0);
@@ -225,7 +266,11 @@ namespace Socnet
             b = temp;
         }
 
-
+        /// <summary>
+        /// Method for obtaining all Eigenvalues and Eigenvectors of a Matrix object
+        /// </summary>
+        /// <param name="matrix">Matrix object</param>
+        /// <returns>Dictionary with Eigenvectors (vmds), Eigenvalues (dmds for real, imds for imaginary)</returns>
         public static Dictionary<string, DataStructure> Eigen2(Matrix matrix)
         {
             Dictionary<string, DataStructure> returnStructures = new Dictionary<string, DataStructure>();
@@ -253,11 +298,14 @@ namespace Socnet
             returnStructures.Add("vmds", vmds);
             returnStructures.Add("dmds", dmds);
             returnStructures.Add("imds", imds);
-
-
             return returnStructures;
         }
 
+        /// <summary>
+        /// Method for calculating weighted correlation of list of tripletss
+        /// </summary>
+        /// <param name="triples">List with Triple objects</param>
+        /// <returns>Correlation coefficient</returns>
         public static double correlateTriplets(List<Triple> triples)
         {
             double mx = 0, my = 0, sx = 0, sy = 0, sxy = 0, w_sum = 0, denom = 0;
@@ -285,6 +333,15 @@ namespace Socnet
             return sxy / denom;
         }
 
+        /// <summary>
+        /// Method to dichotomize a DataStructure
+        /// </summary>
+        /// <param name="structure">DataStructure to dichotomize</param>
+        /// <param name="condition">Conditional expression (e.g. eq, le, gt, ge etc)</param>
+        /// <param name="threshold">Threshold value for condition</param>
+        /// <param name="truevalue">Value if condition is true</param>
+        /// <param name="falsevalue">Value if condition is false</param>
+        /// <returns></returns>
         public static DataStructure? Dichotomize(DataStructure structure, string condition, double threshold, double truevalue, double falsevalue)
         {
             if (structure is Matrix)
@@ -337,10 +394,18 @@ namespace Socnet
                 return (double.IsNaN(falsevalue)) ? value : falsevalue;
         }
 
+        /// <summary>
+        /// Method to rescale values in a DataStructure
+        /// </summary>
+        /// <param name="structure">DataStructure to rescale</param>
+        /// <param name="min">Minimum value of rescaled version</param>
+        /// <param name="max">Maximum value of rescaled</param>
+        /// <param name="incldiag">Bool whether diagonal should be included</param>
+        /// <returns></returns>
         public static DataStructure? Rescale(DataStructure structure, double min, double max, bool incldiag = false)
         {
             if (structure is Matrix)
-                return Rescale((Matrix)structure, min, max);
+                return Rescale((Matrix)structure, min, max, incldiag);
             return null;
         }
 
@@ -397,6 +462,12 @@ namespace Socnet
             return max;
         }
 
+        /// <summary>
+        /// Method to symmetrize a Matrix objectt
+        /// </summary>
+        /// <param name="matrix">Matrix to symmetrize</param>
+        /// <param name="method">Method to use (string)</param>
+        /// <returns>Returns new Matrix object</returns>
         public static Matrix? Symmetrize(Matrix matrix, string method)
         {
             Func<double, double, double> symm;
