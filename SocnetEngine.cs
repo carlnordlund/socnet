@@ -1,22 +1,32 @@
 ﻿using Socnet.DataLibrary;
 using System.Text.RegularExpressions;
 
-
 namespace Socnet
 {
+    /// <summary>
+    /// Class for SocnetEngine, which will receive and execute commands
+    /// </summary>
     public class SocnetEngine
     {
-
+        // Set version info
         public string versionString = "Version 1.1 (January 2024)";
+
+        // Prepare Dataset object
         Dataset dataset;
+
+        // Characters used when trimming from csv files etc
         char[] trimChars = new Char[] { ' ', '"', '\'' };
 
+        // the userDirectoryPath
         public string userDirectoryPath = "";
 
+        // Buffer for storing response lines when executing commands
         public List<string> response = new List<string>();
 
+        // Dictionary with key-value argument list
         Dictionary<string, string> args_input = new Dictionary<string, string>();
 
+        // Dictionary holding all available commands and compulsory arguments to each (might have more arguments)
         Dictionary<string, string[]> args_required = new Dictionary<string, string[]>()
         {
             {"load", new string[] {"file","type" } },
@@ -46,7 +56,9 @@ namespace Socnet
             {"set", new string[] {"name","row","col","value" } }
         };
 
-
+        /// <summary>
+        /// Constructor for SocnetEngine
+        /// </summary>
         public SocnetEngine()
         {
             // Initiate stuff, particularly initiate new NetworkDataset object
@@ -54,6 +66,12 @@ namespace Socnet
             dataset.Name = "Untitled";
         }
 
+        /// <summary>
+        /// Method for parsing and executing a Socnet command
+        /// </summary>
+        /// <param name="command">Command (string) to execute</param>
+        /// <param name="clearResponse">Whether the response buffer should be cleared at the start (default false)</param>
+        /// <returns>List of string responses</returns>
         public List<string> executeCommand(string command, bool clearResponse = false)
         {
             if (clearResponse)
@@ -160,6 +178,11 @@ namespace Socnet
             return response;
         }
 
+        /// <summary>
+        /// Wrapper for method executeCommand to send in multiple lines of commands separated by newline (\n)
+        /// </summary>
+        /// <param name="commandString">string of commands separated by newline (\n)</param>
+        /// <returns></returns>
         internal List<string> executeCommandString(string commandString)
         {
             string[] commands = commandString.Split('\n');
@@ -172,7 +195,12 @@ namespace Socnet
             return response;
         }
 
-        // This is a lookup for checking if a particular argument key exists - if so, returns the value; otherwise null
+        /// <summary>
+        /// Method to get string value of specific argument in the global args_input dictionary.
+        /// Returns empty string if not found.
+        /// </summary>
+        /// <param name="key">The argument key (string)</param>
+        /// <returns>The argument value (string)</returns>
         private string getStringArgument(string key)
         {
             if (args_input.ContainsKey(key) && args_input[key].Length > 0)
@@ -180,6 +208,12 @@ namespace Socnet
             return "";
         }
 
+        /// <summary>
+        /// Method to get integer value of specific argument in the global args_input dictionary.
+        /// Returns -1 if not found.
+        /// </summary>
+        /// <param name="key">The argument key (string)</param>
+        /// <returns>The argument value (integer)</returns>
         private int getIntegerArgument(string key)
         {
             int retval = -1;
@@ -187,6 +221,12 @@ namespace Socnet
             return retval;
         }
 
+        /// <summary>
+        /// Method to get double value of specific argument in the global args_input dictionary.
+        /// Return double.NaN if not found.
+        /// </summary>
+        /// <param name="key">The argument key (string)</param>
+        /// <returns>The argument value (double)</returns>
         private double getDoubleArgument(string key)
         {
             double retval = double.NaN;
@@ -196,6 +236,12 @@ namespace Socnet
         }
 
         // METHODS for FUNCTIONS
+        // Each of these functions are called from code, through System.Reflection, so not called directly.
+        // All functions are named f_[command] where [command] is the actual socnet.se command.
+        // All these functions utilize the various getXXXArgument methods above to obtain command arguments
+        // from the global args_input dictionary.
+        // These functions add lines to the global response list of strings, which will then constitute the
+        // textual output on the console resulting from each command.
         public void f_help()
         {
             response.Add("HELP SECTION");
@@ -359,9 +405,6 @@ namespace Socnet
                 getStringArgument("headers"),
                 getStringArgument("sep")
             ));
-
-            // to-do
-
         }
 
         public void f_rename()
@@ -397,7 +440,6 @@ namespace Socnet
         public void f_deleteall()
         {
             response.Add(dataset.DeleteAllStructures());
-
         }
 
         public void f_structures()
@@ -456,7 +498,6 @@ namespace Socnet
                     response.Add("!Error: Could not parse 'value' as number");
                     return;
                 }
-
             }
             if (structure is Matrix)
             {
@@ -498,8 +539,6 @@ namespace Socnet
                 response.Add("!Error: Not implemented for this structure");
             }
         }
-
-
 
         public BlockImage? f_blockimage()
         {
@@ -588,16 +627,12 @@ namespace Socnet
                         return null;
                     }
                 }
-
                 partition.setPartitionByPartArray(partarray);
             }
             else
                 partition.setZeroPartition();
-
-
             return partition;
         }
-
 
         public void f_coreperi()
         {
@@ -651,8 +686,6 @@ namespace Socnet
                     return;
                 }
                 cpbi.Name = "cp" + powerrelational;
-
-
             }
             else if (intercat != "")
             {
@@ -673,14 +706,11 @@ namespace Socnet
                     cpbi.setBlockByPattern(0, 1, "dnc");
             }
 
-
             if (!cpbi.hasBlocks())
             {
                 response.Add("!Error: Something wrong with inter-categorical blocks");
                 return;
             }
-
-
 
             searchParams["network"] = network;
             searchParams["blockimage"] = cpbi;
@@ -838,7 +868,6 @@ namespace Socnet
                         response.Add("!Error: Found several BlockModel objects - specify which with 'blockmodel' parameter");
                     return;
                 }
-
             }
             else
             {
@@ -911,14 +940,10 @@ namespace Socnet
             }
         }
 
-
-
         public void f_bmlog()
         {
             response.AddRange(Blockmodeling.logLines);
         }
-
-
 
         public void f_bivarieties()
         {

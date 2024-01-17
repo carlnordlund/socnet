@@ -16,6 +16,11 @@ namespace DotNetMatrix
     /// conditioned, or even singular, so the validity of the equation
     /// A = V*D*Inverse(V) depends upon V.cond().
     /// 
+    /// The code for extracting eigenvalues and eigenvectors as here used in
+    /// Socnet.se is taken from the DotNetMatrix, coded together in C# by
+    /// Paul Selormey. That code was in turn based on public domain code.
+    /// See: https://www.codeproject.com/Articles/5835/DotNetMatrix-Simple-Matrix-Library-for-NET
+    /// 
     /// </summary>
 
     [Serializable]

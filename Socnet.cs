@@ -4,7 +4,6 @@ Console.WriteLine("socnet.exe " + String.Join(" ", args));
 // Create SocnetEngine instance and responseLines
 Socnet.SocnetEngine engine = new Socnet.SocnetEngine();
 
-
 // Welcome message
 Console.WriteLine("Socnet - Network analysis in C#");
 Console.WriteLine("===============================");
@@ -17,7 +16,7 @@ Console.WriteLine();
 Console.WriteLine("How to cite specific methods, type in 'citeinfo()'.");
 Console.WriteLine();
 
-// Parse arguments and prepare
+// Prepare variables, set default mode to 'interactive'
 string mode = "interactive", file = "", commands = "", args_error = "";
 bool verbose = true, echo = false;
 
@@ -31,7 +30,7 @@ catch (Exception)
 {
 }
 
-
+// Take care of would-be provided arguments
 if (args != null && args.Length > 0)
 {
     int nbr_args = args.Length;

@@ -2,10 +2,23 @@
 
 namespace Socnet
 {
+    /// <summary>
+    /// Static class for doing IO operations for Socnet.se
+    /// </summary>
     public static class SocnetIO
     {
+        // Characters for removing quotes
         public static char[] quotechars = new char[] { '"', '\'' };
 
+        /// <summary>
+        /// Method for loading an individual DataStructure object as a text file
+        /// </summary>
+        /// <param name="response">List of strings where details can be added</param>
+        /// <param name="dataset">Dataset object from where to get DataStructure</param>
+        /// <param name="name">Name of DataStructure</param>
+        /// <param name="filepath">Filepath where to save it</param>
+        /// <param name="sep">Character to separate data fields</param>
+        /// <returns>Status text</returns>
         internal static string SaveDataStructure(List<string> response, Dataset dataset, string name, string filepath, string sep = "\t")
         {
             DataStructure? structure = dataset.GetStructureByName(name);
@@ -21,7 +34,13 @@ namespace Socnet
             return "error - structure type not implemented";
         }
 
-
+        /// <summary>
+        /// Method for saving BlockImage object
+        /// </summary>
+        /// <param name="blockimage">BlockImage object</param>
+        /// <param name="filepath">Filepath where to save to</param>
+        /// <param name="sep">Character to separate data fields</param>
+        /// <returns>Status text</returns>
         private static string SaveBlockImage(BlockImage blockimage, string filepath, string sep)
         {
             if (blockimage == null || blockimage.blocks == null)
@@ -45,6 +64,13 @@ namespace Socnet
             return "Blockimage '" + blockimage.Name + "' saved: " + filepath;
         }
 
+        /// <summary>
+        /// Method for saving Partition object
+        /// </summary>
+        /// <param name="partition">Partition object</param>
+        /// <param name="filepath">Filepath where to save to</param>
+        /// <param name="sep">Character to separate data fields</param>
+        /// <returns></returns>
         private static string SavePartition(Partition partition, string filepath, string sep)
         {
             if (partition == null)
@@ -62,15 +88,16 @@ namespace Socnet
                 }
             }
             WriteFileCells(filecells, filepath, sep);
-
-            //foreach (Actor actor in partition.actorset.actors)
-            //{
-            //    filecells[actor.index + 1, 0] = actor.Name;
-            //}
-
             return "Partition '" + partition.Name + "' saved: " + filepath;
         }
 
+        /// <summary>
+        /// Method for saving BlockModel object in the form of a JSON string
+        /// This can subsequently be loaded into R as a data frame
+        /// </summary>
+        /// <param name="blockmodel">BlockModel object to save</param>
+        /// <param name="file">File path to JSON text file</param>
+        /// <returns>Status text</returns>
         internal static string SaveBlockModel(BlockModel blockmodel, string file)
         {
             Matrix bmMatrix = blockmodel.bmMatrix;
@@ -135,12 +162,9 @@ namespace Socnet
                     biContent.Add("\"" + stuff + "\"");
                 }
             json += "[" + string.Join(',', biContent) + "]";
-
             json += @"},{""type"":""double"",""attributes"":{},""value"":";
             json += "[" + gof + "]";
-
             json += @"},{""type"":""character"",""attributes"":{},""value"":";
-
             json += "[\"" + gofmethod + "\"]";
             json += @"}]}";
 
@@ -152,10 +176,16 @@ namespace Socnet
             {
                 return "!Error: Could not save file '" + file + "'; " + e.Message;
             }
-
             return "Saved BlockModel to '" + file + "' as JSON for R (use library 'jsonlite' and 'unserializeJSON()' to get this into a useful R object)";
         }
 
+        /// <summary>
+        /// Method to save Matrix object
+        /// </summary>
+        /// <param name="matrix">Matrix object to save</param>
+        /// <param name="filepath">Filepath where to save to</param>
+        /// <param name="sep">Character to separate data fields</param>
+        /// <returns>Status text</returns>
         private static string SaveMatrix(Matrix matrix, string filepath, string sep)
         {
             if (matrix == null)
@@ -174,6 +204,12 @@ namespace Socnet
             return "Matrix '" + matrix.Name + "' saved: " + filepath;
         }
 
+        /// <summary>
+        /// Internal method for writing 2d array to file
+        /// </summary>
+        /// <param name="filecells">2d array of strings with content</param>
+        /// <param name="filepath">File path to save to</param>
+        /// <param name="sep">Character to separate data fields</param>
         private static void WriteFileCells(string[,] filecells, string filepath, string sep)
         {
             int nbrRows = filecells.GetLength(0);
@@ -191,6 +227,20 @@ namespace Socnet
             File.WriteAllLines(filepath, csvLines);
         }
 
+        /// <summary>
+        /// Method for loading network (Matrix object) from edgelist file
+        /// </summary>
+        /// <param name="response">List of strings for storing response log</param>
+        /// <param name="dataset">Dataset to store to</param>
+        /// <param name="filepath">File path to edgelist to load</param>
+        /// <param name="col1">Index of column for Actor 1 (From actor for directional ties)</param>
+        /// <param name="col2">Index of column for Actor 2 (To actor for directional ties)</param>
+        /// <param name="symmetric">String to indicate whether ties are symmetric ("yes") or directional ("no")</param>
+        /// <param name="actorsetName">Name of Actorset, either an existing one or name of new one to be created</param>
+        /// <param name="colval">Index of column with edge values</param>
+        /// <param name="headers">String to indicate whether first line contains headers ("yes" if so)</param>
+        /// <param name="sep">Character that separates data fields in the raw edgelist file</param>
+        /// <returns>Status text</returns>
         internal static string LoadEdgelist(List<string> response, Dataset dataset, string filepath, int col1, int col2, string symmetric, string actorsetName, int colval, string headers, string sep)
         {
             if (!File.Exists(filepath))
@@ -265,7 +315,16 @@ namespace Socnet
             }
         }
 
-
+        /// <summary>
+        /// Method to load DataStructure object
+        /// </summary>
+        /// <param name="response">List of response strings</param>
+        /// <param name="dataset">Dataset object to store to</param>
+        /// <param name="filepath">File path to file to load</param>
+        /// <param name="type">Type to load: "matrix", "table", "partition", "blockimage"</param>
+        /// <param name="name">Name of DataStructure</param>
+        /// <param name="sep">Character to separate data fields</param>
+        /// <returns>Status text</returns>
         internal static string LoadDataStructure(List<string> response, Dataset dataset, string filepath, string type, string name, string sep = "\t")
         {
             try
@@ -392,6 +451,12 @@ namespace Socnet
             }
         }
 
+        /// <summary>
+        /// Internal method for parsing Actors and Data from array of strings
+        /// </summary>
+        /// <param name="lines">Array of strings from loading text file</param>
+        /// <param name="separator">Character to separate data fields</param>
+        /// <returns>Returns ActorsAndData struct</returns>
         private static ActorsAndData parseActorsAndData(string[] lines, char separator = '\t')
         {
             ActorsAndData actorsAndData = new ActorsAndData();
@@ -443,9 +508,12 @@ namespace Socnet
             }
             return null;
         }
-
     }
 
+    /// <summary>
+    /// Struct for storing 'rectangular' data with vectors for row- and column labels.
+    /// Used when loading/saving data structures
+    /// </summary>
     public struct ActorsAndData
     {
         public double[,] data;

@@ -554,6 +554,12 @@ namespace Socnet
             return v;
         }
 
+        /// <summary>
+        /// Method to get median value from a DataStructure
+        /// </summary>
+        /// <param name="structure">The DataStructure object</param>
+        /// <param name="incldiag">Boolean whether the diagonal should be included (for Matrix objects; defaults to false)</param>
+        /// <returns>Returns the median value</returns>
         internal static double GetMedianValue(DataStructure structure, bool incldiag = false)
         {
             List<double> values = GetAllValues(structure, incldiag);
@@ -565,6 +571,12 @@ namespace Socnet
                 return values[size / 2];
         }
 
+        /// <summary>
+        /// Method to extract all values in a DataStructure as a list
+        /// </summary>
+        /// <param name="structure">The DataStructure object</param>
+        /// <param name="incldiag">Boolean whether the diagonal should be included (for Matrix objects)</param>
+        /// <returns>Returns a List of doubles</returns>
         private static List<double> GetAllValues(DataStructure structure, bool incldiag)
         {
             List<double> values = new List<double>();
