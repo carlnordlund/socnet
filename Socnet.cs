@@ -14,9 +14,6 @@ Console.WriteLine("Socnet.se was supported by NordForsk through the funding to")
 Console.WriteLine("The Network Dynamics of Ethnic Integration, project number 105147");
 Console.WriteLine("Nordint.net: https://nordint.net");
 Console.WriteLine();
-Console.WriteLine("How to cite Socnet.se:");
-Console.WriteLine("Nordlund, C., Roy, C.  (2024). Socnet.se: The Blockmodeling Console App [computer software]. https://socnet.se");
-Console.WriteLine();
 Console.WriteLine("How to cite specific methods, type in 'citeinfo()'.");
 Console.WriteLine();
 
