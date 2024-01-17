@@ -274,6 +274,8 @@ namespace Socnet
             // Loop through blockimages, in random order
             blockimages = GenerateRandomOrderBy(blockimages);
             int nbrPositions;
+            int blockimagesDone = 0;
+
             foreach (BlockImage blockimage in blockimages)
             {
                 bestGofAllRuns = bestGofStartValue;
@@ -316,6 +318,21 @@ namespace Socnet
                     // Iterate steps within each run
                     for (int iter = 0; iter < maxNbrIterations && !abortThisRun; iter++)
                     {
+                        if (timeoutActive && stopwatch.ElapsedMilliseconds > maxElapsedMilliseconds)
+                        {
+                            stopwatch.Stop();
+                            log("Timeout: more than " + maxElapsedMilliseconds + " milliseconds passed.");
+                            double shareDone = (double)blockimagesDone / (double)blockimages.Count;
+                            log("Blockimage: " + blockimage.Name + " (" + (int)(100 * (double)blockimagesDone / (double)blockimages.Count) + "%) - Run:" + run + " - Iteration:" + iter);
+                            if (shareDone > 0)
+                            {
+                                double estimatedTimeToFinish = stopwatch.ElapsedMilliseconds / shareDone;
+                                log(" : try setting 'maxtime=" + ((int)estimatedTimeToFinish + 10) + "'");
+                            }
+                            timeoutAbort = true;
+                            return;
+                        }
+
                         checkNextIteration.Clear();
                         foreach (BMSolution currentSolution in checkNeighborsOfThese)
                         {
@@ -406,6 +423,7 @@ namespace Socnet
                     optimalSolutionsGlobal.AddRange(bestSolutionsThisBlockimage);
                     bestGofAllBlockimages = bestGofAllRuns;
                 }
+                blockimagesDone++;
             }
             stopwatch.Stop();
         }

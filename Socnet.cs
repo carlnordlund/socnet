@@ -9,6 +9,7 @@ Console.WriteLine("Socnet - Network analysis in C#");
 Console.WriteLine("===============================");
 Console.WriteLine(engine.versionString);
 Console.WriteLine("Carl Nordlund - carl.nordlund@liu.se");
+Console.WriteLine();
 Console.WriteLine("Socnet.se was supported by NordForsk through the funding to");
 Console.WriteLine("The Network Dynamics of Ethnic Integration, project number 105147");
 Console.WriteLine("Nordint.net: https://nordint.net");
