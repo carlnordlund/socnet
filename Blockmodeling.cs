@@ -723,7 +723,7 @@ namespace Socnet
                     triples.AddRange(blockimage.GetBlock(r, c).getTripletList(matrix, partition.clusters[r], partition.clusters[c], idealMatrix));
             try
             {
-                return new BMSolution(matrix, blockimage, new int[nbrPos, nbrPos], partition.GetPartArrayCopy(), Functions.correlateTriplets(triples), "nordlund", idealMatrix);
+                return new BMSolution(matrix, blockimage, new int[nbrPos, nbrPos], partition.GetPartArrayCopy(), Math.Round(Functions.correlateTriplets(triples),4), "nordlund", idealMatrix);
             }
             catch (Exception e)
             {
