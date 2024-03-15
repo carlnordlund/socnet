@@ -57,7 +57,8 @@ namespace Socnet.DataLibrary.Blocks
                         observedEdges.Add(new Edge(rowActor, colActor, matrix.Get(rowActor, colActor)));
                     }
             int nbrCells = observedEdges.Count;
-            int i1 = (int)Math.Round((double)nbrCells * d);
+            int i1 = (int)Math.Ceiling((double)nbrCells * d);
+            
             int i0 = nbrCells - i1;
             observedEdges.Sort((s1, s2) => s2.value.CompareTo(s1.value));
             for (int i = 0; i < i1; i++)
