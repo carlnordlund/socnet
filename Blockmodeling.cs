@@ -797,17 +797,86 @@ namespace Socnet
                 Partition partition = new Partition(solution.matrix.actorset, "");
                 partition.createClusters(solution.blockimage.nbrPositions);
                 partition.setPartitionByPartArray(solution.partarray);
-                string partString = partition.GetPartString();
+
+                string partString = partition.GetPartString();  // Is this even used?
                 string basename = (outname.Length > 0) ? outname : "bm_" + solution.matrix.Name + "_" + solution.blockimage.Name;
 
                 partition.Name = "part_" + solution.matrix.Name + "_" + solution.blockimage.Name + "_" + index;
 
                 string bmName = basename + "_" + index;
                 BlockModel blockmodel = new BlockModel(bmName, solution.matrix, solution.blockimage, partition, solution.blockindices, solution.gofValue, solution.criteriaFunction, solution.idealMatrix);
-                blockmodels.Add(blockmodel);
-                index++;
+
+                // This is where I should have the checkIdentical check instead! And then both check partition mapping and blockimage mapping. Then I should reuse the dicts
+                // So move the CheckIfIdentical method to Blockmodeling class
+                bool foundIdentical = false;
+                foreach (BlockModel bm in blockmodels)
+                {
+                    if (checkIfIdentical(blockmodel, bm))
+                    {
+                        foundIdentical = true;
+                        break;
+                    }
+                }
+                if (!foundIdentical)
+                {
+                    // Didn't find identical, so add this and increase index
+                    blockmodels.Add(blockmodel);
+                    index++;
+                }
             }
             return blockmodels;
+        }
+
+        /// <summary>
+        /// Function to check if two blockmodels are identical, in the sense that they are equivalent/isomorphic
+        /// it checks this by mapping partition codings onto each other to see if the partitions and the blockimages (and blockindices) are the same
+        /// </summary>
+        /// <param name="bm1">First BlockModel object</param>
+        /// <param name="bm2">Second BlockModel object</param>
+        /// <returns>'true' if the two blockmodels are identical/equivalent/isomorphic, otherwise 'false'</returns>
+        private static bool checkIfIdentical(BlockModel bm1, BlockModel bm2)
+        {
+            Partition p1 = bm1.partition, p2 = bm2.partition;
+            if (p1.actorset != p2.actorset || p1.nbrClusters != p2.nbrClusters)
+                return false;
+
+            Dictionary<int, int> mapdir1 = new Dictionary<int, int>(), mapdir2 = new Dictionary<int, int>();
+            for (int i = 0; i < p1.partArray.Length; i++)
+            {
+                if (mapdir1.ContainsKey(p1.partArray[i]) && mapdir2.ContainsKey(p2.partArray[i]))
+                {
+                    // If not mapping, return false
+                    if (mapdir1[p1.partArray[i]] != p2.partArray[i] || mapdir2[p2.partArray[i]] != p1.partArray[i])
+                        return false;
+                }
+                else if (!mapdir1.ContainsKey(p1.partArray[i]) && !mapdir2.ContainsKey(p2.partArray[i]))
+                {
+                    // Exists in neither: then we can add these to both
+                    mapdir1[p1.partArray[i]] = p2.partArray[i];
+                    mapdir2[p2.partArray[i]] = p1.partArray[i];
+                }
+                else
+                    // Ok - so evidently exists in one but not the other, which indicates that these indeed are different: return false;
+                    return false;
+            }
+
+            // Ok - so partitions are identical. Now also need to check the blockimages
+
+            BlockImage bi1 = bm1.blockimage, bi2 = bm2.blockimage;
+            if (bi1.blocks == null || bi2.blocks == null)
+                return true;
+            if (bi1.blocks.GetLength(0) != bi2.blocks.GetLength(0))
+                return false;
+
+            for (int r = 0; r < bi1.blocks.GetLength(0); r++)
+                for (int c = 0; c < bi1.blocks.GetLength(1); c++)
+                {
+                    int i1 = bi1.blocks[r, c][bm1.blockIndices[r,c]].primeIndex;
+                    int i2 = bi2.blocks[mapdir1[r], mapdir1[c]][bm2.blockIndices[mapdir1[r], mapdir1[c]]].primeIndex;
+                    if (i1 != i2)
+                        return false;
+                }
+            return true;
         }
     }
 

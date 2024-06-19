@@ -9,7 +9,7 @@
         public Actorset actorset;
         public Cluster[] clusters;
         public int[] partArray;
-        int nbrActors, nbrClusters;
+        public int nbrActors, nbrClusters;
 
         /// <summary>
         /// Constructor for Partition object, providing the Actorset to use and the name of the Partition
@@ -251,6 +251,37 @@
             clusters[c1].removeActor(actor);
             clusters[c2].addActor(actor);
             partArray[actor.index] = c2;
+        }
+
+        internal bool CheckIfIdentical(Partition otherPart)
+        {
+            // Start with basic checks - if these are not the same, then not identical
+            if (actorset != otherPart.actorset || nbrClusters != otherPart.nbrClusters || partArray.Length != otherPart.partArray.Length)
+                return false;
+
+            // Go through partArray: build up translation dictionary - if flawed, then return false immediately
+            Dictionary<int, int> mapdirA = new Dictionary<int, int>(), mapdirB = new Dictionary<int, int>();
+            for (int i = 0; i < partArray.Length; i++)
+            {
+                // If exists in both or neither: great. If only exists in one: error
+                if (mapdirA.ContainsKey(partArray[i]) && mapdirB.ContainsKey(otherPart.partArray[i]))
+                {
+                    // If not mapping, return false
+                    if (mapdirA[partArray[i]] != otherPart.partArray[i] || mapdirB[otherPart.partArray[i]] != partArray[i])
+                        return false;
+                }
+                else if (!mapdirA.ContainsKey(partArray[i]) && !mapdirB.ContainsKey(otherPart.partArray[i]))
+                {
+                    // Exists in neither: then we can add these to both
+                    mapdirA[partArray[i]] = otherPart.partArray[i];
+                    mapdirB[otherPart.partArray[i]] = partArray[i];
+                }
+                else
+                    // Ok - so evidently exists in one but not the other, which indicates that these indeed are different: return false;
+                    return false;
+            }
+            // Passed the tests: these are identical. Return true
+            return true;
         }
     }
 }
