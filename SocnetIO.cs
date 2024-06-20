@@ -98,86 +98,86 @@ namespace Socnet
         /// <param name="blockmodel">BlockModel object to save</param>
         /// <param name="file">File path to JSON text file</param>
         /// <returns>Status text</returns>
-        internal static string SaveBlockModel(BlockModel blockmodel, string file)
-        {
-            Matrix bmMatrix = blockmodel.bmMatrix;
-            Actorset bmActorset = bmMatrix.actorset;
-            string actorLabels = "[" + string.Join(',', bmActorset.GetActorLabelArray("\"")) + "]";
-            int nbrActors = bmActorset.Count;
-            string partstring = blockmodel.partition.GetPartString(",");
-            BlockImage bi = blockmodel.blockimage;
-            int nbrPosBi = bi.nbrPositions;
-            double gof = blockmodel.gof;
-            string gofmethod = blockmodel.gofMethod;
+        //internal static string SaveBlockModel(BlockModel blockmodel, string file)
+        //{
+        //    Matrix bmMatrix = blockmodel.bmMatrix;
+        //    Actorset bmActorset = bmMatrix.actorset;
+        //    string actorLabels = "[" + string.Join(',', bmActorset.GetActorLabelArray("\"")) + "]";
+        //    int nbrActors = bmActorset.Count;
+        //    string partstring = blockmodel.partition.GetPartString(",");
+        //    BlockImage bi = blockmodel.blockimage;
+        //    int nbrPosBi = bi.nbrPositions;
+        //    double gof = blockmodel.gof;
+        //    string gofmethod = blockmodel.gofMethod;
 
-            string json = @"{""type"":""list"",""attributes"":{""names"":{""type"":""character"",""attributes"":{},""value"":[""matrix"",""partition"",""blockimage"",""gof"",""gofmethod""]}},""value"":[{""type"":""double"",""attributes"":{""dim"":{""type"":""integer"",""attributes"":{},""value"":";
+        //    string json = @"{""type"":""list"",""attributes"":{""names"":{""type"":""character"",""attributes"":{},""value"":[""matrix"",""partition"",""blockimage"",""gof"",""gofmethod""]}},""value"":[{""type"":""double"",""attributes"":{""dim"":{""type"":""integer"",""attributes"":{},""value"":";
 
-            json += "[" + nbrActors + "," + nbrActors + "]";
+        //    json += "[" + nbrActors + "," + nbrActors + "]";
 
-            json += @"},""dimnames"":{""type"":""list"",""attributes"":{},""value"":[{""type"":""character"",""attributes"":{},""value"":";
+        //    json += @"},""dimnames"":{""type"":""list"",""attributes"":{},""value"":[{""type"":""character"",""attributes"":{},""value"":";
 
-            json += actorLabels;
+        //    json += actorLabels;
 
-            json += @"},{""type"":""character"",""attributes"":{},""value"":";
+        //    json += @"},{""type"":""character"",""attributes"":{},""value"":";
 
-            json += actorLabels;
+        //    json += actorLabels;
 
-            json += @"}]}},""value"":";
+        //    json += @"}]}},""value"":";
 
-            double[,] matrix2dArray = new double[nbrActors, nbrActors];
-            foreach (Actor rowActor in bmActorset.actors)
-                foreach (Actor colActor in bmActorset.actors)
-                    matrix2dArray[rowActor.index, colActor.index] = bmMatrix.Get(rowActor, colActor);
-            double[] matrix1dArray = new double[nbrActors * nbrActors];
-            int index = 0;
-            for (int c = 0; c < nbrActors; c++)
-                for (int r = 0; r < nbrActors; r++)
-                {
-                    matrix1dArray[index] = matrix2dArray[r, c];
-                    index++;
-                }
-            json += "[" + string.Join(',', matrix1dArray) + "]";
+        //    double[,] matrix2dArray = new double[nbrActors, nbrActors];
+        //    foreach (Actor rowActor in bmActorset.actors)
+        //        foreach (Actor colActor in bmActorset.actors)
+        //            matrix2dArray[rowActor.index, colActor.index] = bmMatrix.Get(rowActor, colActor);
+        //    double[] matrix1dArray = new double[nbrActors * nbrActors];
+        //    int index = 0;
+        //    for (int c = 0; c < nbrActors; c++)
+        //        for (int r = 0; r < nbrActors; r++)
+        //        {
+        //            matrix1dArray[index] = matrix2dArray[r, c];
+        //            index++;
+        //        }
+        //    json += "[" + string.Join(',', matrix1dArray) + "]";
 
-            json += @"},{""type"":""integer"",""attributes"":{},""value"":";
+        //    json += @"},{""type"":""integer"",""attributes"":{},""value"":";
 
-            json += "[" + partstring + "]";
+        //    json += "[" + partstring + "]";
 
-            json += @"},{""type"":""character"",""attributes"":{""dim"":{""type"":""integer"",""attributes"":{},""value"":";
+        //    json += @"},{""type"":""character"",""attributes"":{""dim"":{""type"":""integer"",""attributes"":{},""value"":";
 
-            json += "[" + nbrPosBi + "," + nbrPosBi + "]";
+        //    json += "[" + nbrPosBi + "," + nbrPosBi + "]";
 
-            json += @"}},""value"":";
+        //    json += @"}},""value"":";
 
-            List<string> biContent = new List<string>();
-            List<string> cellStuff = new List<string>();
-            for (int c = 0; c < nbrPosBi; c++)
-                for (int r = 0; r < nbrPosBi; r++)
-                {
-                    cellStuff.Clear();
-                    for (int i = 0; i < bi.blocks![r, c].Count; i++)
-                    {
-                        cellStuff.Add(bi.blocks![r, c][i].Name);
-                    }
-                    string stuff = string.Join(';', cellStuff);
-                    biContent.Add("\"" + stuff + "\"");
-                }
-            json += "[" + string.Join(',', biContent) + "]";
-            json += @"},{""type"":""double"",""attributes"":{},""value"":";
-            json += "[" + gof + "]";
-            json += @"},{""type"":""character"",""attributes"":{},""value"":";
-            json += "[\"" + gofmethod + "\"]";
-            json += @"}]}";
+        //    List<string> biContent = new List<string>();
+        //    List<string> cellStuff = new List<string>();
+        //    for (int c = 0; c < nbrPosBi; c++)
+        //        for (int r = 0; r < nbrPosBi; r++)
+        //        {
+        //            cellStuff.Clear();
+        //            for (int i = 0; i < bi.blocks![r, c].Count; i++)
+        //            {
+        //                cellStuff.Add(bi.blocks![r, c][i].Name);
+        //            }
+        //            string stuff = string.Join(';', cellStuff);
+        //            biContent.Add("\"" + stuff + "\"");
+        //        }
+        //    json += "[" + string.Join(',', biContent) + "]";
+        //    json += @"},{""type"":""double"",""attributes"":{},""value"":";
+        //    json += "[" + gof + "]";
+        //    json += @"},{""type"":""character"",""attributes"":{},""value"":";
+        //    json += "[\"" + gofmethod + "\"]";
+        //    json += @"}]}";
 
-            try
-            {
-                File.WriteAllText(file, json);
-            }
-            catch (Exception e)
-            {
-                return "!Error: Could not save file '" + file + "'; " + e.Message;
-            }
-            return "Saved BlockModel to '" + file + "' as JSON for R (use library 'jsonlite' and 'unserializeJSON()' to get this into a useful R object)";
-        }
+        //    try
+        //    {
+        //        File.WriteAllText(file, json);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return "!Error: Could not save file '" + file + "'; " + e.Message;
+        //    }
+        //    return "Saved BlockModel to '" + file + "' as JSON for R (use library 'jsonlite' and 'unserializeJSON()' to get this into a useful R object)";
+        //}
 
         /// <summary>
         /// Method to save Matrix object

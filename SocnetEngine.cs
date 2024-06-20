@@ -37,7 +37,6 @@ namespace Socnet
             {"loadblockimage", new string[] {"file" } },
             {"loadpartition", new string[] {"file" } },
             {"loadedgelist", new string[] {"file", "col1","col2" } },
-            {"saveblockmodel", new string[] {"name", "file"} },
             {"setwd", new string[] {"dir" } },
             {"view", new string[] {"name" } },
             {"delete", new string[] {"name" } },
@@ -78,7 +77,7 @@ namespace Socnet
         {
             if (clearResponse)
                 response.Clear();
-            if (command[0].Equals('#'))
+            if (command.Length>0 && command[0].Equals('#'))
                 return response;
             string pattern = @"^(([\w]+)\s*?=\s*?)?(\w+)(\((.*?)\))?$";
             Match match = Regex.Match(command.Trim(), pattern);
@@ -320,12 +319,12 @@ namespace Socnet
             {
                 string[] dirs = Directory.GetDirectories(Directory.GetCurrentDirectory());
                 string[] files = Directory.GetFiles(Directory.GetCurrentDirectory());
-                response.Add("'" + Directory.GetCurrentDirectory() + "':");
+                //response.Add("'" + Directory.GetCurrentDirectory() + "':");
                 foreach (string dir in dirs)
-                    response.Add(" /" + Path.GetFileName(dir) + "/");
+                    response.Add("/" + Path.GetFileName(dir) + "/");
                 foreach (string file in files)
                 {
-                    response.Add(" " + Path.GetFileName(file));
+                    response.Add(Path.GetFileName(file));
                 }
             }
             catch (Exception e)
@@ -365,18 +364,18 @@ namespace Socnet
             response.Add(SocnetIO.SaveDataStructure(response, dataset, getStringArgument("name"), getStringArgument("file")));
         }
 
-        public void f_saveblockmodel()
-        {
-            response.Add("Saving blockmodel as json for R");
-            string name = getStringArgument("name");
-            DataStructure? structure = dataset.GetStructureByName(getStringArgument("name"), typeof(BlockModel));
-            if (structure == null)
-            {
-                response.Add("!Error: No BlockModel named '" + name + "'");
-                return;
-            }
-            response.Add(SocnetIO.SaveBlockModel((BlockModel)structure, getStringArgument("file")));
-        }
+        //public void f_saveblockmodel()
+        //{
+        //    response.Add("Saving blockmodel as json for R");
+        //    string name = getStringArgument("name");
+        //    DataStructure? structure = dataset.GetStructureByName(getStringArgument("name"), typeof(BlockModel));
+        //    if (structure == null)
+        //    {
+        //        response.Add("!Error: No BlockModel named '" + name + "'");
+        //        return;
+        //    }
+        //    response.Add(SocnetIO.SaveBlockModel((BlockModel)structure, getStringArgument("file")));
+        //}
 
         public void f_loadscript()
         {
