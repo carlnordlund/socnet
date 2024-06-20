@@ -62,6 +62,14 @@
             this.nbrClusters = nbrClusters;
         }
 
+        public void createClusters(string[] positionNames)
+        {
+            nbrClusters = positionNames.Length;
+            clusters = new Cluster[nbrClusters];
+            for (int i = 0; i < nbrClusters; i++)
+                clusters[i] = new Cluster(positionNames[i]);
+        }
+
         internal override void GetContent(List<string> content)
         {
             content.Add("Actorset:" + actorset.Name);

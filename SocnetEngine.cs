@@ -49,7 +49,9 @@ namespace Socnet
             {"bmtest", new string[] {"network","blockimage","partition","method"} },
             {"bmview", new string[] {"blockmodel"} },
             {"bmextract", new string[] {"blockmodel", "type"} },
+            {"densities", new string[] {"network", "partition" } },
             {"coreperi", new string[] {"network", "searchtype" } },
+            {"commdetect", new string[] {"network", "size", "searchtype", "method" } },
             {"dichotomize", new string[] {"name", "condition", "threshold" } },
             {"symmetrize", new string[] {"name", "method" } },
             {"rescale", new string[] {"name" } },
@@ -76,6 +78,8 @@ namespace Socnet
         {
             if (clearResponse)
                 response.Clear();
+            if (command[0].Equals('#'))
+                return response;
             string pattern = @"^(([\w]+)\s*?=\s*?)?(\w+)(\((.*?)\))?$";
             Match match = Regex.Match(command.Trim(), pattern);
             if (match.Success)
@@ -634,6 +638,70 @@ namespace Socnet
             return partition;
         }
 
+        public void f_commdetect()
+        {
+            response.Add("Init and running community detection");
+            Dictionary<string, object?> searchParams = new Dictionary<string, object?>();
+
+            DataStructure? network = dataset.GetStructureByName(getStringArgument("network"), typeof(Matrix));
+            if (network == null)
+            {
+                response.Add("!Error: Network not found (parameter: network)");
+                return;
+            }
+
+            string searchType = getStringArgument("searchtype");
+            if (searchType == "" || !Blockmodeling.searchTypes.Contains(searchType))
+            {
+                response.Add("!Error: Search type '" + searchType + "' not recognized (check 'searchtype' parameter)");
+                return;
+            }
+
+            string gofMethod = getStringArgument("method");
+            if (gofMethod == "" || !Blockmodeling.gofMethods.Contains(gofMethod))
+            {
+                response.Add("!Error: Method not recognized/set (parameter: method)");
+                return;
+            }
+
+
+            int size = getIntegerArgument("size");
+            if (size<2)
+            {
+                response.Add("!Error: Number of communities (i.e. 'size') must be at least 2");
+                return;
+            }
+
+            string diagonal = (getStringArgument("diagonal").Equals(""))?"com":getStringArgument("diagonal");
+            BlockImage cbi = new BlockImage("comms_" + size, size);
+            cbi.setBlocksByPattern("nul");
+            for (int i = 0; i < size; i++)
+                cbi.setBlockByPattern(i, i, diagonal);
+
+            searchParams["network"] = network;
+            searchParams["blockimage"] = cbi;
+            searchParams["searchtype"] = searchType;
+            searchParams["method"] = gofMethod;
+            searchParams["minclustersize"] = getIntegerArgument("minclustersize");
+            searchParams["nbrrestarts"] = getIntegerArgument("nbrrestarts");
+            searchParams["maxiterations"] = getIntegerArgument("maxiterations");
+            searchParams["maxtime"] = getIntegerArgument("maxtime");
+            searchParams["nbrrandomstart"] = getIntegerArgument("nbrrandomstart");
+            searchParams["doswitching"] = getStringArgument("doswitching");
+            searchParams["minnbrbetter"] = getIntegerArgument("minnbrbetter");
+
+            string statusInitMsg = Blockmodeling.InitializeSearch(searchParams);
+            if (statusInitMsg.Equals("ok"))
+            {
+                response.AddRange(Blockmodeling.logLines);
+                f_bmstart();
+            }
+            else if (statusInitMsg[0] == '!')
+                response.Add(statusInitMsg);
+            Blockmodeling.logLines.Clear();
+
+        }
+
         public void f_coreperi()
         {
             response.Add("Init and running corr-based core-peri");
@@ -911,7 +979,6 @@ namespace Socnet
                 BlockImage bi = blockmodel.blockimage;
                 bi.Name = (autoname) ? dataset.GetAutoName(bi.Name) : outname;
                 response.Add(dataset.StoreStructure(bi));
-                //return bi;
             }
             else if (type.Equals("matrix"))
             {
@@ -938,6 +1005,68 @@ namespace Socnet
             {
                 response.Add(blockmodel.gof + " (" + blockmodel.gofMethod + ")");
             }
+        }
+
+        public void f_densities()
+        {
+            response.Add("In densities function");
+            DataStructure? net = dataset.GetStructureByName(getStringArgument("network"), typeof(Matrix));
+            if (net == null)
+            {
+                response.Add("!Error: Network not found");
+                return;
+            }
+            Matrix matrix = (Matrix)net;
+            DataStructure? part = dataset.GetStructureByName(getStringArgument("partition"), typeof(Partition));
+            if (part == null)
+            {
+                response.Add("!Error: Partition not found");
+                return;
+            }
+            Partition partition = (Partition)part;
+            if (partition.actorset != matrix.actorset)
+            {
+                response.Add("!Error: Partition and Matrix have different actorsets");
+                return;
+            }
+
+            string[] clusterNames = new string[partition.nbrClusters];
+            for (int i = 0; i < partition.nbrClusters; i++)
+                clusterNames[i] = partition.clusters[i].Name;
+
+            Actorset? densitiesActorset = dataset.GetActorsetByLabels(clusterNames);
+            if (densitiesActorset == null)
+            {
+                densitiesActorset = dataset.CreateActorsetByLabels(clusterNames);
+                if (densitiesActorset == null)
+                {
+                    response.Add("!Error: Could not create actorset for density matrix");
+                    return;
+                }
+                densitiesActorset.Name = matrix.Name + "_densities_actorset";
+                response.Add(dataset.StoreStructure(densitiesActorset));
+            }
+            Matrix densities = new Matrix(densitiesActorset, matrix.Name + "_densities", "N4");
+            for (int r = 0; r < partition.nbrClusters; r++)
+                for (int c = 0; c < partition.nbrClusters; c++)
+                {
+                    double denom = 0;
+                    foreach (Actor rowActor in partition.clusters[r].actors)
+                        foreach (Actor colActor in partition.clusters[c].actors)
+                            if (rowActor != colActor)
+                            {
+                                densities.data[r, c] += matrix.Get(rowActor, colActor);
+                                denom++;
+                            }
+                    densities.data[r, c] = Math.Round(densities.data[r, c] / denom, 4);
+
+                }
+            response.Add(dataset.StoreStructure(densities));
+            
+
+
+
+
         }
 
         public void f_bmlog()

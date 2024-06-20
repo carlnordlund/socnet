@@ -77,7 +77,7 @@ namespace Socnet
                 return "!Error: Partition is null";
             int size = partition.actorset.Count;
             string[,] filecells = new string[size + 1, 2];
-            filecells[0, 0] = "actor";
+            filecells[0, 0] = "";
             filecells[0, 1] = "partindex";
             for (int c = 0; c < partition.clusters.Length; c++)
             {

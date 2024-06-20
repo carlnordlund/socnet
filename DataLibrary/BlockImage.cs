@@ -139,7 +139,8 @@ namespace Socnet.DataLibrary
         }
 
         /// <summary>
-        /// Set the ideal block positions given a pattern string
+        /// Set the ideal block positions given a pattern string, where ideal block names are separated by semicolon
+        /// E.g. for a standard multiblocked blockimage for structural equivalence: nul;com
         /// </summary>
         /// <param name="pattern">The pattern string of ideal blocks to populate the BlockImage</param>
         internal void setBlocksByPattern(string pattern)

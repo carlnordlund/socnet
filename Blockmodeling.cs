@@ -795,8 +795,9 @@ namespace Socnet
             foreach (BMSolution solution in optimalSolutionsGlobal)
             {
                 Partition partition = new Partition(solution.matrix.actorset, "");
-                partition.createClusters(solution.blockimage.nbrPositions);
+                partition.createClusters(solution.blockimage.positionNames);
                 partition.setPartitionByPartArray(solution.partarray);
+                
 
                 string partString = partition.GetPartString();  // Is this even used?
                 string basename = (outname.Length > 0) ? outname : "bm_" + solution.matrix.Name + "_" + solution.blockimage.Name;
@@ -806,8 +807,7 @@ namespace Socnet
                 string bmName = basename + "_" + index;
                 BlockModel blockmodel = new BlockModel(bmName, solution.matrix, solution.blockimage, partition, solution.blockindices, solution.gofValue, solution.criteriaFunction, solution.idealMatrix);
 
-                // This is where I should have the checkIdentical check instead! And then both check partition mapping and blockimage mapping. Then I should reuse the dicts
-                // So move the CheckIfIdentical method to Blockmodeling class
+                // Below, I check if this solution is identical (isomorphic) to any existing blockmodel solution already stored
                 bool foundIdentical = false;
                 foreach (BlockModel bm in blockmodels)
                 {
