@@ -188,6 +188,22 @@ namespace Socnet.DataLibrary
             blocks![r, c] = Functions.GetBlockInstances(pattern.Split(';'));
         }
 
+        internal bool setBlockByPattern(string rowName, string colName, string pattern)
+        {
+            int r = -1, c = -1;
+            for (int i=0;i<positionNames.Length;i++)
+            {
+                if (positionNames[i].Equals(rowName))
+                    r = i;
+                if (positionNames[i].Equals(colName))
+                    c = i;
+            }
+            if (r == -1 || c == -1)
+                return false;
+            setBlockByPattern(r, c, pattern);
+            return true;
+        }
+
 
         /// <summary>
         /// Check if this is multiblocked: if so, update multiblocked flag
@@ -232,5 +248,6 @@ namespace Socnet.DataLibrary
             }
             multiBlocked = false;
         }
+
     }
 }

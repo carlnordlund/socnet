@@ -54,7 +54,7 @@ namespace Socnet
             {"dichotomize", new string[] {"name", "condition", "threshold" } },
             {"symmetrize", new string[] {"name", "method" } },
             {"rescale", new string[] {"name" } },
-            {"set", new string[] {"name","row","col","value" } }
+            {"set", new string[] {"name","value","row" } }
         };
 
         /// <summary>
@@ -167,7 +167,7 @@ namespace Socnet
                     }
                     if (assigner.Length > 0)
                     {
-                        response.Add("!Error: Use 'rename()' function to rename, 'duplicate() function to duplicate");
+                        response.Add("!Error: Use 'rename()' function to rename");
                         return response;
                     }
                 }
@@ -447,16 +447,16 @@ namespace Socnet
 
         public void f_structures()
         {
-            response.Add("DataType" + "\t" + "Name" + "\t" + "Size");
+            response.Add("Name" + "\t" + "Type" + "\t" + "Size");
             response.Add("========" + "\t" + "====" + "\t" + "====");
             string type = getStringArgument("type");
             if (type == "")
                 foreach (KeyValuePair<string, DataStructure> obj in dataset.structures)
-                    response.Add(obj.Value.DataType + "\t" + obj.Value.Name + "\t" + obj.Value.Size);
+                    response.Add(obj.Value.Name + "\t" + obj.Value.DataType + "\t" + obj.Value.Size);
             else
                 foreach (KeyValuePair<string, DataStructure> obj in dataset.structures)
                     if (obj.Value.GetType().Name.Equals(type, StringComparison.CurrentCultureIgnoreCase))
-                        response.Add(obj.Value.DataType + "\t" + obj.Value.Name + "\t" + obj.Value.Size);
+                        response.Add(obj.Value.Name + "\t" + obj.Value.DataType+ "\t" + obj.Value.Size);
         }
 
         public void f_view()
@@ -480,67 +480,120 @@ namespace Socnet
                 response.Add("!Error: Structure '" + name + "' not found");
                 return;
             }
-            int row = getIntegerArgument("row"), col = getIntegerArgument("col");
-            if (row < 0 || col < 0)
-            {
-                response.Add("!Error: 'row' and/or 'col' arguments not integers");
-                return;
-            }
-            string valstr = getStringArgument("value");
-            if (valstr.Length == 0)
-            {
-                response.Add("!Error: Could not parse 'value' argument");
-                return;
-            }
-            double val = double.NaN;
-            if (structure is Matrix || structure is Table)
-            {
-                val = getDoubleArgument("value");
-                if (double.IsNaN(val))
-                {
-                    response.Add("!Error: Could not parse 'value' as number");
-                    return;
-                }
-            }
+            string rowName = getStringArgument("row"), colName = getStringArgument("col");
             if (structure is Matrix)
             {
                 Matrix matrix = (Matrix)structure;
-                if (row < matrix.data.GetLength(0) && col < matrix.data.GetLength(1))
+                Actor? from = matrix.actorset.GetActorByLabel(rowName), to = matrix.actorset.GetActorByLabel(colName);
+                if (from == null || to == null)
                 {
-                    matrix.data[row, col] = val;
+                    response.Add("!Error: Actor(s) not found in actorset '" + matrix.actorset.Name + "'");
                     return;
                 }
-                response.Add("!Error: 'row' or 'col' index out of range");
+                double val = getDoubleArgument("value");
+                if (double.IsNaN(val))
+                {
+                    response.Add("!Error: 'value' not a number");
+                    return;
+                }
+                matrix.Set(from, to, val);
+                return;
             }
-            else if (structure is Table)
+            else if (structure is Partition)
             {
-                Table table = (Table)structure;
-                if (row < table.data.GetLength(0) && col < table.data.GetLength(1))
+                Partition partition = (Partition)structure;
+                Actor? from = partition.actorset.GetActorByLabel(rowName);
+                if (from == null)
                 {
-                    table.data[row, col] = val;
+                    response.Add("!Error: Actor not found in actorset '" + partition.actorset.Name + "'");
                     return;
                 }
-                response.Add("!Error: 'row' or 'col' index out of range");
+                int val = getIntegerArgument("value");
+                if (val == -1 || val >= partition.nbrClusters)
+                {
+                    response.Add("!Error: 'value' not a valid cluster index");
+                    return;
+                }
+                partition.moveActor(from, val);
+                return;
             }
             else if (structure is BlockImage)
             {
                 BlockImage blockimage = (BlockImage)structure;
-                if (blockimage.blocks == null)
+                string val = getStringArgument("value");
+                if (!blockimage.setBlockByPattern(rowName, colName, val))
                 {
-                    response.Add("!Error: Blockimage has null blocks");
+                    response.Add("!Error: Could not find position name(s) in BlockImage");
                     return;
                 }
-                if (row < blockimage.blocks.GetLength(0) && col < blockimage.blocks.GetLength(1))
-                {
-                    blockimage.setBlockByPattern(row, col, valstr);
-                    return;
-                }
-                response.Add("!Error: 'row' or 'col' index out of range");
             }
             else
             {
                 response.Add("!Error: Not implemented for this structure");
             }
+
+            //int row = getIntegerArgument("row"), col = getIntegerArgument("col");
+
+            //if (row < 0 || col < 0)
+            //{
+            //    response.Add("!Error: 'row' and/or 'col' arguments not integers");
+            //    return;
+            //}
+            //string valstr = getStringArgument("value");
+            //if (valstr.Length == 0)
+            //{
+            //    response.Add("!Error: Could not parse 'value' argument");
+            //    return;
+            //}
+            //double val = double.NaN;
+            //if (structure is Matrix || structure is Table)
+            //{
+            //    val = getDoubleArgument("value");
+            //    if (double.IsNaN(val))
+            //    {
+            //        response.Add("!Error: Could not parse 'value' as number");
+            //        return;
+            //    }
+            //}
+            //if (structure is Matrix)
+            //{
+            //    Matrix matrix = (Matrix)structure;
+            //    if (row < matrix.data.GetLength(0) && col < matrix.data.GetLength(1))
+            //    {
+            //        matrix.data[row, col] = val;
+            //        return;
+            //    }
+            //    response.Add("!Error: 'row' or 'col' index out of range");
+            //}
+            //else if (structure is Table)
+            //{
+            //    Table table = (Table)structure;
+            //    if (row < table.data.GetLength(0) && col < table.data.GetLength(1))
+            //    {
+            //        table.data[row, col] = val;
+            //        return;
+            //    }
+            //    response.Add("!Error: 'row' or 'col' index out of range");
+            //}
+            //else if (structure is BlockImage)
+            //{
+            //    BlockImage blockimage = (BlockImage)structure;
+            //    if (blockimage.blocks == null)
+            //    {
+            //        response.Add("!Error: Blockimage has null blocks");
+            //        return;
+            //    }
+            //    if (row < blockimage.blocks.GetLength(0) && col < blockimage.blocks.GetLength(1))
+            //    {
+            //        blockimage.setBlockByPattern(row, col, valstr);
+            //        return;
+            //    }
+            //    response.Add("!Error: 'row' or 'col' index out of range");
+            //}
+            //else
+            //{
+            //    response.Add("!Error: Not implemented for this structure");
+            //}
         }
 
         public BlockImage? f_blockimage()
@@ -698,7 +751,6 @@ namespace Socnet
             else if (statusInitMsg[0] == '!')
                 response.Add(statusInitMsg);
             Blockmodeling.logLines.Clear();
-
         }
 
         public void f_coreperi()
@@ -986,7 +1038,7 @@ namespace Socnet
                 if (!autoname)
                 {
                     bmMatrix.Name = outname;
-                    bmMatrix.actorset.Name = "actors_" + outname;
+                    bmMatrix.actorset.Name = outname+"_actors";
                     bmIdealMatrix.Name = outname + "_ideal";
                 }
                 response.Add(dataset.StoreStructure(bmMatrix.actorset));
@@ -1008,7 +1060,6 @@ namespace Socnet
 
         public void f_densities()
         {
-            response.Add("In densities function");
             DataStructure? net = dataset.GetStructureByName(getStringArgument("network"), typeof(Matrix));
             if (net == null)
             {
@@ -1061,11 +1112,6 @@ namespace Socnet
 
                 }
             response.Add(dataset.StoreStructure(densities));
-            
-
-
-
-
         }
 
         public void f_bmlog()

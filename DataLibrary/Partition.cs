@@ -261,6 +261,14 @@
             partArray[actor.index] = c2;
         }
 
+        internal void moveActor(Actor actor, int newClusterIndex)
+        {
+            clusters[partArray[actor.index]].removeActor(actor);
+            clusters[newClusterIndex].addActor(actor);
+            partArray[actor.index] = newClusterIndex;
+        }
+
+
         internal bool CheckIfIdentical(Partition otherPart)
         {
             // Start with basic checks - if these are not the same, then not identical
@@ -291,5 +299,6 @@
             // Passed the tests: these are identical. Return true
             return true;
         }
+
     }
 }

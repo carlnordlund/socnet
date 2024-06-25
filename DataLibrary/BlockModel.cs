@@ -11,7 +11,7 @@
         public BlockImage blockimage;
         public Partition partition;
 
-        // Pointer to the ideal Matrix
+        // Pointer to the ideal Matrix - this uses the Actorset of the original matrix (and is thus unsorted); used to create ideal matrix of Blockmodele
         public Matrix idealMatrix;
 
         // internally stored ideal matrix and network matrix for this solution (i.e. sorted Matrix objects)
@@ -21,7 +21,7 @@
         public int[,] blockIndices;
         public double gof;
         public string gofMethod;
-        public int[,] blockPenalties;
+        //public int[,] blockPenalties;
 
         /// <summary>
         /// Constructor for BlockModel object
