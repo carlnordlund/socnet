@@ -121,21 +121,6 @@ namespace Socnet
             bool cont = true;
             while (cont)
             {
-                // 'Increment' the Matrix object representing a single-blocked version of the BlockImage
-                bool increaseDone = false;
-                for (int r = 0; r < k; r++)
-                    for (int c = 0; c < k; c++)
-                    {
-                        biIndexMatrix.data[r, c] = blockimageBase.GetBlock(r, c, indices[r, c]).primeIndex;
-                        if (!increaseDone && maxIndices[r, c] > 1)
-                        {
-                            indices[r, c]++;
-                            if (indices[r, c] < maxIndices[r, c])
-                                increaseDone = true;
-                            else
-                                indices[r, c] = 0;
-                        }
-                    }
 
                 // See if there are at least 2 positions in this BlockImage matrix that are structurally equivalent (SE).
                 // If SE, then this particular blockimage should be excluded
@@ -147,7 +132,7 @@ namespace Socnet
                         bool foundError = false;
                         for (int i = 0; i < k && !foundError; i++)
                         {
-                            if (biIndexMatrix.data[a1, 1] != biIndexMatrix.data[a2, 1] || biIndexMatrix.data[i, a1] != biIndexMatrix.data[i, a2])
+                            if (biIndexMatrix.data[a1, i] != biIndexMatrix.data[a2, i] || biIndexMatrix.data[i, a1] != biIndexMatrix.data[i, a2])
                                 foundError = true;
                         }
                         if (!foundError)
@@ -187,6 +172,22 @@ namespace Socnet
                             isomorphDict[keyString].Add(currentData);
                     }
                 }
+                // 'Increment' the Matrix object representing a single-blocked version of the BlockImage
+                bool increaseDone = false;
+                for (int r = 0; r < k; r++)
+                    for (int c = 0; c < k; c++)
+                    {
+                        biIndexMatrix.data[r, c] = blockimageBase.GetBlock(r, c, indices[r, c]).primeIndex;
+                        if (!increaseDone && maxIndices[r, c] > 1)
+                        {
+                            indices[r, c]++;
+                            if (indices[r, c] < maxIndices[r, c])
+                                increaseDone = true;
+                            else
+                                indices[r, c] = 0;
+                        }
+                    }
+
                 if (!increaseDone)
                     cont = false;
             }
@@ -602,6 +603,30 @@ namespace Socnet
                     values.Add(vec.Get(actor));
             }
             return values;
+        }
+
+        internal static BlockImage GetBlockImageExtended(BlockImage bi_prev, string pattern)
+        {
+            int nbr_positions_prev = bi_prev.nbrPositions;
+            BlockImage bi = new BlockImage(bi_prev.Name + "_extended", nbr_positions_prev + 1);
+            for (int r = 0; r < nbr_positions_prev; r++) {
+                bi.setPositionName(r, bi_prev.positionNames[r]);
+                for (int c = 0; c < nbr_positions_prev; c++)
+                {
+                    if (bi_prev.blocks != null)
+                        for (int i = 0; i < bi_prev.blocks[r,c].Count;i++)
+                        {
+                            bi.blocks![r, c].Add(bi_prev.blocks[r, c][i].cloneBlock());
+                        }
+                }
+                bi.setBlockByPattern(nbr_positions_prev, r, pattern);
+                bi.setBlockByPattern(r, nbr_positions_prev, pattern);
+            }
+            bi.setBlockByPattern(nbr_positions_prev, nbr_positions_prev, pattern);
+
+
+            bi.checkMultiblocked();
+            return bi;
         }
     }
 }

@@ -45,6 +45,7 @@ namespace Socnet
             {"partition", new string[] {"actorset","nbrclusters"} },
             {"bminit", new string[] {"network", "blockimage", "searchtype", "method" } },
             {"bivarieties", new string[] {"blockimage"} },
+            {"biextend", new string[] {"blockimage"} },
             {"bmtest", new string[] {"network","blockimage","partition","method"} },
             {"bmview", new string[] {"blockmodel"} },
             {"bmextract", new string[] {"blockmodel", "type"} },
@@ -1117,6 +1118,23 @@ namespace Socnet
         public void f_bmlog()
         {
             response.AddRange(Blockmodeling.logLines);
+        }
+
+        public BlockImage? f_biextend()
+        {
+            DataStructure? structure = dataset.GetStructureByName(getStringArgument("blockimage"), typeof(BlockImage));
+            if (structure == null)
+            {
+                response.Add("!Error: 'blockimage' not set/recognized");
+                return null;
+            }
+
+            string pattern = getStringArgument("pattern");
+
+
+            BlockImage bi_extended = Functions.GetBlockImageExtended((BlockImage)structure, pattern);
+            return bi_extended;
+            //response.Add(dataset.StoreStructure(bi_extended));
         }
 
         public void f_bivarieties()
