@@ -146,6 +146,8 @@ namespace Socnet
                     // Then we can test for isomorphism: extract the eigenvalues, sort these and create a keystring for these eigenvalues
                     Dictionary<string, DataStructure> eigenData = Functions.Eigen2(biIndexMatrix);
                     double[] eigenvalues = ((Vector)eigenData["dmds"]).data;
+                    for (int i = 0; i < eigenvalues.Length; i++)
+                        eigenvalues[i] = Math.Abs(eigenvalues[i]);
                     Array.Sort(eigenvalues);
                     Array.Reverse(eigenvalues);
                     string keyString = ((Vector)eigenData["dmds"]).GetValueString();
