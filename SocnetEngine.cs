@@ -954,6 +954,7 @@ namespace Socnet
             {
                 long executionTime = Blockmodeling.stopwatch.ElapsedMilliseconds;
                 response.Add("Execution time (ms):" + executionTime);
+                response.Add("Nbr tests done:" + Blockmodeling.nbrTested);
                 List<BlockModel> blockmodels = Blockmodeling.generateBlockmodelStructuresFromBMSolutions(getStringArgument("outname"));
 
                 foreach (BlockModel bm in blockmodels)

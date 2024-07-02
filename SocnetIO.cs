@@ -60,8 +60,10 @@ namespace Socnet
                         filecells[r + 1, c + 1] = "";
                 }
             }
-            WriteFileCells(filecells, filepath, sep);
-            return "Blockimage '" + blockimage.Name + "' saved: " + filepath;
+            if (WriteFileCells(filecells, filepath, sep))
+                return "Blockimage '" + blockimage.Name + "' saved: " + filepath;
+            else
+                return "!Error: Could not save Blockimage file";
         }
 
         /// <summary>
@@ -87,8 +89,11 @@ namespace Socnet
                     filecells[actor.index + 1, 1] = c.ToString();
                 }
             }
-            WriteFileCells(filecells, filepath, sep);
-            return "Partition '" + partition.Name + "' saved: " + filepath;
+            if (WriteFileCells(filecells, filepath, sep))
+                return "Partition '" + partition.Name + "' saved: " + filepath;
+            else
+                return "!Error: Could not save partition '" + partition.Name + "' to file";
+
         }
 
         /// <summary>
@@ -200,8 +205,10 @@ namespace Socnet
                 foreach (Actor colActor in matrix.actorset.actors)
                     filecells[rowActor.index + 1, colActor.index + 1] = matrix.Get(rowActor, colActor).ToString();
             }
-            WriteFileCells(filecells, filepath, sep);
-            return "Matrix '" + matrix.Name + "' saved: " + filepath;
+            if (WriteFileCells(filecells, filepath, sep))
+                return "Matrix '" + matrix.Name + "' saved: " + filepath;
+            else
+                return "!Error: Could not save matrix '" + matrix.Name + "' file";
         }
 
         /// <summary>
@@ -210,7 +217,7 @@ namespace Socnet
         /// <param name="filecells">2d array of strings with content</param>
         /// <param name="filepath">File path to save to</param>
         /// <param name="sep">Character to separate data fields</param>
-        private static void WriteFileCells(string[,] filecells, string filepath, string sep)
+        private static bool WriteFileCells(string[,] filecells, string filepath, string sep)
         {
             int nbrRows = filecells.GetLength(0);
             int nbrCols = filecells.GetLength(1);
@@ -224,7 +231,16 @@ namespace Socnet
                 line += filecells[r, nbrCols - 1];
                 csvLines.Add(line);
             }
-            File.WriteAllLines(filepath, csvLines);
+            try
+            {
+                File.WriteAllLines(filepath, csvLines);
+                return true;
+            }
+            catch (IOException)
+            {
+                return false;
+            }
+            
         }
 
         /// <summary>

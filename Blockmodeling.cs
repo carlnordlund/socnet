@@ -68,6 +68,10 @@ namespace Socnet
         public static bool timeoutActive = true;
         public static bool timeoutAbort = false;
 
+        // Various counters
+        // Counter to keep track of how many tests that has been done
+        public static int nbrTested = 0;
+
         /// <summary>
         /// This method initializes a blockmodeling search
         /// </summary>
@@ -205,6 +209,7 @@ namespace Socnet
             // List for storing optimal solutions
             List<BMSolution> optimalSolutionsThisSearch = new List<BMSolution>();
             int blockimagesDone = 0;
+            nbrTested = 0;
             stopwatch.Restart();
             foreach (BlockImage blockimage in blockimages)
             {
@@ -214,7 +219,7 @@ namespace Socnet
                 partition.createClusters(nbrPositions);
                 partition.setZeroPartition();
 
-                int testindex = 0;
+                //int testindex = 0;
                 while (partition.incrementPartition())
                 {
                     if (!partition.CheckMinimumClusterSize(minClusterSize))
@@ -228,13 +233,14 @@ namespace Socnet
                         optimalSolutionsThisSearch.Add(solution);
                         bestGof = solution.gofValue;
                     }
-                    testindex++;
+                    nbrTested++;
+                    //testindex++;
                     if (timeoutActive && stopwatch.ElapsedMilliseconds > maxElapsedMilliseconds)
                     {
                         stopwatch.Stop();
                         log("Timeout: more than " + maxElapsedMilliseconds + " milliseconds passed.");
                         log("Blockimage: " + blockimage.Name + " (" + blockimagesDone + "/" + blockimages.Count + ")");
-                        log("Partition: " + partition.GetPartString("") + " (testindex=" + testindex + ")");
+                        log("Partition: " + partition.GetPartString("") + " (nbrTested=" + nbrTested + ")");
                         timeoutAbort = true;
                         return;
                     }
@@ -275,6 +281,7 @@ namespace Socnet
             blockimages = GenerateRandomOrderBy(blockimages);
             int nbrPositions;
             int blockimagesDone = 0;
+            nbrTested = 0;
 
             foreach (BlockImage blockimage in blockimages)
             {
@@ -302,6 +309,7 @@ namespace Socnet
                     {
                         tempPartition.setRandomPartition(minClusterSize, random);
                         tempSolution = gofMethod!(matrix, blockimage, tempPartition);
+                        nbrTested++;
                         if ((maximizeGof && tempSolution.gofValue > bestGofThisRun) || (!maximizeGof && tempSolution.gofValue < bestGofThisRun))
                         {
                             partition.setPartitionByPartArray(tempPartition.partArray);
@@ -322,6 +330,7 @@ namespace Socnet
                         {
                             stopwatch.Stop();
                             log("Timeout: more than " + maxElapsedMilliseconds + " milliseconds passed.");
+                            log("Nbr tests done: " + nbrTested);
                             double shareDone = (double)blockimagesDone / (double)blockimages.Count;
                             log("Blockimage: " + blockimage.Name + " (" + (int)(100 * (double)blockimagesDone / (double)blockimages.Count) + "%) - Run:" + run + " - Iteration:" + iter);
                             if (shareDone > 0)
@@ -366,6 +375,7 @@ namespace Socnet
                                                 continue;
                                             }
                                             BMSolution neighSolution = gofMethod(matrix, blockimage, partition);
+                                            nbrTested++;
                                             if ((maximizeGof && neighSolution.gofValue > bestGofThisRun) || (!maximizeGof && neighSolution.gofValue < bestGofThisRun))
                                             {
                                                 bestGofThisRun = neighSolution.gofValue;
@@ -454,6 +464,7 @@ namespace Socnet
             Partition partition = new Partition(matrix!.actorset, "localopt");
             string partString = "";
             int blockimagesDone = 0;
+            nbrTested = 0;
 
             blockimages = GenerateRandomOrderBy(blockimages);
 
@@ -488,6 +499,7 @@ namespace Socnet
                                 // Good - I have found at least one nonchecked partition that can be used
                                 foundNewStartPartition = true;
                                 tempSolution = gofMethod!(matrix, blockimage, tempPartition);
+                                nbrTested++;
                                 if ((maximizeGof && tempSolution.gofValue > bestGofTemp) || (!maximizeGof && tempSolution.gofValue < bestGofTemp))
                                 {
                                     partition = tempPartition;
@@ -525,6 +537,7 @@ namespace Socnet
                         {
                             stopwatch.Stop();
                             log("Timeout: more than " + maxElapsedMilliseconds + " milliseconds passed.");
+                            log("Nbr tests done: " + nbrTested);
                             double shareDone = (double)blockimagesDone / (double)blockimages.Count;
                             log("Blockimage: " + blockimage.Name + " (" + (int)(100 * (double)blockimagesDone / (double)blockimages.Count) + "%) - Run:" + run + " - Iteration:" + iter);
                             if (shareDone > 0)
@@ -563,6 +576,7 @@ namespace Socnet
                                                         {
                                                             checkedPartString.Add(neighborPartString);
                                                             BMSolution neighTest = gofMethod(matrix, blockimage, neighborPartition);
+                                                            nbrTested++;
                                                             bool betterGof = ((maximizeGof && neighTest.gofValue > bestGofThisRun) || (!maximizeGof && neighTest.gofValue < bestGofThisRun));
                                                             if (betterGof)
                                                             {
@@ -604,6 +618,7 @@ namespace Socnet
                                                 if (neighborPartition.CheckMinimumClusterSize(minClusterSize))
                                                 {
                                                     BMSolution neighTest = gofMethod(matrix, blockimage, neighborPartition);
+                                                    nbrTested++;
                                                     bool betterGof = ((maximizeGof && neighTest.gofValue > bestGofThisRun) || (!maximizeGof && neighTest.gofValue < bestGofThisRun));
                                                     if (betterGof)
                                                     {
