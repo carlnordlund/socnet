@@ -117,7 +117,14 @@ namespace Socnet
                 for (int c = 0; c < k; c++)
                     maxIndices[r, c] = blockimageBase.blocks![r, c].Count;
 
-            // Iterate through all potential single-block permutations of the given multi-blocked BlockImage
+            // Prepare the first biIndexMatrix content
+            for (int r = 0; r < k; r++)
+                for (int c = 0; c < k; c++)
+                    biIndexMatrix.data[r, c] = blockimageBase.GetBlock(r, c, indices[r, c]).primeIndex;
+
+
+                    
+            // Iterate through all potential single-block permutations of the given multi-blocked BlockImage        
             bool cont = true;
             while (cont)
             {
@@ -146,11 +153,19 @@ namespace Socnet
                     // Then we can test for isomorphism: extract the eigenvalues, sort these and create a keystring for these eigenvalues
                     Dictionary<string, DataStructure> eigenData = Functions.Eigen2(biIndexMatrix);
                     double[] eigenvalues = ((Vector)eigenData["dmds"]).data;
-                    for (int i = 0; i < eigenvalues.Length; i++)
-                        eigenvalues[i] = Math.Abs(eigenvalues[i]);
+                    string keyString = "";
                     Array.Sort(eigenvalues);
                     Array.Reverse(eigenvalues);
-                    string keyString = ((Vector)eigenData["dmds"]).GetValueString();
+                    for (int i = 0; i < eigenvalues.Length; i++)
+                    {
+                        eigenvalues[i] = Math.Round(eigenvalues[i], 4);
+                        if (eigenvalues[i] == -0)
+                            eigenvalues[i] = 0;
+                        keyString += eigenvalues[i] + ";";
+                    }
+                    keyString.TrimEnd(';');
+
+                    //string keyString = ((Vector)eigenData["dmds"]).GetValueString();
 
                     // Create a 2d array for this particular BlockImage
                     int[,] currentData = new int[k, k];
@@ -179,7 +194,6 @@ namespace Socnet
                 for (int r = 0; r < k; r++)
                     for (int c = 0; c < k; c++)
                     {
-                        biIndexMatrix.data[r, c] = blockimageBase.GetBlock(r, c, indices[r, c]).primeIndex;
                         if (!increaseDone && maxIndices[r, c] > 1)
                         {
                             indices[r, c]++;
@@ -188,6 +202,7 @@ namespace Socnet
                             else
                                 indices[r, c] = 0;
                         }
+                        biIndexMatrix.data[r, c] = blockimageBase.GetBlock(r, c, indices[r, c]).primeIndex;
                     }
 
                 if (!increaseDone)
