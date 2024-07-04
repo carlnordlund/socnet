@@ -693,7 +693,6 @@ namespace Socnet
 
         public void f_commdetect()
         {
-            response.Add("Init and running community detection");
             Dictionary<string, object?> searchParams = new Dictionary<string, object?>();
 
             DataStructure? network = dataset.GetStructureByName(getStringArgument("network"), typeof(Matrix));
@@ -756,7 +755,6 @@ namespace Socnet
 
         public void f_coreperi()
         {
-            response.Add("Init and running corr-based core-peri");
             Dictionary<string, object?> searchParams = new Dictionary<string, object?>();
 
             DataStructure? network = dataset.GetStructureByName(getStringArgument("network"), typeof(Matrix));

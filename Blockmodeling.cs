@@ -83,7 +83,7 @@ namespace Socnet
             initializationOk = false;
             try
             {
-                log("Initializing direct blockmodeling search...");
+                log("Initializing search...");
                 // Set network to search
                 matrix = searchParams["network"] as Matrix;
                 if (matrix == null)
