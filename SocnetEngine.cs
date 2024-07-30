@@ -1178,7 +1178,6 @@ namespace Socnet
 
         public DataStructure? f_dichotomize()
         {
-            response.Add("Dichotomization");
             DataStructure? structure = dataset.GetStructureByName(getStringArgument("name"));
             if (structure == null)
             {
