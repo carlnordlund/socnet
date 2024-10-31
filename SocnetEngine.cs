@@ -32,6 +32,7 @@ namespace Socnet
             {"load", new string[] {"file","type" } },
             {"save", new string[] {"name","file"} },
             {"loadscript", new string[] {"file" } },
+            {"loadactorset", new string[] {"file" } },
             {"loadmatrix", new string[] {"file" } },
             {"loadtable", new string[] {"file" } },
             {"loadblockimage", new string[] {"file" } },
@@ -41,6 +42,8 @@ namespace Socnet
             {"view", new string[] {"name" } },
             {"delete", new string[] {"name" } },
             {"rename", new string[] {"name", "newname" } },
+            {"actorset", new string[] {"size"} },
+            {"matrix", new string[] {"actorset"} },
             {"blockimage", new string[] {"size"} },
             {"partition", new string[] {"actorset","nbrclusters"} },
             {"bminit", new string[] {"network", "blockimage", "searchtype", "method" } },
@@ -340,6 +343,11 @@ namespace Socnet
             response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), getStringArgument("type"), getStringArgument("name"), getStringArgument("sep")));
         }
 
+        public void f_loadactorset()
+        {
+            response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "actorset", getStringArgument("name"), getStringArgument("sep")));
+        }
+
         public void f_loadmatrix()
         {
             response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "matrix", getStringArgument("name"), getStringArgument("sep")));
@@ -595,6 +603,70 @@ namespace Socnet
             //{
             //    response.Add("!Error: Not implemented for this structure");
             //}
+        }
+
+        public Actorset? f_actorset()
+        {
+            int nbrActors = getIntegerArgument("size");
+            if (nbrActors < 1)
+            {
+                response.Add("!Error: Actorset must contain at least 1 actor");
+                return null;
+            }
+            Actorset? actorset = null;
+            string labelstring = getStringArgument("labelarray");
+            if (labelstring.Length > 0)
+            {
+                string[] cells = labelstring.Split(";");
+                if (cells.Length != nbrActors)
+                {
+                    response.Add("!Error: Length of provided labelarray (" + cells.Length + ") not same length as specified Actorset size(" + nbrActors + ")");
+                    return null;
+                }
+                foreach (string cell in cells)
+                {
+                    if (cell.Length == 0)
+                    {
+                        response.Add("!Error: Actor labels must consist of at least one character");
+                        return null;
+                    }
+                }
+                actorset = dataset.CreateActorsetByLabels(cells);
+                if (actorset == null)
+                {
+                    response.Add("!Error: At least two actors seem to have the same name in the 'labelarray'");
+                    return null;
+                }
+            }
+            else
+            {
+                string[] cells = new string[nbrActors];
+                for (int i = 0; i < nbrActors; i++)
+                    cells[i] = "actor" + i;
+                actorset = dataset.CreateActorsetByLabels(cells);
+
+            }
+            return actorset;
+        }
+
+        public Matrix? f_matrix()
+        {
+            string actorsetName = getStringArgument("actorset");
+            if (actorsetName.Length == 0)
+            {
+                response.Add("!Error: No 'actorset' specified");
+                return null;
+            }
+            DataStructure? structure = dataset.GetStructureByName(actorsetName, typeof(Actorset));
+            if (structure == null || !(structure is Actorset))
+            {
+                response.Add("!Error: Actorset '" + actorsetName + "' not found");
+                return null;
+            }
+            Actorset actorset = (Actorset)structure;
+
+            Matrix matrix = new Matrix(actorset, "", "F2");
+            return matrix;
         }
 
         public BlockImage? f_blockimage()

@@ -1,4 +1,5 @@
 ﻿using Socnet.DataLibrary;
+using System.Collections.Concurrent;
 
 namespace Socnet
 {
@@ -30,6 +31,8 @@ namespace Socnet
                 return SaveBlockImage((BlockImage)structure, filepath, sep);
             if (structure is Partition)
                 return SavePartition((Partition)structure, filepath, sep);
+            if (structure is Actorset)
+                return SaveActorset((Actorset)structure, filepath, sep);
 
             return "error - structure type not implemented";
         }
@@ -64,6 +67,20 @@ namespace Socnet
                 return "Blockimage '" + blockimage.Name + "' saved: " + filepath;
             else
                 return "!Error: Could not save Blockimage file";
+        }
+
+        private static string SaveActorset(Actorset actorset, string filepath, string sep)
+        {
+            if (actorset == null)
+                return "!Error: Actorset is null";
+            int size = actorset.Count;
+            string[,] filecells = new string[size, 1];
+            for (int i=0;i<size;i++)
+                filecells[i, 0] = actorset.actors[i].Name;
+            if (WriteFileCells(filecells, filepath, sep))
+                return "Actorset '" + actorset.Name + "' saved: " + filepath;
+            else
+                return "!Error: Could not save actorset '" + actorset.Name + "' to file";
         }
 
         /// <summary>
@@ -354,7 +371,15 @@ namespace Socnet
                 string dsname = (name.Length == 0) ? Path.GetFileNameWithoutExtension(filepath) : name;
                 char sepchar = (sep.Length == 1) ? sep[0] : '\t';
 
-                if (type.Equals("matrix"))
+                if (type.Equals("actorset"))
+                {
+                    Actorset? actorset = dataset.CreateActorsetByLabels(lines);
+                    if (actorset == null)
+                        return "!Error: Couldn't create actorset from file '" + filepath + "'";
+                    actorset.Name = dsname;
+                    response.Add(dataset.StoreStructure(actorset));
+                }
+                else if (type.Equals("matrix"))
                 {
                     ActorsAndData aod = parseActorsAndData(lines, sepchar);
                     if (aod.error)
