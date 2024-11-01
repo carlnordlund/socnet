@@ -84,5 +84,14 @@
                 actorLabels[i] = quote + indexToActor[i].Name + quote;
             return actorLabels;
         }
+
+        internal void RenameActor(Actor actor, string newLabel)
+        {
+            if (!actors.Contains(actor))
+                return;
+            labelToActor.Remove(actor.Name);
+            actor.Name = newLabel;
+            labelToActor[newLabel] = actor;
+        }
     }
 }

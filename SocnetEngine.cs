@@ -490,7 +490,25 @@ namespace Socnet
                 return;
             }
             string rowName = getStringArgument("row"), colName = getStringArgument("col");
-            if (structure is Matrix)
+            if (structure is Actorset)
+            {
+                Actorset actorset=(Actorset)structure;
+                Actor? actor = actorset.GetActorByLabel(rowName);
+                if (actor == null)
+                {
+                    response.Add("!Error: Actor '" + rowName + "' not found in actorset '" + actorset.Name + "'");
+                    return;
+                }
+                string newLabel = getStringArgument("value");
+                if (newLabel.Length < 1 || actorset.labelToActor.ContainsKey(newLabel))
+                {
+                    response.Add("!Error: Actor label '" + newLabel+ "' either too short or already exists in actorset '" + actorset.Name + "'");
+                    return;
+                }
+                actorset.RenameActor(actor, newLabel);
+                return;
+            }
+            else if (structure is Matrix)
             {
                 Matrix matrix = (Matrix)structure;
                 Actor? from = matrix.actorset.GetActorByLabel(rowName), to = matrix.actorset.GetActorByLabel(colName);
