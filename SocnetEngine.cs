@@ -689,22 +689,21 @@ namespace Socnet
             if (dataarray.Length > 0)
             {
                 string[] cells = dataarray.Split(";");
-                if (cells.Length != actorset.Count*2)
+                if (cells.Length != actorset.Count* actorset.Count)
                 {
-                    response.Add("!Error: Size of data array (" + cells.Length + ") differs from size of Matrix (" + (actorset.Count * 2) + ")");
+                    response.Add("!Error: Size of data array (" + cells.Length + ") differs from size of Matrix (" + (actorset.Count * actorset.Count) + ")");
                     return null;
                 }
                 int index = 0;
+                double value = 0;
                 foreach (Actor rowActor in actorset.actors)
                     foreach (Actor colActor in actorset.actors)
                     {
-                        
+                        if (double.TryParse(cells[index], out value))
+                            matrix.Set(rowActor, colActor, value);
+                        index++;                        
                     }
-
             }
-
-
-
             return matrix;
         }
 

@@ -69,6 +69,13 @@ namespace Socnet
                 return "!Error: Could not save Blockimage file";
         }
 
+        /// <summary>
+        /// Method for saving Actorset object
+        /// </summary>
+        /// <param name="actorset">Actorset object</param>
+        /// <param name="filepath">Filepath where to save to</param>
+        /// <param name="sep">Character to separate data fields</param>
+        /// <returns>Status text</returns>
         private static string SaveActorset(Actorset actorset, string filepath, string sep)
         {
             if (actorset == null)
