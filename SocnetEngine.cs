@@ -9,7 +9,7 @@ namespace Socnet
     public class SocnetEngine
     {
         // Set version info
-        public string versionString = "Version 1.2 (June 2024)";
+        public string versionString = "Version 1.2 (December 2024)";
 
         // Prepare Dataset object
         Dataset dataset;
