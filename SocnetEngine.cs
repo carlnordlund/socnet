@@ -274,11 +274,12 @@ namespace Socnet
             response.Add("  https://doi.org/10.1016/j.socnet.2019.10.004");
             response.Add(" ");
             response.Add("Correlation-based core-periphery approach, ignoring inter-categorical blocks or using the 'denuci(d)' ideal blocks:");
-            response.Add("  Borgatti, S.P., Everett M.G. (2000). Models of core/periphery structures. Social Networks, 21(4), 375-395.");
+            response.Add("  Borgatti, S.P., Everett, M.G. (2000). Models of core/periphery structures. Social Networks, 21(4), 375-395.");
             response.Add("  https://doi.org/10.1016/S0378-8733(99)00019-2");
             response.Add(" ");
             response.Add("Correlation-based core-periphery approach using 'pco(p)' for intra-core and/or 'den(d)' or 'denmin(d)' for inter-categorical ties:");
-            response.Add("  Nordlund, C. (n.d.). Retrofitting the Borgatti-Everett core-periphery heuristic: Novel density blocks and the p-core. (Manuscript in preparation).");
+            response.Add("  Estévez, J.L., Nordlund, C. (2025). Revising the Borgatti-Everett core-periphery model: Inter-categorical density blocks and partially connected cores. Social Networks, 81, 31-51.");
+            response.Add("  https://doi.org/10.1016/j.socnet.2024.11.002");
             response.Add(" ");
             response.Add("Power-relational core-periphery approach with core dominance and/or peripheral dependency (i.e. 'powerrelational' argument in 'coreperi'):");
             response.Add("  Nordlund, C. (2018). Power-relational core–periphery structures: Peripheral dependency and core dominance in binary and valued networks. Network Science, 6(3), 348-369.");
@@ -553,6 +554,7 @@ namespace Socnet
                     response.Add("!Error: Could not find position name(s) in BlockImage");
                     return;
                 }
+                blockimage.checkMultiblocked();
             }
             else
             {
