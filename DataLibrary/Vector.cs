@@ -2,6 +2,10 @@
 {
     /// <summary>
     /// Class for Vector objects
+    /// Note that vectors are not used in the current version of Socnet.se
+    /// but are rather left-overs from previous libraries that I have developed.
+    /// I have though decided to keep this here in case it will be useful for future
+    /// versions of Socnet.se
     /// </summary>
     public class Vector : DataStructure
     {

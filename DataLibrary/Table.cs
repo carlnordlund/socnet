@@ -2,6 +2,10 @@
 {
     /// <summary>
     /// Class for Table objects
+    /// Note that tables are not used in the current version of Socnet.se
+    /// but are rather left-overs from previous libraries that I have developed.
+    /// I have though decided to keep this here in case I were to extend Socnet.se
+    /// with bipartite networks
     /// </summary>
     public class Table : DataStructure
     {

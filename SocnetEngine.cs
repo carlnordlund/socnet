@@ -9,7 +9,7 @@ namespace Socnet
     public class SocnetEngine
     {
         // Set version info
-        public string versionString = "Version 1.2 (December 2024)";
+        public string versionString = "Version 1.3 (July 2025)";
 
         // Prepare Dataset object
         Dataset dataset;
@@ -34,7 +34,6 @@ namespace Socnet
             {"loadscript", new string[] {"file" } },
             {"loadactorset", new string[] {"file" } },
             {"loadmatrix", new string[] {"file" } },
-            {"loadtable", new string[] {"file" } },
             {"loadblockimage", new string[] {"file" } },
             {"loadpartition", new string[] {"file" } },
             {"loadedgelist", new string[] {"file", "col1","col2" } },
@@ -54,7 +53,6 @@ namespace Socnet
             {"bmextract", new string[] {"blockmodel", "type"} },
             {"densities", new string[] {"network", "partition" } },
             {"coreperi", new string[] {"network", "searchtype" } },
-            {"commdetect", new string[] {"network", "size", "searchtype", "method" } },
             {"dichotomize", new string[] {"name", "condition", "threshold" } },
             {"symmetrize", new string[] {"name", "method" } },
             {"rescale", new string[] {"name" } },
@@ -261,7 +259,7 @@ namespace Socnet
             response.Add("You type in commands on the prompt to do various things with data: load, save, transform,  analyze etc.");
             response.Add("It is also possible to execute an external text/script file containing a list of commands: then start the");
             response.Add("socnet client with the -f <filepath> extension.");
-            response.Add("Check socnet.se for command references, how-to, and quick-start tutorial!");
+            response.Add("Check www.socnet.se for command references, how-to, and quick-start tutorial!");
         }
 
         public void f_citeinfo()
@@ -290,12 +288,17 @@ namespace Socnet
             response.Add("  https://doi.org/10.1017/CBO9780511584176");
         }
 
-
+        /// <summary>
+        /// Command 'getwd()' to display the current working directory
+        /// </summary>
         public void f_getwd()
         {
             response.Add(Directory.GetCurrentDirectory());
         }
 
+        /// <summary>
+        /// Command 'setwd(..)' to set the current working directory
+        /// </summary>
         public void f_setwd()
         {
             string dir = getStringArgument("dir");
@@ -318,6 +321,9 @@ namespace Socnet
             }
         }
 
+        /// <summary>
+        /// Command 'dir()' to view the content of the current working directory
+        /// </summary>
         public void f_dir()
         {
             try
@@ -339,54 +345,57 @@ namespace Socnet
             }
         }
 
+        /// <summary>
+        /// Command 'load(..)' to load a Socnet.se data structure from file
+        /// </summary>
         public void f_load()
         {
             response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), getStringArgument("type"), getStringArgument("name"), getStringArgument("sep")));
         }
 
+        /// <summary>
+        /// Command 'loadactorset(..)' to load an Actorset structure from file
+        /// </summary>
         public void f_loadactorset()
         {
             response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "actorset", getStringArgument("name"), getStringArgument("sep")));
         }
 
+        /// <summary>
+        /// Command 'loadmatrix(..)' to load a Matrix structure from file
+        /// </summary>
         public void f_loadmatrix()
         {
             response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "matrix", getStringArgument("name"), getStringArgument("sep")));
         }
 
-        public void f_loadtable()
-        {
-            response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "table", getStringArgument("name"), getStringArgument("sep")));
-        }
-
+        /// <summary>
+        /// Command 'loadblockimage(..)' to load a Blockimage structure from file
+        /// </summary>
         public void f_loadblockimage()
         {
             response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "blockimage", getStringArgument("name"), getStringArgument("sep")));
         }
 
+        /// <summary>
+        /// Command 'loadpartition(..)' to load a Partition structure from file
+        /// </summary>
         public void f_loadpartition()
         {
             response.Add(SocnetIO.LoadDataStructure(response, dataset, getStringArgument("file"), "partition", getStringArgument("name"), getStringArgument("sep")));
         }
 
+        /// <summary>
+        /// Command 'save(..)' to save a Socnet.se data structure to file
+        /// </summary>
         public void f_save()
         {
             response.Add(SocnetIO.SaveDataStructure(response, dataset, getStringArgument("name"), getStringArgument("file")));
         }
 
-        //public void f_saveblockmodel()
-        //{
-        //    response.Add("Saving blockmodel as json for R");
-        //    string name = getStringArgument("name");
-        //    DataStructure? structure = dataset.GetStructureByName(getStringArgument("name"), typeof(BlockModel));
-        //    if (structure == null)
-        //    {
-        //        response.Add("!Error: No BlockModel named '" + name + "'");
-        //        return;
-        //    }
-        //    response.Add(SocnetIO.SaveBlockModel((BlockModel)structure, getStringArgument("file")));
-        //}
-
+        /// <summary>
+        /// Command 'loadscript(..)' to load a text file with Socnet.se commands and execute these
+        /// </summary>
         public void f_loadscript()
         {
             string file = getStringArgument("file");
@@ -405,6 +414,9 @@ namespace Socnet
             }
         }
 
+        /// <summary>
+        /// Command 'loadedgelist(..)' to load an edgelist from file and store it as a Matrix object
+        /// </summary>
         public void f_loadedgelist()
         {
             response.Add(SocnetIO.LoadEdgelist(response,
@@ -420,6 +432,9 @@ namespace Socnet
             ));
         }
 
+        /// <summary>
+        /// Command 'rename(..)' to rename a data structure
+        /// </summary>
         public void f_rename()
         {
             string oldName = getStringArgument("name"), newName = getStringArgument("newname");
@@ -441,6 +456,9 @@ namespace Socnet
             }
         }
 
+        /// <summary>
+        /// Command 'delete(..)' to delete a data structure from memory
+        /// </summary>
         public void f_delete()
         {
             DataStructure? structure = dataset.GetStructureByName(getStringArgument("name"));
@@ -450,11 +468,17 @@ namespace Socnet
                 response.Add("!Error: Structure '" + getStringArgument("name") + "' not found");
         }
 
+        /// <summary>
+        /// Command 'deleteall()' to delete all data structures from memory
+        /// </summary>
         public void f_deleteall()
         {
             response.Add(dataset.DeleteAllStructures());
         }
 
+        /// <summary>
+        /// Command 'structures(..)' to display stored data structures
+        /// </summary>
         public void f_structures()
         {
             response.Add("Name" + "\t" + "Type" + "\t" + "Size");
@@ -469,6 +493,9 @@ namespace Socnet
                         response.Add(obj.Value.Name + "\t" + obj.Value.DataType+ "\t" + obj.Value.Size);
         }
 
+        /// <summary>
+        /// Command 'view(..)' to view the content of a data structure
+        /// </summary>
         public void f_view()
         {
             string name = getStringArgument("name");
@@ -481,6 +508,9 @@ namespace Socnet
             response.AddRange(structure.View);
         }
 
+        /// <summary>
+        /// Command 'set(..)' to modify a value in a data structure
+        /// </summary>
         public void f_set()
         {
             string name = getStringArgument("name");
@@ -560,71 +590,12 @@ namespace Socnet
             {
                 response.Add("!Error: Not implemented for this structure");
             }
-
-            //int row = getIntegerArgument("row"), col = getIntegerArgument("col");
-
-            //if (row < 0 || col < 0)
-            //{
-            //    response.Add("!Error: 'row' and/or 'col' arguments not integers");
-            //    return;
-            //}
-            //string valstr = getStringArgument("value");
-            //if (valstr.Length == 0)
-            //{
-            //    response.Add("!Error: Could not parse 'value' argument");
-            //    return;
-            //}
-            //double val = double.NaN;
-            //if (structure is Matrix || structure is Table)
-            //{
-            //    val = getDoubleArgument("value");
-            //    if (double.IsNaN(val))
-            //    {
-            //        response.Add("!Error: Could not parse 'value' as number");
-            //        return;
-            //    }
-            //}
-            //if (structure is Matrix)
-            //{
-            //    Matrix matrix = (Matrix)structure;
-            //    if (row < matrix.data.GetLength(0) && col < matrix.data.GetLength(1))
-            //    {
-            //        matrix.data[row, col] = val;
-            //        return;
-            //    }
-            //    response.Add("!Error: 'row' or 'col' index out of range");
-            //}
-            //else if (structure is Table)
-            //{
-            //    Table table = (Table)structure;
-            //    if (row < table.data.GetLength(0) && col < table.data.GetLength(1))
-            //    {
-            //        table.data[row, col] = val;
-            //        return;
-            //    }
-            //    response.Add("!Error: 'row' or 'col' index out of range");
-            //}
-            //else if (structure is BlockImage)
-            //{
-            //    BlockImage blockimage = (BlockImage)structure;
-            //    if (blockimage.blocks == null)
-            //    {
-            //        response.Add("!Error: Blockimage has null blocks");
-            //        return;
-            //    }
-            //    if (row < blockimage.blocks.GetLength(0) && col < blockimage.blocks.GetLength(1))
-            //    {
-            //        blockimage.setBlockByPattern(row, col, valstr);
-            //        return;
-            //    }
-            //    response.Add("!Error: 'row' or 'col' index out of range");
-            //}
-            //else
-            //{
-            //    response.Add("!Error: Not implemented for this structure");
-            //}
         }
 
+        /// <summary>
+        /// Command 'actorset(..)' to create an Actorset structure
+        /// </summary>
+        /// <returns></returns>
         public Actorset? f_actorset()
         {
             int nbrActors = getIntegerArgument("size");
@@ -669,6 +640,10 @@ namespace Socnet
             return actorset;
         }
 
+        /// <summary>
+        /// Command 'matrix()' to create a Matrix structure
+        /// </summary>
+        /// <returns></returns>
         public Matrix? f_matrix()
         {
             string actorsetName = getStringArgument("actorset");
@@ -709,6 +684,10 @@ namespace Socnet
             return matrix;
         }
 
+        /// <summary>
+        /// Command 'blockimage(..)' to create a Blockimage structure
+        /// </summary>
+        /// <returns></returns>
         public BlockImage? f_blockimage()
         {
             int nbrPositions = getIntegerArgument("size");
@@ -748,6 +727,10 @@ namespace Socnet
             return bi;
         }
 
+        /// <summary>
+        /// Command 'partition(..)' to create a Partition structure
+        /// </summary>
+        /// <returns></returns>
         public Partition? f_partition()
         {
             string actorsetName = getStringArgument("actorset");
@@ -803,68 +786,9 @@ namespace Socnet
             return partition;
         }
 
-        public void f_commdetect()
-        {
-            Dictionary<string, object?> searchParams = new Dictionary<string, object?>();
-
-            DataStructure? network = dataset.GetStructureByName(getStringArgument("network"), typeof(Matrix));
-            if (network == null)
-            {
-                response.Add("!Error: Network not found (parameter: network)");
-                return;
-            }
-
-            string searchType = getStringArgument("searchtype");
-            if (searchType == "" || !Blockmodeling.searchTypes.Contains(searchType))
-            {
-                response.Add("!Error: Search type '" + searchType + "' not recognized (check 'searchtype' parameter)");
-                return;
-            }
-
-            string gofMethod = getStringArgument("method");
-            if (gofMethod == "" || !Blockmodeling.gofMethods.Contains(gofMethod))
-            {
-                response.Add("!Error: Method not recognized/set (parameter: method)");
-                return;
-            }
-
-
-            int size = getIntegerArgument("size");
-            if (size<2)
-            {
-                response.Add("!Error: Number of communities (i.e. 'size') must be at least 2");
-                return;
-            }
-
-            string diagonal = (getStringArgument("diagonal").Equals(""))?"com":getStringArgument("diagonal");
-            BlockImage cbi = new BlockImage("comms_" + size, size);
-            cbi.setBlocksByPattern("nul");
-            for (int i = 0; i < size; i++)
-                cbi.setBlockByPattern(i, i, diagonal);
-
-            searchParams["network"] = network;
-            searchParams["blockimage"] = cbi;
-            searchParams["searchtype"] = searchType;
-            searchParams["method"] = gofMethod;
-            searchParams["minclustersize"] = getIntegerArgument("minclustersize");
-            searchParams["nbrrestarts"] = getIntegerArgument("nbrrestarts");
-            searchParams["maxiterations"] = getIntegerArgument("maxiterations");
-            searchParams["maxtime"] = getIntegerArgument("maxtime");
-            searchParams["nbrrandomstart"] = getIntegerArgument("nbrrandomstart");
-            searchParams["doswitching"] = getStringArgument("doswitching");
-            searchParams["minnbrbetter"] = getIntegerArgument("minnbrbetter");
-
-            string statusInitMsg = Blockmodeling.InitializeSearch(searchParams);
-            if (statusInitMsg.Equals("ok"))
-            {
-                response.AddRange(Blockmodeling.logLines);
-                f_bmstart();
-            }
-            else if (statusInitMsg[0] == '!')
-                response.Add(statusInitMsg);
-            Blockmodeling.logLines.Clear();
-        }
-
+        /// <summary>
+        /// Function 'coreperi(..)' to initialize and run a Borgatti-Everett-style search for a core-periphery structure
+        /// </summary>
         public void f_coreperi()
         {
             Dictionary<string, object?> searchParams = new Dictionary<string, object?>();
@@ -965,6 +889,10 @@ namespace Socnet
             Blockmodeling.logLines.Clear();
         }
 
+        /// <summary>
+        /// Command 'bmtest(..)' to get the blockmodel for a specific partition, network and blockimage
+        /// </summary>
+        /// <returns></returns>
         public BlockModel? f_bmtest()
         {
             DataStructure? network = dataset.GetStructureByName(getStringArgument("network"), typeof(Matrix));
@@ -1003,6 +931,9 @@ namespace Socnet
             return blockmodel;
         }
 
+        /// <summary>
+        /// Command 'bminit(..)' to initialize a blockmodeling search
+        /// </summary>
         public void f_bminit()
         {
             Dictionary<string, object?> searchParams = new Dictionary<string, object?>();
@@ -1057,6 +988,9 @@ namespace Socnet
             Blockmodeling.logLines.Clear();
         }
 
+        /// <summary>
+        /// Command 'bmstart(..)' to start a blockmodeling search
+        /// </summary>
         public void f_bmstart()
         {
             string status = Blockmodeling.StartSearch();
@@ -1081,6 +1015,9 @@ namespace Socnet
             }
         }
 
+        /// <summary>
+        /// Command 'bmview(..)' to display a Blockmodel structure
+        /// </summary>
         public void f_bmview()
         {
             BlockModel bm;
@@ -1123,6 +1060,9 @@ namespace Socnet
             response.Add("Goodness-of-fit: " + bm.gof + " (" + bm.gofMethod + ")");
         }
 
+        /// <summary>
+        /// Command 'bmextract(..)' to extract internal structures from a Blockmodel structure
+        /// </summary>
         public void f_bmextract()
         {
             // "blockmodel", "type"
@@ -1170,6 +1110,9 @@ namespace Socnet
             }
         }
 
+        /// <summary>
+        /// Command 'densities(..)' to create a density matrix from a network and a partition
+        /// </summary>
         public void f_densities()
         {
             DataStructure? net = dataset.GetStructureByName(getStringArgument("network"), typeof(Matrix));
@@ -1226,11 +1169,10 @@ namespace Socnet
             response.Add(dataset.StoreStructure(densities));
         }
 
-        public void f_bmlog()
-        {
-            response.AddRange(Blockmodeling.logLines);
-        }
-
+        /// <summary>
+        /// Command 'biextend(..)' to make an extention of an existing Blockimage
+        /// </summary>
+        /// <returns></returns>
         public BlockImage? f_biextend()
         {
             DataStructure? structure = dataset.GetStructureByName(getStringArgument("blockimage"), typeof(BlockImage));
@@ -1248,6 +1190,9 @@ namespace Socnet
             //response.Add(dataset.StoreStructure(bi_extended));
         }
 
+        /// <summary>
+        /// Command 'bivarieties(..)' to create all non-isomorphic and non-trivial singleblocked blockimages
+        /// </summary>
         public void f_bivarieties()
         {
             response.Add("*** TEST FUNCTION ***");
@@ -1269,6 +1214,10 @@ namespace Socnet
                 dataset.StoreStructure(blim);
         }
 
+        /// <summary>
+        /// Command 'symmetrize(..)' to symmetrize a Matrix structure
+        /// </summary>
+        /// <returns></returns>
         public Matrix? f_symmetrize()
         {
             DataStructure? structure = dataset.GetStructureByName(getStringArgument("name"));
@@ -1288,6 +1237,10 @@ namespace Socnet
             return symmMatrix;
         }
 
+        /// <summary>
+        /// Command 'dichotomize(..)' to dichotomize a Matrix structure
+        /// </summary>
+        /// <returns></returns>
         public DataStructure? f_dichotomize()
         {
             DataStructure? structure = dataset.GetStructureByName(getStringArgument("name"));
@@ -1320,6 +1273,10 @@ namespace Socnet
             return Functions.Dichotomize(structure, condition, threshold, truevalue, falsevalue);
         }
 
+        /// <summary>
+        /// Command 'rescale(..)' to rescale the values in a Matrix structure
+        /// </summary>
+        /// <returns></returns>
         public DataStructure? f_rescale()
         {
             DataStructure? structure = dataset.GetStructureByName(getStringArgument("name"));

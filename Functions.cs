@@ -121,14 +121,11 @@ namespace Socnet
             for (int r = 0; r < k; r++)
                 for (int c = 0; c < k; c++)
                     biIndexMatrix.data[r, c] = blockimageBase.GetBlock(r, c, indices[r, c]).primeIndex;
-
-
                     
             // Iterate through all potential single-block permutations of the given multi-blocked BlockImage        
             bool cont = true;
             while (cont)
             {
-
                 // See if there are at least 2 positions in this BlockImage matrix that are structurally equivalent (SE).
                 // If SE, then this particular blockimage should be excluded
                 bool foundPerfectSE = false;
@@ -164,8 +161,6 @@ namespace Socnet
                         keyString += eigenvalues[i] + ";";
                     }
                     keyString.TrimEnd(';');
-
-                    //string keyString = ((Vector)eigenData["dmds"]).GetValueString();
 
                     // Create a 2d array for this particular BlockImage
                     int[,] currentData = new int[k, k];
@@ -640,8 +635,6 @@ namespace Socnet
                 bi.setBlockByPattern(r, nbr_positions_prev, pattern);
             }
             bi.setBlockByPattern(nbr_positions_prev, nbr_positions_prev, pattern);
-
-
             bi.checkMultiblocked();
             return bi;
         }
