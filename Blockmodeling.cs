@@ -893,6 +893,11 @@ namespace Socnet
                 }
             return true;
         }
+
+        internal static void SetRandomSeed(int seed)
+        {
+            random = new Random(seed);
+        }
     }
 
     /// <summary>

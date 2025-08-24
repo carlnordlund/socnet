@@ -56,7 +56,8 @@ namespace Socnet
             {"dichotomize", new string[] {"name", "condition", "threshold" } },
             {"symmetrize", new string[] {"name", "method" } },
             {"rescale", new string[] {"name" } },
-            {"set", new string[] {"name","value","row" } }
+            {"set", new string[] {"name","value","row" } },
+            {"randomseed", new string[] {"seed"} }
         };
 
         /// <summary>
@@ -294,6 +295,19 @@ namespace Socnet
         public void f_getwd()
         {
             response.Add(Directory.GetCurrentDirectory());
+        }
+
+        public void f_randomseed()
+        {
+            int seed = getIntegerArgument("seed");
+            if (seed < 0)
+            {
+                response.Add("!Error: Seed value 'seed' not set.");
+                return;
+            }
+            Blockmodeling.SetRandomSeed(seed);
+            response.Add("New random seed set: " + seed);
+
         }
 
         /// <summary>
