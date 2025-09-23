@@ -89,7 +89,7 @@ namespace Socnet.DataLibrary
             {
                 for (int c = 0; c < nbrPositions; c++)
                     line += "\t" + positionNames[c];
-                content.Add(line);
+                content.Add(":" + line);
                 for (int r = 0; r < nbrPositions; r++)
                 {
                     line = positionNames[r];
@@ -100,10 +100,10 @@ namespace Socnet.DataLibrary
                             line += string.Join(";", blocks[r, c]);
                         line += "]";
                     }
-                    content.Add(line);
+                    content.Add(":" + line);
                 }
             }
-            content.Add("Multiblocked: " + multiBlocked);
+            content.Add(":Multiblocked: " + multiBlocked);
         }
 
         /// <summary>

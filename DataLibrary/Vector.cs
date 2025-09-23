@@ -38,10 +38,10 @@
 
         internal override void GetContent(List<string> content)
         {
-            content.Add("Actorset:" + actorset.Name);
-            content.Add("actor" + "\t" + "value");
+            content.Add(":Actorset:" + actorset.Name);
+            content.Add(":actor" + "\t" + "value");
             foreach (Actor actor in actorset.actors)
-                content.Add(actor.Name + "\t" + Get(actor));
+                content.Add(":" + actor.Name + "\t" + Get(actor));
         }
 
         internal string GetValueString()

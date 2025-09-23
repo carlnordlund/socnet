@@ -9,7 +9,7 @@ namespace Socnet
     public class SocnetEngine
     {
         // Set version info
-        public string versionString = "Version 1.3 (July 2025)";
+        public string versionString = "Version 1.4 (October 2025)";
 
         // Prepare Dataset object
         Dataset dataset;
@@ -250,43 +250,41 @@ namespace Socnet
         // textual output on the console resulting from each command.
         public void f_help()
         {
-            response.Add("HELP SECTION");
-            response.Add("============");
-            response.Add(versionString);
-            response.Add("See website for documentation:");
-            response.Add("https://socnet.se");
-            response.Add(" ");
-            response.Add("The socnet client is used to do blockmodeling analyses, with some extra functionality for data management.");
-            response.Add("You type in commands on the prompt to do various things with data: load, save, transform,  analyze etc.");
-            response.Add("It is also possible to execute an external text/script file containing a list of commands: then start the");
-            response.Add("socnet client with the -f <filepath> extension.");
-            response.Add("Check www.socnet.se for command references, how-to, and quick-start tutorial!");
+            response.Add(":HELP SECTION");
+            response.Add(":============");
+            response.Add(":" + versionString);
+            response.Add(":See website for documentation:");
+            response.Add(":https://socnet.se");
+            response.Add(": ");
+            response.Add(":The socnet client is used to do blockmodeling analyses, with some extra functionality for data management.");
+            response.Add(":You type in commands on the prompt to do various things with data: load, save, transform,  analyze etc.");
+            response.Add(":Check www.socnet.se for command references, how-to, and quick-start tutorial!");
         }
 
         public void f_citeinfo()
         {
-            response.Add("The Socnet.se software client:");
-            response.Add("  Nordlund, C., Roy, C. (2024). Socnet.se: The Blockmodeling Console App [computer software]. https://socnet.se");
-            response.Add(" ");
-            response.Add("Direct blockmodeling using the 'nordlund' method (i.e. weighted correlation coefficients):");
-            response.Add("  Nordlund, C. (2020). Direct blockmodeling of valued and binary networks: a dichotomization-free approach. Social Networks, 61, 128-143.");
-            response.Add("  https://doi.org/10.1016/j.socnet.2019.10.004");
-            response.Add(" ");
-            response.Add("Correlation-based core-periphery approach, ignoring inter-categorical blocks or using the 'denuci(d)' ideal blocks:");
-            response.Add("  Borgatti, S.P., Everett, M.G. (2000). Models of core/periphery structures. Social Networks, 21(4), 375-395.");
-            response.Add("  https://doi.org/10.1016/S0378-8733(99)00019-2");
-            response.Add(" ");
-            response.Add("Correlation-based core-periphery approach using 'pco(p)' for intra-core and/or 'den(d)' or 'denmin(d)' for inter-categorical ties:");
-            response.Add("  Estévez, J.L., Nordlund, C. (2025). Revising the Borgatti-Everett core-periphery model: Inter-categorical density blocks and partially connected cores. Social Networks, 81, 31-51.");
-            response.Add("  https://doi.org/10.1016/j.socnet.2024.11.002");
-            response.Add(" ");
-            response.Add("Power-relational core-periphery approach with core dominance and/or peripheral dependency (i.e. 'powerrelational' argument in 'coreperi'):");
-            response.Add("  Nordlund, C. (2018). Power-relational core–periphery structures: Peripheral dependency and core dominance in binary and valued networks. Network Science, 6(3), 348-369.");
-            response.Add("  https://doi.org/10.1017/nws.2018.15");
-            response.Add(" ");
-            response.Add("Direct generalized blockmodeling using 'hamming' distances as penalty function:");
-            response.Add("  Doreian, P., Batagelj, V., Ferligoj, A. (2004). Generalized Blockmodeling. Cambridge: Cambridge University Press.");
-            response.Add("  https://doi.org/10.1017/CBO9780511584176");
+            response.Add(":The Socnet.se software client:");
+            response.Add(":  Nordlund, C., Roy, C. (2024). Socnet.se: The Blockmodeling Console App [computer software]. https://socnet.se");
+            response.Add(": ");
+            response.Add(":Direct blockmodeling using the 'nordlund' method (i.e. weighted correlation coefficients):");
+            response.Add(":  Nordlund, C. (2020). Direct blockmodeling of valued and binary networks: a dichotomization-free approach. Social Networks, 61, 128-143.");
+            response.Add(":  https://doi.org/10.1016/j.socnet.2019.10.004");
+            response.Add(": ");
+            response.Add(":Correlation-based core-periphery approach, ignoring inter-categorical blocks or using the 'denuci(d)' ideal blocks:");
+            response.Add(":  Borgatti, S.P., Everett, M.G. (2000). Models of core/periphery structures. Social Networks, 21(4), 375-395.");
+            response.Add(":  https://doi.org/10.1016/S0378-8733(99)00019-2");
+            response.Add(": ");
+            response.Add(":Correlation-based core-periphery approach using 'pco(p)' for intra-core and/or 'den(d)' or 'denmin(d)' for inter-categorical ties:");
+            response.Add(":  Estévez, J.L., Nordlund, C. (2025). Revising the Borgatti-Everett core-periphery model: Inter-categorical density blocks and partially connected cores. Social Networks, 81, 31-51.");
+            response.Add(":  https://doi.org/10.1016/j.socnet.2024.11.002");
+            response.Add(": ");
+            response.Add(":Power-relational core-periphery approach with core dominance and/or peripheral dependency (i.e. 'powerrelational' argument in 'coreperi'):");
+            response.Add(":  Nordlund, C. (2018). Power-relational core–periphery structures: Peripheral dependency and core dominance in binary and valued networks. Network Science, 6(3), 348-369.");
+            response.Add(":  https://doi.org/10.1017/nws.2018.15");
+            response.Add(": ");
+            response.Add(":Direct generalized blockmodeling using 'hamming' distances as penalty function:");
+            response.Add(":  Doreian, P., Batagelj, V., Ferligoj, A. (2004). Generalized Blockmodeling. Cambridge: Cambridge University Press.");
+            response.Add(":  https://doi.org/10.1017/CBO9780511584176");
         }
 
         /// <summary>
@@ -294,7 +292,7 @@ namespace Socnet
         /// </summary>
         public void f_getwd()
         {
-            response.Add(Directory.GetCurrentDirectory());
+            response.Add(":" + Directory.GetCurrentDirectory());
         }
 
         public void f_randomseed()
@@ -344,12 +342,11 @@ namespace Socnet
             {
                 string[] dirs = Directory.GetDirectories(Directory.GetCurrentDirectory());
                 string[] files = Directory.GetFiles(Directory.GetCurrentDirectory());
-                //response.Add("'" + Directory.GetCurrentDirectory() + "':");
                 foreach (string dir in dirs)
-                    response.Add("/" + Path.GetFileName(dir) + "/");
+                    response.Add(":/" + Path.GetFileName(dir) + "/");
                 foreach (string file in files)
                 {
-                    response.Add(Path.GetFileName(file));
+                    response.Add(":" + Path.GetFileName(file));
                 }
             }
             catch (Exception e)
@@ -500,11 +497,11 @@ namespace Socnet
             string type = getStringArgument("type");
             if (type == "")
                 foreach (KeyValuePair<string, DataStructure> obj in dataset.structures)
-                    response.Add(obj.Value.Name + "\t" + obj.Value.DataType + "\t" + obj.Value.Size);
+                    response.Add(":" + obj.Value.Name + "\t" + obj.Value.DataType + "\t" + obj.Value.Size);
             else
                 foreach (KeyValuePair<string, DataStructure> obj in dataset.structures)
                     if (obj.Value.GetType().Name.Equals(type, StringComparison.CurrentCultureIgnoreCase))
-                        response.Add(obj.Value.Name + "\t" + obj.Value.DataType+ "\t" + obj.Value.Size);
+                        response.Add(":" + obj.Value.Name + "\t" + obj.Value.DataType + "\t" + obj.Value.Size);
         }
 
         /// <summary>
@@ -1061,17 +1058,16 @@ namespace Socnet
                 }
                 bm = (BlockModel)structure;
             }
-            response.Add("Blockmodel:");
+            response.Add(":Blockmodel:");
             response.AddRange(bm.DisplayBlockmodelMatrix());
             if (showIdealMatrix)
             {
-                response.Add("Ideal blockmodel:");
+                response.Add(":Ideal blockmodel:");
                 response.AddRange(bm.DisplayIdealMatrix());
-                //response.AddRange(bm.DisplayBlockmodel("ideal", '1', '0'));
             }
-            response.Add("Blockimage:");
+            response.Add(":Blockimage:");
             response.AddRange(bm.DisplayBlockimage());
-            response.Add("Goodness-of-fit: " + bm.gof + " (" + bm.gofMethod + ")");
+            response.Add(":Goodness-of-fit: " + bm.gof + " (" + bm.gofMethod + ")");
         }
 
         /// <summary>
@@ -1079,7 +1075,6 @@ namespace Socnet
         /// </summary>
         public void f_bmextract()
         {
-            // "blockmodel", "type"
             string outname = getStringArgument("outname");
             bool autoname = (outname.Length == 0);
 
@@ -1120,7 +1115,7 @@ namespace Socnet
             }
             else if (type.Equals("gof"))
             {
-                response.Add(blockmodel.gof + " (" + blockmodel.gofMethod + ")");
+                response.Add(":" + blockmodel.gof + " (" + blockmodel.gofMethod + ")");
             }
         }
 

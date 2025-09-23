@@ -53,9 +53,9 @@
 
         internal override void GetContent(List<string> content)
         {
-            content.Add("Cluster:" + Name);
+            content.Add(":Cluster:" + Name);
             foreach (Actor actor in actors)
-                content.Add("Actor: " + actor.Name);
+                content.Add(":Actor: " + actor.Name);
         }
     }
 }

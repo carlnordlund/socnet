@@ -19,17 +19,17 @@
 
         internal override void GetContent(List<string> content)
         {
-            content.Add("Actorsets: Rows:" + rowActorset.Name + " Cols:" + colActorset.Name);
+            content.Add(":Actorsets: Rows:" + rowActorset.Name + " Cols:" + colActorset.Name);
             string line = "";
             foreach (Actor colActor in colActorset.actors)
                 line += "\t" + colActor.Name;
-            content.Add(line);
+            content.Add("_" + line);
             foreach (Actor rowActor in rowActorset.actors)
             {
                 line = rowActor.Name;
                 foreach (Actor colActor in colActorset.actors)
                     line += "\t" + Get(rowActor, colActor);
-                content.Add(line.TrimEnd('\t'));
+                content.Add(":" + line.TrimEnd('\t'));
             }
         }
 

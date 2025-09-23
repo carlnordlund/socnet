@@ -17,17 +17,17 @@
 
         internal override void GetContent(List<string> content)
         {
-            content.Add("Actorset:" + actorset.Name);
+            content.Add(":Actorset:" + actorset.Name);
             string line = "";
             foreach (Actor colActor in actorset.actors)
                 line += "\t" + colActor.Name;
-            content.Add(line);
+            content.Add(":" + line);
             foreach (Actor rowActor in actorset.actors)
             {
                 line = rowActor.Name;
                 foreach (Actor colActor in actorset.actors)
                     line += "\t" + Get(rowActor, colActor);
-                content.Add(line.TrimEnd('\t'));
+                content.Add(":" + line.TrimEnd('\t'));
             }
         }
 

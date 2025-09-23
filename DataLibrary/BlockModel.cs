@@ -109,14 +109,14 @@
             string line = "";
             for (int c = 0; c < nbrClusters; c++)
                 line += "\t" + blockimage.positionNames[c];
-            lines.Add(line);
+            lines.Add(":" + line);
 
             for (int r = 0; r < nbrClusters; r++)
             {
                 line = blockimage.positionNames[r];
                 for (int c = 0; c < nbrClusters; c++)
                     line += "\t" + blockimage.GetBlock(r, c, blockIndices[r, c]).ToString();
-                lines.Add(line);
+                lines.Add(":" + line);
             }
             return lines;
         }
@@ -141,7 +141,7 @@
             double median = (max == 1) ? 0.5 : Functions.GetMedianValue(displayMatrix);
 
             int nbrClusters = partition.clusters.Length;
-            lines.Add("+" + new string('-', partition.actorset.Count + nbrClusters - 1) + "+");
+            lines.Add(":+" + new string('-', partition.actorset.Count + nbrClusters - 1) + "+");
             string line = "";
             double val = 0;
             for (int r = 0; r < nbrClusters; r++)
@@ -165,10 +165,10 @@
                         line += "|";
                     }
                     line += "\t" + r + "_" + rowActor.Name;
-                    lines.Add(line);
+                    lines.Add(":" + line);
                 }
                 if (r < nbrClusters)
-                    lines.Add("+" + new string('-', partition.actorset.Count + nbrClusters - 1) + "+");
+                    lines.Add(":+" + new string('-', partition.actorset.Count + nbrClusters - 1) + "+");
             }
             return lines;
         }

@@ -72,12 +72,12 @@
 
         internal override void GetContent(List<string> content)
         {
-            content.Add("Actorset:" + actorset.Name);
+            content.Add(":Actorset:" + actorset.Name);
             for (int i = 0; i < nbrClusters; i++)
             {
-                content.Add("Cluster " + i + ": " + clusters[i].Name);
+                content.Add(":Cluster " + i + ": " + clusters[i].Name);
                 foreach (Actor actor in clusters[i].actors)
-                    content.Add(actor.Name + "\t(" + actor.index + ")");
+                    content.Add(":" + actor.Name + "\t(" + actor.index + ")");
             }
         }
 

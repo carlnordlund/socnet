@@ -28,9 +28,9 @@
 
         internal override void GetContent(List<string> content)
         {
-            content.Add("index" + "\t" + "label");
+            content.Add(":index" + "\t" + "label");
             foreach (Actor actor in actors)
-                content.Add(actor.index + "\t" + actor.Name);
+                content.Add(":" + actor.index + "\t" + actor.Name);
         }
 
         /// <summary>
