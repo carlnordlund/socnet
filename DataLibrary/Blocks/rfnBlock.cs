@@ -11,7 +11,7 @@
         public rfnBlock()
         {
             Name = "rfn";
-            primeIndex = 6;
+            isoIndex = 6;
         }
 
         public override _Block cloneBlock()

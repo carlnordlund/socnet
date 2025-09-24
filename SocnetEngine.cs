@@ -812,7 +812,7 @@ namespace Socnet
             }
 
             string searchType = getStringArgument("searchtype");
-            if (searchType == "" || !Blockmodeling.searchTypes.Contains(searchType))
+            if (searchType == "" || !BlockmodelingConstants.SearchTypes.Contains(searchType))
             {
                 response.Add("!Error: Search type '" + searchType + "' not recognized (check 'searchtype' parameter)");
                 return;
@@ -926,7 +926,7 @@ namespace Socnet
             }
 
             string gofMethod = getStringArgument("method");
-            if (gofMethod == "" || !Blockmodeling.gofMethods.Contains(gofMethod))
+            if (gofMethod == "" || !BlockmodelingConstants.GofMethods.Contains(gofMethod))
             {
                 response.Add("!Error: Method '" + gofMethod + "' not recognized/set (parameter: method)");
                 return null;
@@ -967,13 +967,13 @@ namespace Socnet
                 return;
             }
             string searchType = getStringArgument("searchtype");
-            if (searchType == "" || !Blockmodeling.searchTypes.Contains(searchType))
+            if (searchType == "" || !BlockmodelingConstants.SearchTypes.Contains(searchType))
             {
                 response.Add("!Error: Search type not recognized/set (parameter: searchtype");
                 return;
             }
             string gofMethod = getStringArgument("method");
-            if (gofMethod == "" || !Blockmodeling.gofMethods.Contains(gofMethod))
+            if (gofMethod == "" || !BlockmodelingConstants.GofMethods.Contains(gofMethod))
             {
                 response.Add("!Error: Method not recognized/set (parameter: method)");
                 return;

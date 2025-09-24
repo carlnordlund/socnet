@@ -11,7 +11,7 @@
         public nulBlock()
         {
             Name = "nul";
-            primeIndex = 1;
+            isoIndex = 1;
         }
 
         public override _Block cloneBlock()

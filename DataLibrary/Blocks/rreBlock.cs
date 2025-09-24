@@ -11,7 +11,7 @@
         public rreBlock()
         {
             Name = "rre";
-            primeIndex = 4;
+            isoIndex = 4;
         }
 
         public override _Block cloneBlock()

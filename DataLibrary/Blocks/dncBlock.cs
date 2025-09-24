@@ -12,7 +12,7 @@
         public dncBlock()
         {
             Name = "dnc";
-            primeIndex = 0;
+            isoIndex = 0;
         }
 
         public override double getPenaltyHamming(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix = null)

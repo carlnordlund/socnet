@@ -11,7 +11,7 @@
         public creBlock()
         {
             Name = "cre";
-            primeIndex = 5;
+            isoIndex = 5;
         }
 
         public override _Block cloneBlock()

@@ -11,7 +11,7 @@
         public comBlock()
         {
             Name = "com";
-            primeIndex = 2;
+            isoIndex = 2;
         }
 
         public override _Block cloneBlock()

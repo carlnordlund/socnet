@@ -1,4 +1,4 @@
-﻿using socnet.DataLibrary;
+﻿using Socnet.DataLibrary;
 
 namespace Socnet.DataLibrary.Blocks
 {
@@ -17,7 +17,7 @@ namespace Socnet.DataLibrary.Blocks
         {
             Name = "den";
             this.d = 0.5;
-            primeIndex = 9;
+            isoIndex = 9;
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Socnet.DataLibrary.Blocks
         {
             Name = "den";
             this.d = Functions.minMaxRange(d, 0, 1);
-            primeIndex = 9;
+            isoIndex = 9;
         }
 
         /// <summary>

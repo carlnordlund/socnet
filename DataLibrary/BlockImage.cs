@@ -238,9 +238,9 @@ namespace Socnet.DataLibrary
                 for (int c = 0; c < nbrPositions; c++)
                 {
                     this.blocks[r, c] = new List<_Block>();
-                    if (Functions.indexToIdealBlockName.ContainsKey(blockIndices[r, c]))
+                    if (BlockmodelingConstants.IndexToIdealBlockName.ContainsKey(blockIndices[r, c]))
                     {
-                        _Block? block = Functions.GetBlockInstance(Functions.indexToIdealBlockName[blockIndices[r, c]]);
+                        _Block? block = Functions.GetBlockInstance(BlockmodelingConstants.IndexToIdealBlockName[blockIndices[r, c]]);
                         if (block != null)
                             this.blocks[r, c].Add(block);
                     }

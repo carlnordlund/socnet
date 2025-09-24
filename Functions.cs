@@ -9,23 +9,23 @@ namespace Socnet
     /// </summary>
     public static class Functions
     {
-        // Dictionary for ideal Blocks, mapping prime indices to their respective Block names
-        public static Dictionary<int, string> indexToIdealBlockName = new Dictionary<int, string>() {
-            { 0, "dnc" },
-            { 1, "nul" },
-            { 2, "com" },
-            { 3, "reg" },
-            { 4, "rre" },
-            { 5, "cre" },
-            { 6, "rfn" },
-            { 7, "cfn" },
-            { 8, "denuci" },
-            { 9, "den" },
-            { 10, "denmin" },
-            { 11, "pco" },
-            { 12, "pcdd" },
-            { 13, "cpdd" }
-        };
+        //// Dictionary for ideal Blocks, mapping prime indices to their respective Block names
+        //public static Dictionary<int, string> indexToIdealBlockName = new Dictionary<int, string>() {
+        //    { 0, "dnc" },
+        //    { 1, "nul" },
+        //    { 2, "com" },
+        //    { 3, "reg" },
+        //    { 4, "rre" },
+        //    { 5, "cre" },
+        //    { 6, "rfn" },
+        //    { 7, "cfn" },
+        //    { 8, "denuci" },
+        //    { 9, "den" },
+        //    { 10, "denmin" },
+        //    { 11, "pco" },
+        //    { 12, "pcdd" },
+        //    { 13, "cpdd" }
+        //};
 
         // Lists with conditional statements and number transformations
         public static List<string> conditionAbbrs = new List<string>() { "gt", "ge", "lt", "le", "eq", "ne" };
@@ -120,7 +120,7 @@ namespace Socnet
             // Prepare the first biIndexMatrix content
             for (int r = 0; r < k; r++)
                 for (int c = 0; c < k; c++)
-                    biIndexMatrix.data[r, c] = blockimageBase.GetBlock(r, c, indices[r, c]).primeIndex;
+                    biIndexMatrix.data[r, c] = blockimageBase.GetBlock(r, c, indices[r, c]).isoIndex;
                     
             // Iterate through all potential single-block permutations of the given multi-blocked BlockImage        
             bool cont = true;
@@ -197,7 +197,7 @@ namespace Socnet
                             else
                                 indices[r, c] = 0;
                         }
-                        biIndexMatrix.data[r, c] = blockimageBase.GetBlock(r, c, indices[r, c]).primeIndex;
+                        biIndexMatrix.data[r, c] = blockimageBase.GetBlock(r, c, indices[r, c]).isoIndex;
                     }
 
                 if (!increaseDone)

@@ -11,7 +11,7 @@
         public cfnBlock()
         {
             Name = "cfn";
-            primeIndex = 7;
+            isoIndex = 7;
         }
 
         public override _Block cloneBlock()

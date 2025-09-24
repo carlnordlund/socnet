@@ -8,17 +8,17 @@ namespace Socnet
     public static class Blockmodeling
     {
         // Specifies which ideal blocks that may be used for respective goodness-of-fit measure
-        public static Dictionary<string, List<string>> availableBlocks = new Dictionary<string, List<string>>()
-        {
-            { "hamming", new List<string>() { "dnc","nul","com","reg","rre","cre","rfn","cfn", "den", "denmin" } },
-            { "nordlund", new List<string>() { "dnc","nul","com","reg","rre","cre","rfn","cfn", "denuci", "den", "denmin","pco","cpdd","pcdd" } }
-        };
+        //public static Dictionary<string, List<string>> availableBlocks = new Dictionary<string, List<string>>()
+        //{
+        //    { "hamming", new List<string>() { "dnc","nul","com","reg","rre","cre","rfn","cfn", "den", "denmin" } },
+        //    { "nordlund", new List<string>() { "dnc","nul","com","reg","rre","cre","rfn","cfn", "denuci", "den", "denmin","pco","cpdd","pcdd" } }
+        //};
 
-        // Specifies the types of search algorithms currently implemented
-        public static List<string> searchTypes = new List<string>() { "localopt", "exhaustive", "ljubljana" };
+        //// Specifies the types of search algorithms currently implemented
+        //public static List<string> searchTypes = new List<string>() { "localopt", "exhaustive", "ljubljana" };
 
-        // Specifies the types of goodness-of-fit measures currently implemented
-        public static List<string> gofMethods = new List<string>() { "hamming", "nordlund" };
+        //// Specifies the types of goodness-of-fit measures currently implemented
+        //public static List<string> gofMethods = new List<string>() { "hamming", "nordlund" };
 
         // For storing the optimal solutions found in a search
         public static List<BMSolution> optimalSolutionsGlobal = new List<BMSolution>();
@@ -137,7 +137,7 @@ namespace Socnet
                 List<string> uniqueBlockNames = bi.GetAllUniqueBlockNames();
                 foreach (string blockname in uniqueBlockNames)
                 {
-                    if (!availableBlocks[gofMethodName].Contains(blockname))
+                    if (!BlockmodelingConstants.AvailableBlocks[gofMethodName].Contains(blockname))
                     {
                         return "!Error - Block '" + blockname + "' can't be used in method '" + gofMethodName + "' criteria function";
                     }
@@ -886,8 +886,8 @@ namespace Socnet
             for (int r = 0; r < bi1.blocks.GetLength(0); r++)
                 for (int c = 0; c < bi1.blocks.GetLength(1); c++)
                 {
-                    int i1 = bi1.blocks[r, c][bm1.blockIndices[r,c]].primeIndex;
-                    int i2 = bi2.blocks[mapdir1[r], mapdir1[c]][bm2.blockIndices[mapdir1[r], mapdir1[c]]].primeIndex;
+                    int i1 = bi1.blocks[r, c][bm1.blockIndices[r,c]].isoIndex;
+                    int i2 = bi2.blocks[mapdir1[r], mapdir1[c]][bm2.blockIndices[mapdir1[r], mapdir1[c]]].isoIndex;
                     if (i1 != i2)
                         return false;
                 }

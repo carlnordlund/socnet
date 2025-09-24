@@ -1,4 +1,4 @@
-﻿using socnet.DataLibrary;
+﻿using Socnet.DataLibrary;
 
 namespace Socnet.DataLibrary.Blocks
 {
@@ -16,7 +16,7 @@ namespace Socnet.DataLibrary.Blocks
         {
             Name = "pco";
             this.p = 0.5;
-            primeIndex = 11;
+            isoIndex = 11;
         }
 
         /// <summary>
@@ -26,13 +26,14 @@ namespace Socnet.DataLibrary.Blocks
         {
             Name = "pco";
             this.p = Functions.minMaxRange(p, 0, 1);
-            primeIndex = 11;
+            isoIndex = 11;
         }
 
         public override void initArgValue(double v)
         {
             this.p = Functions.minMaxRange(v, 0, 1);
         }
+
         public override _Block cloneBlock()
         {
             return new pcoBlock(this.p);

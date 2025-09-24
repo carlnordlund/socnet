@@ -14,7 +14,7 @@
         {
             Name = "denuci";
             this.d = 0.5;
-            primeIndex = 8;
+            isoIndex = 8;
         }
 
         /// <summary>
@@ -24,7 +24,7 @@
         {
             Name = "denuci";
             this.d = d;
-            primeIndex = 8;
+            isoIndex = 8;
         }
 
         /// <summary>

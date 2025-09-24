@@ -1,7 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 // Create SocnetEngine instance and responseLines
-using socnet;
+using Socnet;
 
 Socnet.SocnetEngine engine = new Socnet.SocnetEngine();
 

@@ -8,8 +8,8 @@
         // Name of ideal block
         public string Name = "";
 
-        // Index of ideal block (manually incremented for respective ideal block; used for determining isomorphic block images)
-        public int primeIndex;
+        // Index of ideal block (manually incremented for respective ideal block) used for determining isomorphic block images
+        public int isoIndex;
 
         /// <summary>
         /// Virtual method to get Hamming distance for a particular block in a matrix

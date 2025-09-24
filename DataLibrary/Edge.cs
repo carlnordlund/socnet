@@ -1,6 +1,6 @@
 ﻿using Socnet.DataLibrary;
 
-namespace socnet.DataLibrary
+namespace Socnet.DataLibrary
 {
     /// <summary>
     /// Struct representing an Edge

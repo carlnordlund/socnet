@@ -12,7 +12,7 @@
         public cpddBlock()
         {
             Name = "cpdd";
-            primeIndex = 13;
+            isoIndex = 13;
         }
 
         public override List<Triple> getTripletList(Matrix matrix, Cluster rowCluster, Cluster colCluster, Matrix? idealMatrix = null)

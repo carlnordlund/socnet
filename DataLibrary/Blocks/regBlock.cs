@@ -11,7 +11,7 @@
         public regBlock()
         {
             Name = "reg";
-            primeIndex = 3;
+            isoIndex = 3;
         }
 
         public override _Block cloneBlock()
