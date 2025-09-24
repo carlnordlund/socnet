@@ -1,18 +1,17 @@
 About
 =====
-Socnet.se is a CLI-based client for direct blockmodeling, a set of techniques for finding latent structures in network data. A good introduction to blockmodeling is available on Wikipedia:
-
+Socnet.se is an open-source, CLI-based client for direct blockmodeling, a set of techniques for finding latent structures in network data. A good introduction to blockmodeling is available on Wikipedia:
 https://en.wikipedia.org/wiki/Blockmodeling
 
-Socnet.se is developed in C#/.NET and can be compiled for multiple operating systems and architectures. Precompiled binaries and installation files for Windows, Linux, and MacOS are available on the project website:
+Socnet.se is developed in C#/.NET and can be compiled for multiple operating systems and architectures. See INSTALL.txt for information on how to compile Socnet.se from source.
 
+Precompiled binaries and installation files for Windows, Linux, and MacOS are available on the project website:
 https://www.socnet.se
 
 Authors and Funding
 ===================
 Socnet.se is developed and maintained by Carl Nordlund at the Institute for Analytical Sociology, Linköping University, Sweden.
 The project is part of the Network Dynamics of Ethnic Integration, a Nordic research project funded by Nordforsk (project 105147). More information about the project can be found here:
-
 https://www.nordint.net
 
 License
