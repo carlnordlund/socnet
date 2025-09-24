@@ -40,9 +40,10 @@ implemented.
 
 Implementing a new goodness-of-fit measure (in Blockmodeling.cs)
 ================================================================
-It is possible to implement a new goodness-of-fit measure, though it takes a bit more work. All this work is done inside
-the Blockmodeling.cs class. A good way to start is to explore how the two existing goodness-of-fit measures are
-implemented, i.e. the following methods (in Blockmodeling.se):
+It is possible to implement a new goodness-of-fit measure, though it takes a bit more work. First, the novel goodness-
+of-fit measure must be implemented in the classes for the ideal blocks that are compatible with this measure. A good
+way to start is to explore how the two existing goodness-of-fit measures are implemented, i.e. the following existing
+methods in Blockmodeling.se:
 
 public static BMSolution binaryHamming(Matrix matrix, BlockImage blockimage, Partition partition) { ... }
 
