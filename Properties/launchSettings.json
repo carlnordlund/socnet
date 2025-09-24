@@ -1,8 +1,7 @@
 {
   "profiles": {
     "socnet": {
-      "commandName": "Project",
-      "commandLineArgs": "-s -e"
+      "commandName": "Project"
     }
   }
 }
