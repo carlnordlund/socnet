@@ -81,8 +81,8 @@ different platforms, use the 'dotnet publish' command in .NET CLI:
 - Linux (x64):
     dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true
 
-- Linux (x64):
-    dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true
+- MacOS (x64):
+    dotnet publish -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true
 
 The output will be placed in:
   bin/Release/net8.0/<RID>/publish/
