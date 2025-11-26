@@ -1,0 +1,266 @@
+# Replication script for Socnet.se JSS manuscript
+# ===============================================
+
+# This script contains all Socnet.se code for the examples provided in
+# the JSS manuscript. Whereas this script could be loaded and executed
+# using the Socnet.se 'loadscript(...)' function - see:
+# https://socnet.se/?page=docs#f_loadscript
+# it is instead recommended to use this script file by copying each
+# line separately and running it in the console one by one.
+
+# Given that the random seed is set with the specified seed (see below),
+# the output from these lines is identical to that of the JSS manuscript.
+
+# Note that lines starting with the hashtag are comments and will be
+# ignored by the client. Also note that some commands below might have
+# to be modified (due to stochastic nature of the ljubljana search
+# algorithm)
+
+# On replicability and setting random seed
+# ========================================
+# The so-called 'Ljubljana' search algorithm applied below is stochastic, meaning
+# that it is randomly picking the order in which to search for solutions. Whereas
+# the solutions are isomorphically identical between runs, the actual order of
+# positions will most likely differ between runs.
+
+# To make sure that the Socnet.se script below always generates identical positional
+# orders, the random seed can be set using the 'randomseed()' function. To replicate
+# the results in the article, the random seed should therefore be set to the following:
+
+randomseed(6031769)
+
+
+# Set working directory
+# =====================
+# For this to work, you need to have unzipped the 'example_data.zip' package
+# at a suitable location on your system. Having started the Socnet.se client,
+# you then need to navigate to this directory using the 'setwd()' function:
+# https://socnet.se/?page=docs#f_setwd
+
+# It is thus assumed below that the current working directory is where the
+# example data files are.
+
+# Example 1: Structural equivalence blockmodeling using Little League
+
+# Load little_league_ti.txt network:
+loadmatrix(file = little_league_ti.txt, name = llti)
+
+# Prepare 2x2 blockimage with complete and null ideal blocks:
+bi2se = blockimage(size = 2, pattern = com;nul)
+
+# Inspect this blockimage
+bi2se
+
+# Initialize an exhaustive search:
+bminit(network = llti, blockimage = bi2se, searchtype = exhaustive,method = hamming)
+
+# Start the search:
+bmstart()
+
+# Inspect the resulting blockmodel and its ideal content:
+bmview(blockmodel = bm_llti_bi2se_0, ideal = y)
+
+# Extract the matrix from this solution:
+bmextract(blockmodel = bm_llti_bi2se_0, type = matrix)
+
+# Extract the blockimage from this solution:
+bmextract(blockmodel = bm_llti_bi2se_0, type = blockimage)
+
+# Extract the partition from this solution:
+bmextract(blockmodel = bm_llti_bi2se_0, type = partition)
+
+# Inspect the blockimage from this solution:
+bi2se_0
+
+# Extract the goodness-of-fit for this solution:
+bmextract(blockmodel = bm_llti_bi2se_0, type = gof)
+
+# Create a 3x3 structural equivalence blockimage:
+bi3se = blockimage(size=3, type=structural)
+
+# Initialize the search using this blockimage instead:
+bminit(network = llti, blockimage = bi3se, searchtype = exhaustive,method = hamming)
+
+# Start the search
+bmstart()
+
+# Create a 4x4 structural equivalence blockimage:
+bi4se = blockimage(size=4, type=structural)
+
+# Initialize the search using the 4x4 blockimage, now with ljubljana
+bminit(llti, bi4se, ljubljana, hamming)
+
+# Do the search
+bmstart()
+
+# View the solution:
+bmview(bm_llti_bi4se_0)
+
+# This should be (1,3,4,5),(6,10,11,12,13),(2),(7,8,9)
+
+
+# Extract the partition for this solution
+bmextract(bm_llti_bi4se_0, partition)
+
+# Create a density blockimage:
+densities(llti, part_llti_bi4se_0)
+
+# Display the density blockimage:
+llti_densities
+
+# Optionally (remove hashtag to run it): extract and save the
+# blockmodel as a matrix (assuming that there is a directory
+# named 'results' here)
+# bmextract(blockmodel = bm_llti_bi4se_0, type = matrix)
+# save(name = bm_llti_bi4se_0_matrix, file = results/bm_llti_se4.txt)
+
+# Example 2: regular equivalence blockmodeling with Hlebec notesharing
+
+# List all currently stored structures:
+structures
+
+# Delete all structures:
+deleteall()
+
+# Load hlebec.txt:
+loadmatrix(hlebec.txt)
+
+# Prepare 2x2 regular equivalence blockimage:
+bi2re = blockimage(2, pattern = nul;reg)
+
+# prepare the exhaustive search using weighted correlation coefficients:
+bminit(hlebec, bi2re, exhaustive, nordlund)
+
+# Do the search
+bmstart()
+
+# Inspect the blockmodel (only one existing in memory):
+bmview
+
+# Prepare 3x3 regular equivalence blockimage:
+bi3re = blockimage(3, pattern = nul;reg)
+
+# prepare the exhaustive search using weighted correlation coefficients:
+bminit(hlebec, bi3re, ljubljana, nordlund)
+
+# Run the search
+bmstart()
+
+# View the resulting blockmodel:
+bmview(bm_hlebec_bi3re_19_0)
+
+# Extract the single-blocked blockimage from this result:
+bmextract(bm_hlebec_bi3re_19_0, blockimage)
+
+# Create an extended version of this with new reg/nul blocks:
+bi4re = biextend(blockimage = bi3re_19, pattern = nul;reg)
+
+# Inspect this:
+bi4re
+
+# Initialize the search using this blockimage:
+bminit(hlebec, bi4re, ljubljana, nordlund)
+
+# Start the search
+bmstart()
+
+# Check out the resulting solution:
+bmview(bm_hlebec_bi4re_0_0)
+
+
+# Example 3: Core-periphery identification using Baker data
+
+# Delete all structures
+deleteall()
+
+# Load the original valued Baker data:
+loadmatrix(baker_original.txt)
+
+# Dichotomize this data:
+baker_binary = dichotomize(name = baker_original, condition = gt, threshold = 0)
+
+# Initialize and search using default Borgatti-Everett:
+coreperi(baker_binary, ljubljana)
+
+# Inspect solution
+bmview()
+
+# Search using a Ucinet-style density of 0.5 in inter-categorical blocks
+coreperi(baker_binary, ljubljana, intercat = denuci(0.5))
+
+# Search using the alternative density implementation from Esteves &
+# Nordlund (2025):
+coreperi(baker_binary, ljubljana, intercat = den(0.5))
+
+# Search using standard BE approach, plus col/row-regular blocks:
+coreperi(baker_binary, ljubljana, ptoc = rre, ctop = cre)
+
+# Search using power-relational features:
+coreperi(baker_binary, ljubljana,powerrelational=depdom)
+
+# Search using power-relational features and a p-core with p=0.75
+coreperi(baker_binary, ljubljana,powerrelational=depdom, core=pco(0.75))
+
+# Auxilliary functions
+
+# Delete all structures
+deleteall()
+
+# Create actorset called 'myactors' with 4 named actors:
+myactors = actorset(size=4, labelarray=Ron_1;Tom_2;Frank_3;Boyd_4)
+
+# Create matrix called 'mymatrix' using the myactors and data:
+mymatrix = matrix(myactors,data=0;0;1;1;1;0;1;0;1;0;0;1;1;1;1;0)
+
+# Creates a 2x2 multiblocked blockimage with 'com', 'nul', and 'reg' ideal
+# blocks in each cell
+bi = blockimage(size = 2, pattern = com;nul;reg)
+
+# Creates a 2x2 singleblocked blockimage with 'reg' and 'pco(0.5)' in the
+# top-left cell, 'cre' in the top-right cell, 'rre' in the bottom-left
+# cell, and 'nul' in the bottom-right cell
+cpx = blockimage(size = 2, content = reg;pco(0.5)|cre|rre|nul)
+
+# Creates a 4x4 multiblocked blockimage with 'reg' and 'nul' ideal
+# blocks in each cell
+bi4re = blockimage(size = 4, type = regular)
+
+# Creates a partition 'p' using myactors above:
+p = partition(actorset = myactors, nbrclusters = 2, partarray = 0;1;1;0)
+
+# Various setting functions: make sure that these structures exist
+# and remove hashtag before running
+
+# Set the value of the tie from actor '1' to actor '2' to 4.5 in
+# the matrix called 'hlebec':
+# set(name = hlebec, row = 1, col = 2, value = 4.5)
+
+# Rename the actor with label 'Tim_5' to 'Timmy_5' in
+# the actorset called 'llti_actors':
+# set(llti_actors, row = Tim_5, value = Timmy_5)
+
+# Set the possible ideal blocks from position P2 to
+# position P1 to 'nul' and 'reg' in the blockimage
+# called 'bi3se':
+# set(bi3se, row = P2, col = P1, value = nul;reg)
+
+# Place the actor 'Jerry_10' in the second position
+# (the position that has the index 1)
+# set(part_llti_bi3se_0, row = Jerry_10, value = 1)
+
+# Pre-specified partitions
+
+# Delete all structures
+deleteall()
+
+# Load llti dataset:
+loadmatrix(file = little_league_ti.txt, name = llti)
+
+# Create pre-specified partition:
+part1 = partition(actorset = llti_actors, nbrclusters = 3, partarray = 0;0;1;2;1;1;0;2;2;0;2;1;1)
+
+# Create 3x3 regular blockimage:
+bi3 = blockimage(size = 3, type = regular)
+
+# Get the blockmodel for this partition:
+bm1 = bmtest(network = llti, blockimage = bi3, partition = part1, method = hamming)
