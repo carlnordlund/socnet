@@ -19,9 +19,10 @@ To build Socnet.se from source, you need:
   Download this from: https://dotnet.microsoft.com/download
 
 Optional (Windows only):
-- Visual Studio 2022 (Community Edition or higher), which
-  includes the .NET SDK.
+- Visual Studio 2022 (Community Edition or higher)
 
+Note: Socnet.se has also been tested in .NET 10.0 (released mid-November 2025),
+with no issues detected during compiling and running.
 
 2. GETTING THE SOURCE CODE
 ==========================
@@ -43,14 +44,14 @@ the same on Windows, Linux and MacOS.
 
 To build in Release mode:
 
-  dotnet build -c Release
+  dotnet build -c Release socnet.sln
 
 Binaries will be in:
   bin/Release/net8.0/
 
 To build in Debug mode:
 
-  dotnet build
+  dotnet build -c Debug socnet.sln
 
 This will produce binaries in:
   bin/Debug/net8.0/
@@ -76,13 +77,13 @@ To compile the source code into stand-alone executables for
 different platforms, use the 'dotnet publish' command in .NET CLI:
 
 - Windows (x64, i.e. 64-bit):
-    dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
+    dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true socnet.sln
 
 - Linux (x64):
-    dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true
+    dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true socnet.sln
 
 - MacOS (x64):
-    dotnet publish -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true
+    dotnet publish -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true socnet.sln
 
 The output will be placed in:
   bin/Release/net8.0/<RID>/publish/
@@ -126,3 +127,7 @@ This can then be built, run and published directly from the Visual Studio IDE.
 
 - Ensure that the .NET SDK is correctly installed and available in your system PATH
 before attempting to build or run.
+
+- Socnet.se was developed using .NET 8.0, whose long-term support ends in November 2026.
+Socnet.se however compiles fine using .NET 10.0, i.e. the latest long-term support released
+in November 2025.
