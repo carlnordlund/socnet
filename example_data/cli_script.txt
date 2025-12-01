@@ -33,8 +33,11 @@ randomseed(6031769)
 # Set working directory
 # =====================
 # For this to work, you need to have unzipped the 'example_data.zip' package
-# at a suitable location on your system. Having started the Socnet.se client,
-# you then need to navigate to this directory using the 'setwd()' function:
+# at a suitable location on your system. If you obtained Socnet.se from source
+# you will find the 'example_data' folder as part of the repository.
+
+# Having started the Socnet.se client, you then need to navigate to this directory
+# using the 'setwd()' function:
 # https://socnet.se/?page=docs#f_setwd
 
 # It is thus assumed below that the current working directory is where the
