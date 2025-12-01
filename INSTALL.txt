@@ -44,14 +44,14 @@ the same on Windows, Linux and MacOS.
 
 To build in Release mode:
 
-  dotnet build -c Release socnet.sln
+  dotnet build socnet.sln -c Release
 
 Binaries will be in:
   bin/Release/net8.0/
 
 To build in Debug mode:
 
-  dotnet build -c Debug socnet.sln
+  dotnet build socnet.sln -c Debug
 
 This will produce binaries in:
   bin/Debug/net8.0/
@@ -77,13 +77,13 @@ To compile the source code into stand-alone executables for
 different platforms, use the 'dotnet publish' command in .NET CLI:
 
 - Windows (x64, i.e. 64-bit):
-    dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true socnet.sln
+    dotnet publish socnet.sln -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
 
 - Linux (x64):
-    dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true socnet.sln
+    dotnet publish socnet.sln -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true
 
 - MacOS (x64):
-    dotnet publish -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true socnet.sln
+    dotnet publish socnet.sln -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true
 
 The output will be placed in:
   bin/Release/net8.0/<RID>/publish/
