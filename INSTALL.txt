@@ -67,6 +67,8 @@ Or by executing the compiled binary (Release mode):
 
 - Linux / macOS:
   ./bin/Release/net8.0/Socnet
+# You may need to make the binary executable:
+  chmod +x ./bin/Release/net8.0/Socnet
 
 5. PUBLISHING SELF-CONTAINED BINARIES
 =====================================
@@ -82,7 +84,8 @@ different platforms, use the 'dotnet publish' command in .NET CLI:
 - macOS (x64):
     dotnet publish Socnet.csproj -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true -o ./out
 
-All published files will be placed in the folder `out/` in the current directory, creating this folder if it does not exist.
+All published files will be placed in the folder `out/` in the current directory; 
+this folder will be created automatically if it does not exist.
 
 Removing the '-o ./out' option will place the compiled output in:
 
