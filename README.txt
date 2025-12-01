@@ -8,10 +8,13 @@ Socnet.se is developed in C#/.NET and can be compiled for multiple operating sys
 Precompiled binaries and installation files for Windows, Linux, and MacOS are available on the project website:
 https://www.socnet.se
 
+Please check the /example_data/ folder for example networks. This folder also contains a script exemplifying how to conduct various kinds of direct blockmodeling analyses.
+
 Authors and Funding
 ===================
-Socnet.se is developed and maintained by Carl Nordlund at the Institute for Analytical Sociology, Linköping University, Sweden.
-The project is part of the Network Dynamics of Ethnic Integration, a Nordic research project funded by Nordforsk (project 105147). More information about the project can be found here:
+Socnet.se is developed and maintained by Carl Nordlund at the Institute for Analytical Sociology, Linköping University, Sweden, with contributions from José Luis Estévez, Kristian Gade Kjelmann,
+Jesper Lindmarker, and Chandreyee Roy.
+This project was supported by NordForsk through the funding to the Network Dynamics of Ethnic Integration (project number 105147). More information about this project can be found here:
 https://www.nordint.net
 
 License
