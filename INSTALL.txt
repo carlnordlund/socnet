@@ -87,9 +87,10 @@ The output will be placed in:
 
 ...where <RID> is the runtime identifier (e.g. win-x64, linux-x64, osx-x64).
 
-These published files can be distributed and run on the respective platforms without
-requiring the .NET runtime. (These are the files that are available as pre-compiled
-and code-signed binaries on https://www.socnet.se website).
+The published self-contained binaries include all required .NET runtime
+components, so they can be executed directly without installing .NET.
+These are the files that are available as pre-compiled
+and code-signed binaries on https://www.socnet.se website.
 
 Supported Runtime Identifiers (RIDs) are as follows:
 
@@ -123,6 +124,6 @@ cross-platform reproducibility.
 - Ensure that the .NET SDK is correctly installed and available in your system PATH
 before attempting to build or run.
 
-- Socnet.se was developed using .NET 8.0, whose long-term support ends in November 2026.
-Socnet.se however compiles and runs fine using .NET 10.0, i.e. the latest long-term support
-released in November 2025.
+- Socnet.se was developed using .NET 8.0 (LTS, support until Nov 2026) and
+has been tested with .NET 10.0 (LTS, released Nov 2025). Both versions
+compile and run successfully.
