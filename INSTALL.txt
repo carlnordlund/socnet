@@ -105,14 +105,14 @@ Windows:
   win-x64       64-bit Intel/AMD
   win-arm64     64-bit ARM (Surface Pro X, modern ARM laptops)
 
-macOS:
-  osx-x64     64-bit Intel (older Macs)
-  osx-arm64   64-bit ARM (Apple Silicon: M1, M2, M3...)
-
 Linux:
   linux-x64   64-bit Intel/AMD
   linux-arm   32-bit ARM (e.g. Raspberry Pi OS 32-bit)
   linux-arm64 64-bit ARM (Raspberry Pi 4/5 with 64-bit OS, ARM servers etc)
+
+macOS:
+  osx-x64     64-bit Intel (older Macs)
+  osx-arm64   64-bit ARM (Apple Silicon: M1, M2, M3...)
 
 6. PUBLISH WITH VISUAL STUDIO (Windows only)
 ============================================
