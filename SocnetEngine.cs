@@ -295,6 +295,9 @@ namespace Socnet
             response.Add(":" + Directory.GetCurrentDirectory());
         }
 
+        /// <summary>
+        /// Sets the random seed of the Blockmodeling class to the specified value
+        /// </summary>
         public void f_randomseed()
         {
             int seed = getIntegerArgument("seed");
