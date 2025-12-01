@@ -44,14 +44,14 @@ the same on Windows, Linux and MacOS.
 
 To build in Release mode:
 
-  dotnet build socnet.sln -c Release
+  dotnet build Socnet.csproj -c Release
 
 Binaries will be in:
   bin/Release/net8.0/
 
 To build in Debug mode:
 
-  dotnet build socnet.sln -c Debug
+  dotnet build Socnet.csproj -c Debug
 
 This will produce binaries in:
   bin/Debug/net8.0/
@@ -66,10 +66,10 @@ You can run Socnet.se directly from the .NET CLI:
 Or by executing the compiled binary (Release mode):
 
 - Windows:
-  .\bin\Release\net8.0\socnet.exe
+  .\bin\Release\net8.0\Socnet.exe
 
 - Linux / MacOS:
-  ./bin/Release/net8.0/socnet
+  ./bin/Release/net8.0/Socnet
 
 5. PUBLISHING SELF-CONTAINED BINARIES
 =====================================
@@ -77,13 +77,13 @@ To compile the source code into stand-alone executables for
 different platforms, use the 'dotnet publish' command in .NET CLI:
 
 - Windows (x64, i.e. 64-bit):
-    dotnet publish socnet.sln -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
+    dotnet publish Socnet.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
 
 - Linux (x64):
-    dotnet publish socnet.sln -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true
+    dotnet publish Socnet.csproj -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true
 
 - MacOS (x64):
-    dotnet publish socnet.sln -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true
+    dotnet publish Socnet.csproj -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true
 
 The output will be placed in:
   bin/Release/net8.0/<RID>/publish/
@@ -116,7 +116,7 @@ Linux:
 ============================================
 Windows users can alternatively open the solution file in Visual Studio 2022:
 
-  socnet.sln
+  Socnet.sln
 
 This can then be built, run and published directly from the Visual Studio IDE.
 
@@ -129,5 +129,5 @@ This can then be built, run and published directly from the Visual Studio IDE.
 before attempting to build or run.
 
 - Socnet.se was developed using .NET 8.0, whose long-term support ends in November 2026.
-Socnet.se however compiles fine using .NET 10.0, i.e. the latest long-term support released
-in November 2025.
+Socnet.se however compiles and runs fine using .NET 10.0, i.e. the latest long-term support
+released in November 2025.
