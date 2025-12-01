@@ -38,7 +38,7 @@ Optional (Visual Studio only):
 3. BUILDING FROM SOURCE (CROSS-PLATFORM)
 ========================================
 The Socnet.se project can be built using the .NET CLI, which works
-the same on Windows, Linux and MacOS.
+the same on Windows, Linux and macOS.
 
 To build in Release mode:
 
@@ -65,7 +65,7 @@ Or by executing the compiled binary (Release mode):
 - Windows:
   .\bin\Release\net8.0\Socnet.exe
 
-- Linux / MacOS:
+- Linux / macOS:
   ./bin/Release/net8.0/Socnet
 
 5. PUBLISHING SELF-CONTAINED BINARIES
@@ -74,16 +74,19 @@ To compile the source code into stand-alone executables for
 different platforms, use the 'dotnet publish' command in .NET CLI:
 
 - Windows (x64, i.e. 64-bit):
-    dotnet publish Socnet.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
+    dotnet publish Socnet.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./out
 
 - Linux (x64):
-    dotnet publish Socnet.csproj -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true
+    dotnet publish Socnet.csproj -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./out
 
-- MacOS (x64):
-    dotnet publish Socnet.csproj -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true
+- macOS (x64):
+    dotnet publish Socnet.csproj -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true -o ./out
 
-The output will be placed in:
-  bin/Release/net8.0/<RID>/publish/
+All published files will be placed in the folder `out/` in the current directory, creating this folder if it does not exist.
+
+Removing the '-o ./out' option will place the compiled output in:
+
+  ./bin/Release/net8.0/<RID>/publish/
 
 ...where <RID> is the runtime identifier (e.g. win-x64, linux-x64, osx-x64).
 
@@ -100,7 +103,7 @@ Windows:
   win-arm     32-bit ARM (e.g. Surface RT, somewhat rare)
   win-arm64   64-bit ARM (e.g. Surface pro X, some modern tablets/laptops)
 
-MacOS:
+macOS:
   osx-x64     64-bit Intel (older Macs)
   osx-arm64   64-bit ARM (Apple Silicon: M1, M2, M3...)
 
@@ -119,7 +122,7 @@ cross-platform reproducibility.
 
 7. NOTES
 ========
-- Socnet.se is cross-platform: it compiles and runs on Windows, Linux and MacOS.
+- Socnet.se is cross-platform: it compiles and runs on Windows, Linux and macOS.
 
 - Ensure that the .NET SDK is correctly installed and available in your system PATH
 before attempting to build or run.
