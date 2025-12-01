@@ -11,7 +11,6 @@ This document explains how to compile the Socnet.se client from source code
 that is available on its github repository:
 https://github.com/carlnordlund/socnet
 
-
 1. DEPENDENCIES
 ===============
 To build Socnet.se from source, you need:
@@ -36,7 +35,6 @@ Optional (Visual Studio only):
 - It is also possible to clone the repository from Visual Studio,
   i.e. using the github.com URL provided above.
 
-
 3. BUILDING FROM SOURCE (CROSS-PLATFORM)
 ========================================
 The Socnet.se project can be built using the .NET CLI, which works
@@ -55,7 +53,6 @@ To build in Debug mode:
 
 This will produce binaries in:
   bin/Debug/net8.0/
-
 
 4. RUNNING THE APPLICATION
 ==========================
@@ -111,15 +108,13 @@ Linux:
   linux-arm   32-bit ARM (e.g. Raspberry Pi OS 32-bit, embedded systems)
   linux-arm64 64-bit ARM (Raspberry Pi 4/5 with 64-bit OS, ARM servers etc)
 
-
 6. PUBLISH WITH VISUAL STUDIO (Windows only)
 ============================================
 Windows users can alternatively open the solution file in Visual Studio 2022:
-
   Socnet.sln
 
-This can then be built, run and published directly from the Visual Studio IDE.
-
+However, building the Socnet.csproj directly (as shown above) is recommended for
+cross-platform reproducibility.
 
 7. NOTES
 ========
