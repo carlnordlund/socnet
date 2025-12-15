@@ -1,0 +1,30 @@
+# Test: 4-positional structural equivalence on Little League (TI) network
+
+# Delete any existing structures
+deleteall()
+
+# Set random seed
+randomseed(6031769)
+
+# Load matrix Hlebec notesharing
+loadmatrix(file = "example_data/hlebec.txt")
+# Create a 3-positional blockimage with nul and reg blocks
+
+bi3re = blockimage(size = 3, type = regular)
+
+# Initialize the search: use ljubljana search algorithm and weighted-correlation gof
+bminit(network = hlebec, blockimage = bi3re, searchtype = ljubljana, method = nordlund)
+
+# Start the search
+bmstart()
+
+# Display the blockmodel (should yield a single one)
+bmview(blockmodel = bm_hlebec_bi3re_19_0)
+
+# The optimal partition should be:
+# (4,8,9)
+# (2,10)
+# (1,3,5,6,7,11,12,13)
+
+# The optimal goodness-of-fit should be:
+# 0.8813 (nordlund)
