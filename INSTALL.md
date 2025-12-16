@@ -2,19 +2,19 @@
 
 Socnet.se is a cross-platform C# CLI-based console application for direct
 blockmodeling of network data. See README.txt for more information or visit:
-https://www.socnet.se
+[https://www.socnet.se](https://www.socnet.se)
 
 Socnet is developed under the so-called MIT License. Please read LICENSE.txt
 before use and/or compiling the source code.
 
 This document explains how to compile the Socnet.se client from source code
 that is available on its github repository:
-https://github.com/carlnordlund/socnet
+[https://github.com/carlnordlund/socnet](https://github.com/carlnordlund/socnet)
 
 ## 1. DEPENDENCIES
 To build Socnet.se from source, you need:
 - **.NET 8.0 SDK or later**
-  Download this from: https://dotnet.microsoft.com/download
+  Download this from: [https://dotnet.microsoft.com/download](https://dotnet.microsoft.com/download)
 
 Optional (Windows only):
 - **Visual Studio 2022** (Community Edition or higher)
@@ -25,7 +25,7 @@ with no issues detected during compiling and running.
 ## 2. GETTING THE SOURCE CODE
 Clone this repository from GitHub:
 ```bash
-git clone https://github.com/carlnordlund/socnet.git
+git clone [https://github.com/carlnordlund/socnet.git](https://github.com/carlnordlund/socnet.git)
 ```
 Navigate to the folder where your copy of the source code is:
 ```bash

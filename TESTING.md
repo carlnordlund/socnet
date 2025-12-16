@@ -23,6 +23,9 @@ dir
 ```
 The `/example_data/` and `/tests/` folders should be visible in the list that appears in the Socnet client.
 
+- **Note**: The `/example_data/` folder also contains a more comprehensive script called `cli_script.txt`.
+  This script is meant more as a tutorial to Socnet commands. There is also additional documentation and a
+  quick-start guide on [https://www.socnet.se](https://www.socnet.se).
 
 ## Test 1: Structural equivalence blockmodeling on binary network
 
