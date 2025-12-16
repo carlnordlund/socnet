@@ -25,7 +25,7 @@ with no issues detected during compiling and running.
 ## 2. GETTING THE SOURCE CODE
 Clone this repository from GitHub:
 ```bash
-git clone [https://github.com/carlnordlund/socnet.git](https://github.com/carlnordlund/socnet.git)
+git clone https://github.com/carlnordlund/socnet.git
 ```
 Navigate to the folder where your copy of the source code is:
 ```bash
