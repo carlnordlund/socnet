@@ -53,7 +53,7 @@ P1  nul nul nul nul
 P2  nul nul nul nul
 P3  nul nul com com
 ```
-Make sure that the goodness-of-fit for the found solutioni is:
+Make sure that the goodness-of-fit for the found solution is:
 ```bash
 20 (hamming)
 ```
@@ -83,7 +83,7 @@ P0  reg nul nul
 P1  reg reg nul
 P2  reg nul nul
 ```
-Make sure that the goodness-of-fit for the found solutioni is:
+Make sure that the goodness-of-fit for the found solution is:
 ```bash
 0.8813 (nordlund)
 ```
@@ -113,7 +113,7 @@ P    rfn        nul
 ```
 Note: cfn=column-functional ideal block, rfn=row-functional ideal block
 
-Make sure that the goodness-of-fit for the found solutioni is:
+Make sure that the goodness-of-fit for the found solution is:
 ```bash
 0.5071 (nordlund)
 ```
