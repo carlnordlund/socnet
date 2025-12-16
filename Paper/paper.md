@@ -259,6 +259,6 @@ The software reads and writes standard text-based formats (tab-separated matrice
 
 # Acknowledgments
 
-This research was supported by NordForsk through funding to the Network Dynamics of Ethnic Integration (project number 105147). We thank colleagues in the research project and students in the 2023 and 2024 Masters programme cohorts in Computational Social Science at Linköping University, Sweden, for valuable feedback.
+This research was supported by NordForsk through funding to the Network Dynamics of Ethnic Integration (project number 105147). We thank colleagues in the research project and students in the Masters programme in Computational Social Science at Linköping University, Sweden, for valuable feedback.
 
 # References
