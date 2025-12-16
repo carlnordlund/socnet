@@ -5,10 +5,8 @@ The repository contains 3 Socnet-scripts to test core analytical features in Soc
 Note that these scripts are Socnet.se scripts, meaning that they are text files containing
 a sequence of Socnet.se-specific CLI commands that can be entered into the Socnet.se CLI console.
 
-To load and execute the content of such a script file, Socnet provides the following CLI command:
-```bash
-loadscript(file = "[path_to_script_file]")
-```
+However, it is easier to use the CLI command `loadscript(..)` to load and execute a script file.
+
 Before running the script file corresponding to each test, do the following:
 
 - Start the Socnet client
