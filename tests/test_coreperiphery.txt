@@ -1,0 +1,27 @@
+﻿# Test: Core-periphery identification on original Baker data
+
+# Delete any existing structures
+deleteall()
+
+# Set random seed
+randomseed(6031769)
+
+# Load matrix Little League TI
+loadmatrix(file = "example_data/baker_original.txt")
+
+# Rescale it (needed for using p-cores)
+baker_rescaled = rescale(baker_original, min=0, max=1)
+
+# Initialize and do a core-periphery search using peripheral dependency and
+# cores modeled as a p-core (p=0.75), using the ljubljana search algorithm:
+coreperi(baker_rescaled, ljubljana, core=pco(0.75),powerrelational=dep)
+
+# Display the blockmodel (should yield a single one, so without arguments is fine):
+bmview()
+
+# The Core should consist of:
+# {CW,CYSR,CSW,SSR,SW}
+# Rest in partition
+
+# The optimal goodness-of-fit should be:
+# 0.5071 (nordlund)

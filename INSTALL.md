@@ -1,5 +1,5 @@
-﻿SOCNET.SE INSTALLATION INSTRUCTIONS
-===================================
+﻿# SOCNET.SE INSTALLATION INSTRUCTIONS
+
 Socnet.se is a cross-platform C# CLI-based console application for direct
 blockmodeling of network data. See README.txt for more information or visit:
 https://www.socnet.se
@@ -11,124 +11,128 @@ This document explains how to compile the Socnet.se client from source code
 that is available on its github repository:
 https://github.com/carlnordlund/socnet
 
-1. DEPENDENCIES
-===============
+## 1. DEPENDENCIES
 To build Socnet.se from source, you need:
-- .NET 8.0 SDK or later
+- **.NET 8.0 SDK or later**
   Download this from: https://dotnet.microsoft.com/download
 
 Optional (Windows only):
-- Visual Studio 2022 (Community Edition or higher)
+- **Visual Studio 2022** (Community Edition or higher)
 
 Note: Socnet.se has also been tested in .NET 10.0 (released mid-November 2025),
 with no issues detected during compiling and running.
 
-2. GETTING THE SOURCE CODE
-==========================
+## 2. GETTING THE SOURCE CODE
 Clone this repository from GitHub:
-  git clone https://github.com/carlnordlund/socnet.git
-
+```bash
+git clone https://github.com/carlnordlund/socnet.git
+```
 Navigate to the folder where your copy of the source code is:
-  cd socnet
-
+```bash
+cd socnet
+```
 Optional (Visual Studio only):
 - It is also possible to clone the repository from Visual Studio,
   i.e. using the github.com URL provided above.
 
-3. BUILDING FROM SOURCE (CROSS-PLATFORM)
-========================================
+## 3. BUILDING FROM SOURCE (CROSS-PLATFORM)
 The Socnet.se project can be built using the .NET CLI, which works
 the same on Windows, Linux and macOS.
 
-To build in Release mode:
-
-  dotnet build Socnet.csproj -c Release
-
+### To build in Release mode:
+```bash
+dotnet build Socnet.csproj -c Release
+```
 Binaries will be in:
-  bin/Release/net8.0/
-
+```bash
+bin/Release/net8.0/
+```
 To build in Debug mode:
-
-  dotnet build Socnet.csproj -c Debug
-
+```bash
+dotnet build Socnet.csproj -c Debug
+```
 This will produce binaries in:
-  bin/Debug/net8.0/
-
-4. RUNNING THE APPLICATION
-==========================
+```bash
+bin/Debug/net8.0/
+```
+## 4. RUNNING THE APPLICATION
 You can run Socnet.se directly from the .NET CLI:
-
-  dotnet run -- [arguments]
-
+```bash
+dotnet run -- [arguments]
+```
 Or by executing the compiled binary (Release mode):
 
-- Windows:
-  .\bin\Release\net8.0\Socnet.exe
+- **Windows:**
+```bash
+.\bin\Release\net8.0\Socnet.exe
+```
+- **Linux / macOS:**
+```bash
+./bin/Release/net8.0/Socnet
+```
+You may need to make the binary executable:
+```bash
+chmod +x ./bin/Release/net8.0/Socnet
+```
 
-- Linux / macOS:
-  ./bin/Release/net8.0/Socnet
-# You may need to make the binary executable:
-  chmod +x ./bin/Release/net8.0/Socnet
-
-5. PUBLISHING SELF-CONTAINED BINARIES
-=====================================
+## 5. PUBLISHING SELF-CONTAINED BINARIES
 To compile the source code into stand-alone executables for
 different platforms, use the 'dotnet publish' command in .NET CLI:
+### Windows (x64, i.e. 64-bit):
+```bash
+dotnet publish Socnet.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./out
+```
 
-- Windows (x64, i.e. 64-bit):
-    dotnet publish Socnet.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./out
+### Linux (x64):
+```bash
+dotnet publish Socnet.csproj -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./out
+```
 
-- Linux (x64):
-    dotnet publish Socnet.csproj -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./out
-
-- macOS (x64):
-    dotnet publish Socnet.csproj -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true -o ./out
+### macOS (x64):
+```bash
+dotnet publish Socnet.csproj -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true -o ./out
+```
 
 All published files will be placed in the folder `out/` in the current directory; 
 this folder will be created automatically if it does not exist.
 
 Removing the '-o ./out' option will place the compiled output in:
-
-  ./bin/Release/net8.0/<RID>/publish/
+```bash
+./bin/Release/net8.0/<RID>/publish/
+```
 
 ...where <RID> is the runtime identifier (e.g. win-x64, linux-x64, osx-x64).
 
 The published self-contained binaries include all required .NET runtime
 components, so they can be executed directly without installing .NET.
 These are the files that are available as pre-compiled
-and code-signed binaries on https://www.socnet.se website.
+and code-signed binaries on [https://www.socnet.se](https://www.socnet.se).
 
-Supported Runtime Identifiers (RIDs) are as follows:
+### Supported Runtime Identifiers (RIDs) are as follows:
+#### Windows:
+- `win-x86` - 32-bit Intel/AMD
+- `win-x64` - 64-bit Intel/AMD
+- `win-arm64` - 64-bit ARM (Surface Pro X, modern ARM laptops)
+#### Linux:
+- `linux-x64` - 64-bit Intel/AMD
+- `linux-arm` - 32-bit ARM (e.g. Raspberry Pi OS 32-bit)
+- `linux-arm64` - 64-bit ARM (Raspberry Pi 4/5 with 64-bit OS, ARM servers etc)
+#### macOS:
+- `osx-x64` - 64-bit Intel (older Macs)
+- `osx-arm64` - 64-bit ARM (Apple Silicon: M1, M2, M3...)
 
-Windows:
-  win-x86       32-bit Intel/AMD
-  win-x64       64-bit Intel/AMD
-  win-arm64     64-bit ARM (Surface Pro X, modern ARM laptops)
-
-Linux:
-  linux-x64   64-bit Intel/AMD
-  linux-arm   32-bit ARM (e.g. Raspberry Pi OS 32-bit)
-  linux-arm64 64-bit ARM (Raspberry Pi 4/5 with 64-bit OS, ARM servers etc)
-
-macOS:
-  osx-x64     64-bit Intel (older Macs)
-  osx-arm64   64-bit ARM (Apple Silicon: M1, M2, M3...)
-
-6. PUBLISH WITH VISUAL STUDIO (Windows only)
-============================================
+## 6. PUBLISH WITH VISUAL STUDIO (Windows only)
 Windows users can alternatively open the solution file in Visual Studio 2022:
-  Socnet.sln
-
+```bash
+Socnet.sln
+```
 However, building the Socnet.csproj directly (as shown above) is recommended for
 cross-platform reproducibility.
 
-7. NOTES
-========
+## 7. NOTES
 - Socnet.se is cross-platform: it compiles and runs on Windows, Linux and macOS.
-
 - Ensure that the .NET SDK is correctly installed and available in your system PATH
 before attempting to build or run.
-
 - Socnet.se was developed using .NET 8.0 (LTS, support until Nov 2026) and
 has been tested with .NET 10.0 (LTS, released Nov 2025). Both versions
 compile and run successfully.
