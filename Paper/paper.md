@@ -81,7 +81,6 @@ The target audience includes social network researchers, computational social sc
 
 Socnet.se has so far been used in @Estevez2025, providing the implementations for the extensions to the traditional Borgatti-Everett approach to identifying core-periphery structures, and its functionality for partially constrained blockimages is being applied in ongoing research on world-system structures. Socnet.se has also been used in social network analysis course modules in the computational social science Masters program at Linköping University, Sweden.
 
-\newpage
 # Key Features
 
 `Socnet.se` provides comprehensive functionality for direct blockmodeling:
@@ -179,9 +178,7 @@ Goodness-of-fit (1st BlockModel): 20 (hamming)
 
 # In this example, using the Little League TI data, we arrive at a solution
 # named 'bm_llti_bi4se_0'
-```
-\newpage
-```
+
 # View results
 > bmview(blockmodel = bm_llti_bi4se_0)
 Blockmodel:
