@@ -8,8 +8,8 @@ randomseed(6031769)
 
 # Load matrix Little League TI
 loadmatrix(file = "example_data/little_league_ti.txt", name = llti)
-# Create a 4-positional blockimage with nul and com blocks
 
+# Create a 4-positional blockimage with nul and com blocks
 bi4se = blockimage(size = 4, type = structural)
 
 # Initialize the search: use ljubljana search algorithm and hamming distances
