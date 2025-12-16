@@ -61,7 +61,9 @@ This fragmentation means researchers must learn multiple tools, convert data bet
 4. **Open and extensible**: MIT-licensed with object-oriented architecture designed for adding new ideal blocks, goodness-of-fit measures, and search algorithms
 5. **Cross-platform**: Available as pre-compiled binaries for Windows, Linux, and macOS, as well as build scripts for respective platform
 
-| Feature | Pajek | Žiberna's blockmodeling | Socnet.se |
+Table 1 below provides a comparison of features available in Pajek, Žiberna's blockmodeling R package, and Socnet.se.
+
+| Feature | Pajek | blockmodeling R package | Socnet.se |
 |-----------|---------|--------------------|-----------|
 | Equivalence types | Structural, regular, generalized | Structural, regular, generalized, homogeneity | Structural, regular, generalized |
 | | | | |
@@ -110,7 +112,7 @@ Socnet.se has so far been used in @Estevez2025, providing the implementations fo
 - Exhaustive search for small networks
 - `localopt`: Local optimization with optional actor switching
 - `ljubljana`: Semi-stochastic depth/width hybrid search
-- Configurable parameters: random starts, restarts, iteration limits, minimum cluster sizes
+- Configurable parameters: number of random tests for starting partitions, number of restarts, iteration limits, minimum cluster sizes, timeout settings
 
 **Core-Periphery Detection**:
 
@@ -121,13 +123,15 @@ Socnet.se has so far been used in @Estevez2025, providing the implementations fo
 
 **Additional Functionality**:
 
-- Automatic detection and filtering of isomorphic solutions
+- Automatic detection and filtering of isomorphic solutions and blockimages
+- Partially constrained blockimages (mixing single or multiple ideal blocks in a blockimage)
+- Incremental expansion of blockimage templates based on previous optimal findings (using the `biextend()` command; see online documentation)
 - Data transformations: dichotomization, symmetrization, rescaling
 - Density table generation for partitions
 - Matrix and edgelist file formats
 - Integrated file handling and data management
 
-Full documentation on how to use the above features (and more) are available at https://socnet.se/.
+Full documentation on how to use the above features, all available Socnet CLI commands, and a comprehensive quick-start guide are available at https://socnet.se/.
 
 
 # Usage Example
@@ -150,12 +154,13 @@ Stored structure 'llti_actors' (Actorset)
 Stored structure 'llti' (Matrix)
 Loading data structure: OK
 
-# Create a 4-position blockimage with complete and null blocks (i.e. structural equivalence)
+# Create a 4-position blockimage with complete and null blocks (i.e. structural
+# equivalence)
 > bi4se = blockimage(size = 4, type = structural)
 Stored structure 'bi4se' (BlockImage)
 
 # Initialize search using ljubljana algorithm with Hamming distance
-> bminit(network = llti, blockimage = bi4se, searchtype = ljubljana, method = hamming)
+> bminit(network=llti, blockimage=bi4se, searchtype=ljubljana, method=hamming)
 Initializing search...
 Network: llti
 Method: hamming
@@ -236,8 +241,8 @@ Additional examples including valued network analysis and power-relational core-
 
 `Socnet.se` can be integrated into existing workflows:
 
-- **R integration**: The GitHub repository includes `client_socnetse.R`, a library of wrapper functions for calling Socnet.se from R. Make sure that the Socnet client is first installed properly. See the `demo_socnetse.R` file for a demonstration on how to use the R wrapper.
-- **Python integration**: Can be invoked as an external process from Python scripts
+- **R integration**: The GitHub repository includes `client_socnetse.R`, a library of wrapper functions for calling `Socnet.se` from R. Make sure that the Socnet client is first installed properly. See the `demo_socnetse.R` file for a demonstration on how to use the R wrapper.
+- **Python integration**: Also possible to invoke as an external process from Python
 - **Script files**: Batch processing via script files containing Socnet.se commands
 - **Standalone use**: Direct command-line interaction for exploratory analysis
 
