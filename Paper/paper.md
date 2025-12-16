@@ -5,8 +5,6 @@ tags:
 - role analysis
 - network analysis
 - C#
-date: "16 December 2025"
-output: pdf_document
 authors:
 - name: Carl Nordlund
   orcid: "0000-0001-5057-1985"
@@ -14,7 +12,7 @@ authors:
   affiliation: 1
 - name: José Luis Estévez
   orcid: "0000-0001-9044-7612"
-  affiliation: 2, 3
+  affiliation: "2, 3"
 - name: Kristian Gade Kjelmann
   orcid: "0000-0001-7994-735X"
   affiliation: 4
@@ -24,7 +22,6 @@ authors:
 - name: Chandreyee Roy
   orcid: "0000-0002-5517-1056"
   affiliation: 5
-bibliography: paper.bib
 affiliations:
 - name: Linköping University, Sweden
   index: 1
@@ -36,6 +33,8 @@ affiliations:
   index: 4
 - name: Aalto University, Finland
   index: 5
+date: "16 December 2025"
+bibliography: paper.bib
 ---
 
 # Summary
