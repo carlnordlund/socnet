@@ -1,10 +1,10 @@
 ﻿# SOCNET.SE INSTALLATION INSTRUCTIONS
 
 Socnet.se is a cross-platform C# CLI-based console application for direct
-blockmodeling of network data. See README.txt for more information or visit:
+blockmodeling of network data. See [README.md](README.md) for more information or visit:
 [https://www.socnet.se](https://www.socnet.se)
 
-Socnet is developed under the so-called MIT License. Please read LICENSE.txt
+Socnet is developed under the so-called MIT License. Please read [LICENSE.md](LICENSE.md)
 before use and/or compiling the source code.
 
 This document explains how to compile the Socnet.se client from source code
