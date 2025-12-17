@@ -66,17 +66,12 @@ Table 1 below provides a comparison of features available in Pajek, Žiberna's b
 | Feature | Pajek | blockmodeling R package | Socnet.se |
 |-----------|---------|--------------------|-----------|
 | Equivalence types | Structural, regular, generalized | Structural, regular, generalized, homogeneity | Structural, regular, generalized |
-| | | | |
 | Binary networks | Yes (Hamming only) | Yes (Hamming + homogeneity) | Yes (Hamming + correlation) |
-| | | | |
 | Valued networks | No (must dichotomize) | Yes (novel valued blocks) | Yes (correlation-based) |
-| | | | |
 | Borgatti-Everett-style Core-periphery models | No | No | Yes (multiple variants) |
-| | | | |
 | Open source | No | Yes (GPL-2/3) | Yes (MIT) |
-| | | | |
 | Platforms | Windows only | Win/Linux/macOS | Win/Linux/macOS |
-| | | | |
+
 Table 1: Comparison of direct blockmodeling software features for one-mode networks.
 
 The target audience includes social network researchers, computational social scientists, and anyone analyzing relational data who needs flexible, theory-driven methods for uncovering latent structural patterns.
