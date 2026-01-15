@@ -39,7 +39,7 @@ bibliography: paper.bib
 
 # Summary
 
-The `Socnet.se` client is an open-source, cross-platform console application for direct blockmodeling of one-mode network data. Developed in C#, it unifies multiple blockmodeling approaches—structural, regular, and generalized equivalence—into a single tool, supporting both binary and valued networks through classical Hamming distance and correlation-based goodness-of-fit measures. The software includes specialized functionality for detecting various core-periphery structures and provides integrated isomorphism detection for blockmodels. `Socnet.se` operates via a simple scripting language and can be used as a standalone command-line tool, through script files, or as an external process called from R, Python, or similar environments. Given sufficient knowledge in C#, Socnet.se can easily be modified and extended with additional types of equivalences, ideal blocks, goodness-of-fit measures and search heuristics, as well as additional data structures if needed, and the code may also be scavenged for the further development of other existing or future software solutions for direct blockmodeling. `Socnet.se` is available as pre-compiled binaries for Windows, Linux, and macOS at [www.socnet.se](https://www.socnet.se), and can also be compiled directly from source.
+The `Socnet.se` client is an open-source, cross-platform console application for direct blockmodeling of one-mode network data. Developed in C#, it unifies multiple blockmodeling approaches — structural, regular, and generalized equivalence — into a single tool, supporting both binary and valued networks through classical Hamming distance and correlation-based goodness-of-fit measures. The software includes specialized functionality for detecting various core-periphery structures and provides integrated isomorphism detection for blockmodels. `Socnet.se` operates via a simple scripting language and can be used as a standalone command-line tool, through script files, or as an external process called from R, Python, or similar environments. Given sufficient knowledge in C#, Socnet.se can easily be modified and extended with additional types of equivalences, ideal blocks, goodness-of-fit measures, and search heuristics, as well as additional data structures if needed, and the code may also be scavenged for the further development of other existing or future software solutions for direct blockmodeling. `Socnet.se` is available as pre-compiled binaries for Windows, Linux, and macOS at [www.socnet.se](https://www.socnet.se), and can also be compiled directly from source.
 
 # Statement of Need
 
@@ -75,8 +75,6 @@ Table 1 below provides a comparison of features available in Pajek, Žiberna's b
 Table 1: Comparison of direct blockmodeling software features for one-mode networks.
 
 The target audience includes social network researchers, computational social scientists, and anyone analyzing relational data who needs flexible, theory-driven methods for uncovering latent structural patterns.
-
-Socnet.se has so far been used in @Estevez2025, providing the implementations for the extensions to the traditional Borgatti-Everett approach to identifying core-periphery structures, and its functionality for partially constrained blockimages is being applied in ongoing research on world-system structures. Socnet.se has also been used in social network analysis course modules in the computational social science Masters program at Linköping University, Sweden.
 
 # Key Features
 
@@ -130,8 +128,8 @@ Full documentation on how to use the above features, all available Socnet CLI co
 
 # Research impact
 Developed within the scope of the Network Dynamics of Ethnic integration project, a large Nordic research project funded by the NordForsk program on interdisciplinary research,
-the Socnet.se client was first introduced in a paper in *Social Networks* [@Estevez2025], where we propose and implement extensions to the classical Borgatti-Everett approach to identify and
-quantify core-periphery structures. Socnet.se has also been used on course modules in Social network analysis within the MSc program in Computational Social Science at Linköping university, Sweden,
+the Socnet.se client was first introduced in @Estevez2025, providing the implementations for the extensions to the traditional Borgatti-Everett approach to identifying core-periphery structures.
+Socnet.se has also been used on course modules in Social network analysis within the MSc program in Computational Social Science at Linköping university, Sweden,
 as well as the Research School in Computational Social Science. In ongoing research on the structure of the contemporary world-system, the features of partially constrained blockimages are proven to
 be particularly useful in an ongoing study on semiperipheral patterns.
 
@@ -282,6 +280,7 @@ This research was supported by NordForsk through funding to the Network Dynamics
 No generative AI tools were used in the development of the software code. AI assistance (`claude.ai`) was partly used for proofreading and improving readability of the manuscript text.
 
 # References
+
 
 
 
