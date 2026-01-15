@@ -277,9 +277,10 @@ The software reads and writes standard text-based formats (tab-separated matrice
 This research was supported by NordForsk through funding to the Network Dynamics of Ethnic Integration (project number 105147). We thank colleagues in the research project and students in the Masters programme in Computational Social Science at Linköping University, Sweden, for valuable feedback.
 
 # AI Usage Disclosure
-No generative AI tools were used in the development of the software code. AI assistance (`claude.ai`) was partly used for proofreading and improving readability of the manuscript text.
+No generative AI tools were used in the development of the software code. AI assistance (Claude) was sporadically used for proofreading and improving readability of the manuscript text.
 
 # References
+
 
 
 
