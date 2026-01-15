@@ -280,10 +280,3 @@ This research was supported by NordForsk through funding to the Network Dynamics
 No generative AI tools were used in the development of the software code. AI assistance (Claude) was sporadically used for proofreading and improving readability of the manuscript text.
 
 # References
-
-
-
-
-
-
-
