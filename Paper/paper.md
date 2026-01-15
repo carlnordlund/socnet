@@ -239,11 +239,11 @@ For core-periphery detection, the process is simplified:
 Additional examples including valued network analysis and power-relational core-periphery detection are provided in the comprehensive documentation at https://socnet.se/. The `/example_data/` folder also contains an extensively commented script - `cli_script.txt` - that describes how typical analytical workflows look like.
 
 # Software Design
-Developed explicitly with compactness and self-sufficiency in mind, with no other dependencies than the standard libraries of .NET 8.0, the `Socnet.se` client builds on standard object-oriented principles to allow for would-be further extensions. Specifically, the codebase has been prepared with three types of extensions in mind: implementing new ideal blocks, new goodness-of-fit measures, and new search heuristics. While providing a short introduction to how `Socnet.se` can be expanded below, more detailed
+Developed explicitly with compactness and self-sufficiency in mind, with no other dependencies than the standard libraries of .NET 8.0, the `Socnet.se` client builds on standard object-oriented principles to allow for future extensions. Specifically, the codebase has been prepared with three types of extensions in mind: implementing new ideal blocks, new goodness-of-fit measures, and new search heuristics. While a short introduction to extending `Socnet.se` follows below, more detailed
 technical instructions are provided in the `CONTRIBUTING.txt` file that is available in the `Socnet.se` repository.
 
 ## Ideal blocks
-Each ideal block is implemented as a separate class that inherits from a shared abstract class (`_Block.cs`), the latter specifying the necessary properties and virtual methods of all ideal blocks. To add a new ideal block, a new class is created (in the `/DataLibrary/Blocks/` folder) that implements the block-specific properties and goodness-of-fit method(s). To make a new ideal block available when constructing blockimages, the ideal block is finally registered in the `BlockmodelingConstant.cs` class. An extensively commented template (`_exampleBlock.cs`) is provided in the `/Blocks/` folder to facilitate this process.
+Each ideal block is implemented as a separate class that inherits from a shared abstract class (`_Block.cs`), the latter specifying the necessary properties and virtual methods of all ideal blocks. To add a new ideal block, a new class is created (in the `/DataLibrary/Blocks/` folder) that implements the block-specific properties and goodness-of-fit method(s). To make a new ideal block available when constructing blockimages, the ideal block is finally registered in the `BlockmodelingConstant.cs` class. An extensively commented template (`_exampleBlock.cs`) is provided in the `/DataLibrary/Blocks/` folder to facilitate this process.
 
 ## Goodness-of-fit measures
 `Socnet.se` currently includes two measures (Hamming and weighted correlation-based), but additional measures can be implemented as well. Each measure is defined as a method in
@@ -280,5 +280,6 @@ The software reads and writes standard text-based formats (tab-separated matrice
 This research was supported by NordForsk through funding to the Network Dynamics of Ethnic Integration (project number 105147). We thank colleagues in the research project and students in the Masters programme in Computational Social Science at Linköping University, Sweden, for valuable feedback.
 
 # References
+
 
 
