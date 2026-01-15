@@ -128,6 +128,12 @@ Socnet.se has so far been used in @Estevez2025, providing the implementations fo
 
 Full documentation on how to use the above features, all available Socnet CLI commands, and a comprehensive quick-start guide are available at https://socnet.se/.
 
+# Research impact
+Developed within the scope of the Network Dynamics of Ethnic integration project, a large Nordic research project funded by the NordForsk program on interdisciplinary research,
+the Socnet.se client was first introduced in a paper in *Social Networks* [@Estevez2025], where we propose and implement extensions to the classical Borgatti-Everett approach to identify and
+quantify core-periphery structures. Socnet.se has also been used on course modules in Social network analysis within the MSc program in Computational Social Science at Linköping university, Sweden,
+as well as the Research School in Computational Social Science. In ongoing research on the structure of the contemporary world-system, the features of partially constrained blockimages are proven to
+be particularly useful in an ongoing study on semiperipheral patterns.
 
 # Usage Example
 
@@ -232,6 +238,23 @@ For core-periphery detection, the process is simplified:
 
 Additional examples including valued network analysis and power-relational core-periphery detection are provided in the comprehensive documentation at https://socnet.se/. The `/example_data/` folder also contains an extensively commented script - `cli_script.txt` - that describes how typical analytical workflows look like.
 
+# Software Design
+Developed explicitly with compactness and self-sufficiency in mind, with no other dependencies than the standard libraries of .NET 8.0, the `Socnet.se` client builds on standard object-oriented principles to allow for would-be further extensions. Specifically, the codebase has been prepared with three types of extensions in mind: implementing new ideal blocks, new goodness-of-fit measures, and new search heuristics. While providing a short introduction to how Socnet.se can be expanded below, more detailed
+instructions are provided in the `CONTRIBUTING.txt` file that is available in the `Socnet.se` repository.
+
+## Ideal blocks
+Each ideal block is implemented as a separate class that inherits from a shared abstract class (`_Block.cs`), the latter specifying the necessary properties and virtual methods of all ideal blocks. To add a new ideal block, a new class is created (in the `/DataLibrary/Blocks/` folder) that implements the block-specific properties and goodness-of-fit method(s). To make a new ideal block available when constructing blockimages, the ideal block is finally registered in the `BlockmodelingConstant.cs` class. An extensively commented template (`_exampleBlock.cs`) is provided in the `/Blocks/` folder to facilitate this process.
+
+## Goodness-of-fit measures
+`Socnet.se` currently includes two measures (Hamming and weighted correlation-baed), but additional measures can be implemented as well. Each measure is defined as a method in
+`Blockmodeling.cs` with a specific method signature: a new goodness-of-fit method should thus follow the same signature as the `Blockmodeling.binaryHamming(...)` method. The
+new measure must then be implemented for all ideal block classes that should support it, which also must be declared in BlockmodelingConstants and added as an option in the
+`bminit()` command and the `InitializeSearch()` method.
+
+## Search heuristics
+New heuristics and algorithms for finding optimal partitions can also be implemented in `Socnet.se`. Each search approach is implemented as a separate method in `Blockmodeling.cs` and
+initiated as a method delegate. All these search methods must be registered in `BlockmodelingConstants.cs` and exposed as an option in the `bminit()` command.
+
 # Integration with Other Software
 
 `Socnet.se` can be integrated into existing workflows:
@@ -257,3 +280,4 @@ The software reads and writes standard text-based formats (tab-separated matrice
 This research was supported by NordForsk through funding to the Network Dynamics of Ethnic Integration (project number 105147). We thank colleagues in the research project and students in the Masters programme in Computational Social Science at Linköping University, Sweden, for valuable feedback.
 
 # References
+
