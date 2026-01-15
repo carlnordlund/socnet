@@ -274,12 +274,15 @@ The software reads and writes standard text-based formats (tab-separated matrice
 - **blockmodeling R package** [@Ziberna2007]: Implements valued blockmodeling with novel ideal blocks; `Socnet.se` provides correlation-based alternatives and core-periphery specialization
 - **Core-periphery tools**: Various implementations [@Kojaku2018; @Schoch2023] focus specifically on the traditional core-periphery model of Borgatti-Everett [@Borgatti2000]; `Socnet.se` integrates this within a broader blockmodeling framework and provides a variety of extended core-periphery models
 
-
 # Acknowledgments
 
 This research was supported by NordForsk through funding to the Network Dynamics of Ethnic Integration (project number 105147). We thank colleagues in the research project and students in the Masters programme in Computational Social Science at Linköping University, Sweden, for valuable feedback.
 
+# AI Usage Disclosure
+No generative AI tools were used in the development of the software code. AI assistance (`claude.ai`) was partly used for proofreading and improving readability of the manuscript text.
+
 # References
+
 
 
 
