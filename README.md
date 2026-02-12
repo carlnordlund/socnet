@@ -1,3 +1,5 @@
+[![status](https://joss.theoj.org/papers/650cd553bf6a3f9cb5e8bc5003d1c420/status.svg)](https://joss.theoj.org/papers/650cd553bf6a3f9cb5e8bc5003d1c420)
+
 # Socnet.se
 
 ### About
