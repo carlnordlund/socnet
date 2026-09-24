@@ -99,7 +99,7 @@ bmstart()
 # View the solution:
 bmview(bm_llti_bi4se_0)
 
-# This should be (1,3,4,5),(6,10,11,12,13),(2),(7,8,9)
+# This should be (2),(6,10,11,12,13),(7,8,9),(1,3,4,5)
 
 
 # Extract the partition for this solution
