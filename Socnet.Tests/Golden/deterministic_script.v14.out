@@ -1,0 +1,890 @@
+Socnet - Direct blockmodeling in C#
+===================================
+Version 1.4 (October 2025)
+Carl Nordlund - carl.nordlund@liu.se
+
+Socnet.se was supported by NordForsk through the funding to
+The Network Dynamics of Ethnic Integration, project number 105147
+Nordint.net: https://nordint.net
+
+How to cite specific methods, type in 'citeinfo()'.
+
+Entering interactive mode (type 'quit' to quit, 'help' for help):
+> Loading and executing 'deterministic_script.txt'...
+> help
+HELP SECTION
+============
+Version 1.4 (October 2025)
+See website for documentation:
+https://socnet.se
+ 
+The socnet client is used to do blockmodeling analyses, with some extra functionality for data management.
+You type in commands on the prompt to do various things with data: load, save, transform,  analyze etc.
+Check www.socnet.se for command references, how-to, and quick-start tutorial!
+> citeinfo()
+The Socnet.se software client:
+  Nordlund, C., Roy, C. (2024). Socnet.se: The Blockmodeling Console App [computer software]. https://socnet.se
+ 
+Direct blockmodeling using the 'nordlund' method (i.e. weighted correlation coefficients):
+  Nordlund, C. (2020). Direct blockmodeling of valued and binary networks: a dichotomization-free approach. Social Networks, 61, 128-143.
+  https://doi.org/10.1016/j.socnet.2019.10.004
+ 
+Correlation-based core-periphery approach, ignoring inter-categorical blocks or using the 'denuci(d)' ideal blocks:
+  Borgatti, S.P., Everett, M.G. (2000). Models of core/periphery structures. Social Networks, 21(4), 375-395.
+  https://doi.org/10.1016/S0378-8733(99)00019-2
+ 
+Correlation-based core-periphery approach using 'pco(p)' for intra-core and/or 'den(d)' or 'denmin(d)' for inter-categorical ties:
+  Estévez, J.L., Nordlund, C. (2025). Revising the Borgatti-Everett core-periphery model: Inter-categorical density blocks and partially connected cores. Social Networks, 81, 31-51.
+  https://doi.org/10.1016/j.socnet.2024.11.002
+ 
+Power-relational core-periphery approach with core dominance and/or peripheral dependency (i.e. 'powerrelational' argument in 'coreperi'):
+  Nordlund, C. (2018). Power-relational core–periphery structures: Peripheral dependency and core dominance in binary and valued networks. Network Science, 6(3), 348-369.
+  https://doi.org/10.1017/nws.2018.15
+ 
+Direct generalized blockmodeling using 'hamming' distances as penalty function:
+  Doreian, P., Batagelj, V., Ferligoj, A. (2004). Generalized Blockmodeling. Cambridge: Cambridge University Press.
+  https://doi.org/10.1017/CBO9780511584176
+> loadmatrix(file = little_league_ti.txt, name = llti)
+Stored structure 'llti_actors' (Actorset)
+Stored structure 'llti' (Matrix)
+Loading data structure: OK
+> llti
+Name:llti	Datatype:Matrix	Size:13;13
+Actorset:llti_actors
+	Ron__1	Tom__2	Frank_3	Boyd_4	Tim__5	John_6	Jeff_7	Jay__8	Sandy_9	Jerry_10	Darrin_11	Ben_12	Arnie_13
+Ron__1	0	0	1	1	1	0	0	0	0	0	0	0	0
+Tom__2	1	0	1	0	0	0	0	0	0	0	1	0	0
+Frank_3	1	0	0	1	0	0	0	0	0	0	1	0	0
+Boyd_4	1	1	1	0	0	0	0	0	0	0	0	0	0
+Tim__5	1	0	1	1	0	0	0	0	0	0	0	0	0
+John_6	0	0	0	0	1	0	0	0	0	0	0	1	1
+Jeff_7	0	1	0	0	0	0	0	1	1	0	0	0	0
+Jay__8	0	1	0	0	0	0	1	0	1	0	0	0	0
+Sandy_9	0	1	0	0	0	0	1	1	0	0	0	0	0
+Jerry_10	1	0	0	0	0	1	0	0	0	0	0	0	0
+Darrin_11	1	1	0	0	0	0	0	0	0	1	0	0	0
+Ben_12	1	0	0	0	0	1	0	0	0	1	0	0	0
+Arnie_13	0	0	0	0	1	1	0	0	0	0	0	0	0
+> view(llti_actors)
+Name:llti_actors	Datatype:Actorset	Size:13
+index	label
+0	Ron__1
+1	Tom__2
+2	Frank_3
+3	Boyd_4
+4	Tim__5
+5	John_6
+6	Jeff_7
+7	Jay__8
+8	Sandy_9
+9	Jerry_10
+10	Darrin_11
+11	Ben_12
+12	Arnie_13
+> structures
+Name	Type	Size
+========	====	====
+llti_actors	Actorset	13
+llti	Matrix	13;13
+> structures(type = matrix)
+Name	Type	Size
+========	====	====
+llti	Matrix	13;13
+> loadmatrix(hlebec.txt)
+Stored structure 'hlebec_actors' (Actorset)
+Stored structure 'hlebec' (Matrix)
+Loading data structure: OK
+> loadmatrix(baker_original.txt)
+Stored structure 'baker_original_actors' (Actorset)
+Stored structure 'baker_original' (Matrix)
+Loading data structure: OK
+> baker_original
+Name:baker_original	Datatype:Matrix	Size:20;20
+Actorset:baker_original_actors
+	AMH	ASW	BJSW	CAN	CCQ	CW	CYSR	CSWJ	FR	IJSW	JGSW	JSP	JSWE	PW	SCW	SSR	SW	SWG	SWHC	SWRA
+AMH	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	3	0	0	0
+ASW	0	0	0	0	0	0	0	0	0	0	0	0	18	13	0	21	73	0	0	7
+BJSW	0	0	0	0	0	0	0	0	0	0	0	0	13	0	0	0	19	0	0	0
+CAN	0	0	0	0	0	9	0	0	0	0	0	0	0	0	6	0	8	0	0	0
+CCQ	0	0	0	0	0	12	0	0	0	0	0	0	0	0	3	0	0	0	0	0
+CW	0	0	0	7	0	0	6	0	0	0	0	0	11	7	32	10	58	0	0	0
+CYSR	0	0	0	12	5	70	0	0	4	0	0	0	0	6	8	14	28	0	0	5
+CSWJ	0	0	0	0	0	0	0	0	0	0	0	0	0	0	47	20	45	0	0	0
+FR	0	0	0	0	0	0	0	0	0	0	0	0	0	0	18	0	9	0	0	0
+IJSW	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	3	0	0	0
+JGSW	0	0	0	0	0	0	0	0	0	0	0	0	0	0	16	0	18	0	0	0
+JSP	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	7	0	0	0	0
+JSWE	0	9	0	0	0	0	0	0	0	0	0	0	0	0	18	16	58	0	7	16
+PW	0	0	0	7	0	4	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+SCW	0	8	0	6	0	17	0	8	6	0	6	0	21	0	0	36	124	8	6	18
+SSR	0	7	0	0	0	17	0	0	0	0	0	0	9	0	30	0	106	0	0	25
+SW	0	15	0	0	0	52	0	0	9	0	0	0	33	19	58	53	0	15	43	8
+SWG	0	0	2	0	0	0	0	0	0	0	0	0	9	0	9	7	40	0	9	0
+SWHC	0	0	0	0	0	0	0	0	0	0	0	0	0	0	20	0	26	0	0	0
+SWRA	0	0	0	0	0	8	0	0	0	0	0	0	24	0	8	39	44	0	0	0
+> myactors = actorset(size=4, labelarray=Ron_1;Tom_2;Frank_3;Boyd_4)
+Stored structure 'myactors' (Actorset)
+> myactors
+Name:myactors	Datatype:Actorset	Size:4
+index	label
+0	Ron_1
+1	Tom_2
+2	Frank_3
+3	Boyd_4
+> actorset(size=3)
+Name:actorset	Datatype:Actorset	Size:3
+index	label
+0	actor0
+1	actor1
+2	actor2
+> mymatrix = matrix(myactors,data=0;0;1;1;1;0;1;0;1;0;0;1;1;1;1;0)
+Stored structure 'mymatrix' (Matrix)
+> mymatrix
+Name:mymatrix	Datatype:Matrix	Size:4;4
+Actorset:myactors
+	Ron_1	Tom_2	Frank_3	Boyd_4
+Ron_1	0	0	1	1
+Tom_2	1	0	1	0
+Frank_3	1	0	0	1
+Boyd_4	1	1	1	0
+> set(name = mymatrix, row = Ron_1, col = Tom_2, value = 0.5)
+> mymatrix
+Name:mymatrix	Datatype:Matrix	Size:4;4
+Actorset:myactors
+	Ron_1	Tom_2	Frank_3	Boyd_4
+Ron_1	0	0.5	1	1
+Tom_2	1	0	1	0
+Frank_3	1	0	0	1
+Boyd_4	1	1	1	0
+> set(name = myactors, row = Ron_1, value = Ronny)
+> myactors
+Name:myactors	Datatype:Actorset	Size:4
+index	label
+0	Ronny
+1	Tom_2
+2	Frank_3
+3	Boyd_4
+> bi = blockimage(size = 2, pattern = com;nul;reg)
+Stored structure 'bi' (BlockImage)
+> bi
+Name:bi	Datatype:BlockImage	Size:2x2
+	P0	P1
+P0	[com;nul;reg]	[com;nul;reg]
+P1	[com;nul;reg]	[com;nul;reg]
+Multiblocked: True
+> cpx = blockimage(size = 2, content = reg;pco(0.5)|cre|rre|nul)
+Stored structure 'cpx' (BlockImage)
+> cpx
+Name:cpx	Datatype:BlockImage	Size:2x2
+	P0	P1
+P0	[reg;pco(0.5)]	[cre]
+P1	[rre]	[nul]
+Multiblocked: True
+> bi4re = blockimage(size = 4, type = regular)
+Stored structure 'bi4re' (BlockImage)
+> bi4re
+Name:bi4re	Datatype:BlockImage	Size:4x4
+	P0	P1	P2	P3
+P0	[nul;reg]	[nul;reg]	[nul;reg]	[nul;reg]
+P1	[nul;reg]	[nul;reg]	[nul;reg]	[nul;reg]
+P2	[nul;reg]	[nul;reg]	[nul;reg]	[nul;reg]
+P3	[nul;reg]	[nul;reg]	[nul;reg]	[nul;reg]
+Multiblocked: True
+> set(name = bi4re, row = P0, col = P1, value = den(0.25);denmin(0.3))
+> bi4re
+Name:bi4re	Datatype:BlockImage	Size:4x4
+	P0	P1	P2	P3
+P0	[nul;reg]	[den(0.25);denmin(0.3)]	[nul;reg]	[nul;reg]
+P1	[nul;reg]	[nul;reg]	[nul;reg]	[nul;reg]
+P2	[nul;reg]	[nul;reg]	[nul;reg]	[nul;reg]
+P3	[nul;reg]	[nul;reg]	[nul;reg]	[nul;reg]
+Multiblocked: True
+> p = partition(actorset = myactors, nbrclusters = 2, partarray = 0;1;1;0)
+Stored structure 'p' (Partition)
+> p
+Name:p	Datatype:Partition	Size:2 clusters;4 actors
+Actorset:myactors
+Cluster 0: P0
+Ronny	(0)
+Boyd_4	(3)
+Cluster 1: P1
+Tom_2	(1)
+Frank_3	(2)
+> set(name = p, row = Tom_2, value = 0)
+> p
+Name:p	Datatype:Partition	Size:2 clusters;4 actors
+Actorset:myactors
+Cluster 0: P0
+Ronny	(0)
+Boyd_4	(3)
+Tom_2	(1)
+Cluster 1: P1
+Frank_3	(2)
+> part1 = partition(actorset = llti_actors, nbrclusters = 3, partarray = 0;0;1;2;1;1;0;2;2;0;2;1;1)
+Stored structure 'part1' (Partition)
+> bi3 = blockimage(size = 3, type = regular)
+Stored structure 'bi3' (BlockImage)
+> bm1 = bmtest(network = llti, blockimage = bi3, partition = part1, method = hamming)
+Stored structure 'bm1' (BlockModel)
+> bm1
+Name:bm1	Datatype:BlockModel	Size:[Blockmodel size]
+Matrix:llti
+Blockimage:bi3
+Partition:part1 (0;0;1;2;1;1;0;2;2;0;2;1;1)
+GoF:26 (hamming)
+> bmview(blockmodel = bm1, ideal = yes)
+Blockmodel:
++---------------+
+|\   |XX   |X   |	0_Ron__1
+|X\  |X    |   X|	0_Tom__2
+| X\ |     | XX |	0_Jeff_7
+|X  \|  X  |    |	0_Jerry_10
++---------------+
+|X   |\    |X  X|	1_Frank_3
+|X   |X\   |X   |	1_Tim__5
+|    | X\XX|    |	1_John_6
+|X  X|  X\ |    |	1_Ben_12
+|    | XX \|    |	1_Arnie_13
++---------------+
+|XX  |X    |\   |	2_Boyd_4
+| XX |     | \X |	2_Jay__8
+| XX |     | X\ |	2_Sandy_9
+|XX X|     |   \|	2_Darrin_11
++---------------+
+Ideal blockmodel:
++---------------+
+|\000|00000|0000|	0_Ron__1
+|0\00|00000|0000|	0_Tom__2
+|00\0|00000|0000|	0_Jeff_7
+|000\|00000|0000|	0_Jerry_10
++---------------+
+|0000|\0000|0000|	1_Frank_3
+|0000|1\000|0000|	1_Tim__5
+|0000|01\11|0000|	1_John_6
+|0000|001\0|0000|	1_Ben_12
+|0000|0100\|0000|	1_Arnie_13
++---------------+
+|1100|00000|\000|	2_Boyd_4
+|0110|00000|0\00|	2_Jay__8
+|0100|00000|00\0|	2_Sandy_9
+|1001|00000|000\|	2_Darrin_11
++---------------+
+Blockimage:
+	P0	P1	P2
+P0	nul	nul	nul
+P1	nul	reg	nul
+P2	reg	nul	nul
+Goodness-of-fit: 26 (hamming)
+> bmextract(blockmodel = bm1, type = gof)
+26 (hamming)
+> bmextract(blockmodel = bm1, type = matrix)
+Stored structure 'bm_llti_bi3_part1_actors' (Actorset)
+Stored structure 'bm_llti_bi3_part1_matrix' (Matrix)
+Stored structure 'bm_llti_bi3_part1_idealmatrix' (Matrix)
+> bm1_actors
+!Error: 'bm1_actors' neither function nor structure
+> bmextract(blockmodel = bm1, type = partition)
+Stored structure 'part1' (Partition)
+> bi3se = blockimage(size = 3, type = structural)
+Stored structure 'bi3se' (BlockImage)
+> bm2 = bmtest(llti, bi3se, part1, hamming)
+Stored structure 'bm2' (BlockModel)
+> bmview(bm2, ideal = y)
+Blockmodel:
++---------------+
+|\   |XX   |X   |	0_Ron__1
+|X\  |X    |   X|	0_Tom__2
+| X\ |     | XX |	0_Jeff_7
+|X  \|  X  |    |	0_Jerry_10
++---------------+
+|X   |\    |X  X|	1_Frank_3
+|X   |X\   |X   |	1_Tim__5
+|    | X\XX|    |	1_John_6
+|X  X|  X\ |    |	1_Ben_12
+|    | XX \|    |	1_Arnie_13
++---------------+
+|XX  |X    |\   |	2_Boyd_4
+| XX |     | \X |	2_Jay__8
+| XX |     | X\ |	2_Sandy_9
+|XX X|     |   \|	2_Darrin_11
++---------------+
+Ideal blockmodel:
++---------------+
+|\000|00000|0000|	0_Ron__1
+|0\00|00000|0000|	0_Tom__2
+|00\0|00000|0000|	0_Jeff_7
+|000\|00000|0000|	0_Jerry_10
++---------------+
+|0000|\0000|0000|	1_Frank_3
+|0000|0\000|0000|	1_Tim__5
+|0000|00\00|0000|	1_John_6
+|0000|000\0|0000|	1_Ben_12
+|0000|0000\|0000|	1_Arnie_13
++---------------+
+|1111|00000|\000|	2_Boyd_4
+|1111|00000|0\00|	2_Jay__8
+|1111|00000|00\0|	2_Sandy_9
+|1111|00000|000\|	2_Darrin_11
++---------------+
+Blockimage:
+	P0	P1	P2
+P0	nul	nul	nul
+P1	nul	nul	nul
+P2	com	nul	nul
+Goodness-of-fit: 35 (hamming)
+> bi3s = blockimage(size = 3, content = com|nul|rfn|cfn|reg|den(0.3)|denmin(0.4)|rre|cre)
+Stored structure 'bi3s' (BlockImage)
+> bm3 = bmtest(llti, bi3s, part1, hamming)
+Stored structure 'bm3' (BlockModel)
+> bmview(bm3, ideal = y)
+Blockmodel:
++---------------+
+|\   |XX   |X   |	0_Ron__1
+|X\  |X    |   X|	0_Tom__2
+| X\ |     | XX |	0_Jeff_7
+|X  \|  X  |    |	0_Jerry_10
++---------------+
+|X   |\    |X  X|	1_Frank_3
+|X   |X\   |X   |	1_Tim__5
+|    | X\XX|    |	1_John_6
+|X  X|  X\ |    |	1_Ben_12
+|    | XX \|    |	1_Arnie_13
++---------------+
+|XX  |X    |\   |	2_Boyd_4
+| XX |     | \X |	2_Jay__8
+| XX |     | X\ |	2_Sandy_9
+|XX X|     |   \|	2_Darrin_11
++---------------+
+Ideal blockmodel:
++---------------+
+|\111|00000|1000|	0_Ron__1
+|1\11|00000|0001|	0_Tom__2
+|11\1|00000|0100|	0_Jeff_7
+|111\|00000|0000|	0_Jerry_10
++---------------+
+|1000|\0000|1001|	1_Frank_3
+|0000|1\000|1000|	1_Tim__5
+|0000|01\11|0000|	1_John_6
+|0001|001\0|0000|	1_Ben_12
+|0000|0100\|0000|	1_Arnie_13
++---------------+
+|1100|10000|\000|	2_Boyd_4
+|0110|00000|0\10|	2_Jay__8
+|0110|00000|01\0|	2_Sandy_9
+|1101|00000|000\|	2_Darrin_11
++---------------+
+Blockimage:
+	P0	P1	P2
+P0	com	nul	rfn
+P1	cfn	reg	den(0.3)
+P2	denmin(0.4)	rre	cre
+Goodness-of-fit: 61 (hamming)
+> bm4 = bmtest(llti, bi3s, part1, nordlund)
+Stored structure 'bm4' (BlockModel)
+> bmview(bm4, ideal = y)
+Blockmodel:
++---------------+
+|\   |XX   |X   |	0_Ron__1
+|X\  |X    |   X|	0_Tom__2
+| X\ |     | XX |	0_Jeff_7
+|X  \|  X  |    |	0_Jerry_10
++---------------+
+|X   |\    |X  X|	1_Frank_3
+|X   |X\   |X   |	1_Tim__5
+|    | X\XX|    |	1_John_6
+|X  X|  X\ |    |	1_Ben_12
+|    | XX \|    |	1_Arnie_13
++---------------+
+|XX  |X    |\   |	2_Boyd_4
+| XX |     | \X |	2_Jay__8
+| XX |     | X\ |	2_Sandy_9
+|XX X|     |   \|	2_Darrin_11
++---------------+
+Ideal blockmodel:
++---------------+
+|\111|00000|1000|	0_Ron__1
+|1\11|00000|0001|	0_Tom__2
+|11\1|00000|0100|	0_Jeff_7
+|111\|00000|0000|	0_Jerry_10
++---------------+
+|1000|\1000|1111|	1_Frank_3
+|0000|1\000|1000|	1_Tim__5
+|0000|01\11|0000|	1_John_6
+|0001|001\0|0000|	1_Ben_12
+|0000|0100\|0010|	1_Arnie_13
++---------------+
+|1100|10000|\001|	2_Boyd_4
+|0110|10000|1\10|	2_Jay__8
+|0110|10000|01\0|	2_Sandy_9
+|1101|10000|000\|	2_Darrin_11
++---------------+
+Blockimage:
+	P0	P1	P2
+P0	com	nul	rfn
+P1	cfn	reg	den(0.3)
+P2	denmin(0.4)	rre	cre
+Goodness-of-fit: 0.3821 (nordlund)
+> bi3n = blockimage(size = 3, content = pco(0.6)|cpdd|pcdd|denuci(0.3)|dnc|nul|com|den(0.4)|denmin(0.2))
+Stored structure 'bi3n' (BlockImage)
+> bm5 = bmtest(llti, bi3n, part1, nordlund)
+Stored structure 'bm5' (BlockModel)
+> bmview(bm5, ideal = y)
+Blockmodel:
++---------------+
+|\   |XX   |X   |	0_Ron__1
+|X\  |X    |   X|	0_Tom__2
+| X\ |     | XX |	0_Jeff_7
+|X  \|  X  |    |	0_Jerry_10
++---------------+
+|X   |\    |X  X|	1_Frank_3
+|X   |X\   |X   |	1_Tim__5
+|    | X\XX|    |	1_John_6
+|X  X|  X\ |    |	1_Ben_12
+|    | XX \|    |	1_Arnie_13
++---------------+
+|XX  |X    |\   |	2_Boyd_4
+| XX |     | \X |	2_Jay__8
+| XX |     | X\ |	2_Sandy_9
+|XX X|     |   \|	2_Darrin_11
++---------------+
+Ideal blockmodel:
++---------------+
+|\111|11000|1000|	0_Ron__1
+|1\11|10000|0001|	0_Tom__2
+|11\0|10000|0110|	0_Jeff_7
+|110\|00100|0000|	0_Jerry_10
++---------------+
+|0000|\....|0000|	1_Frank_3
+|0000|.\...|0000|	1_Tim__5
+|0000|..\..|0000|	1_John_6
+|0000|...\.|0000|	1_Ben_12
+|0000|....\|0000|	1_Arnie_13
++---------------+
+|1111|11111|\100|	2_Boyd_4
+|1111|11000|0\10|	2_Jay__8
+|1111|00000|01\0|	2_Sandy_9
+|1111|00010|000\|	2_Darrin_11
++---------------+
+Blockimage:
+	P0	P1	P2
+P0	pco(0.6)	cpdd	pcdd
+P1	denuci(0.3)	dnc	nul
+P2	com	den(0.4)	denmin(0.2)
+Goodness-of-fit: 0.4759 (nordlund)
+> bm6 = bmtest(llti, bi3, part1, nordlund)
+!Error: Can't do 'bmtest()' with method 'nordlund' and multiblocked 'blockimage'
+!Error: Function 'bmtest' returns null, can't be assigned
+> bmview(bm6, ideal = y)
+!Error: Blockmodel 'bm6' not found (parameter: blockmodel)
+> densities(llti, part1)
+Stored structure 'llti_densities_actorset' (Actorset)
+Stored structure 'llti_densities' (Matrix)
+> llti_densities
+Name:llti_densities	Datatype:Matrix	Size:3;3
+Actorset:llti_densities_actorset
+	P0	P1	P2
+P0	0.25	0.2	0.25
+P1	0.2	0.35	0.15
+P2	0.5625	0.05	0.1667
+> dichotomize(name = baker_original, condition = gt, threshold = 5)
+Name:dich_gt5_baker_original	Datatype:Matrix	Size:20;20
+Actorset:baker_original_actors
+	AMH	ASW	BJSW	CAN	CCQ	CW	CYSR	CSWJ	FR	IJSW	JGSW	JSP	JSWE	PW	SCW	SSR	SW	SWG	SWHC	SWRA
+AMH	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+ASW	0	0	0	0	0	0	0	0	0	0	0	0	1	1	0	1	1	0	0	1
+BJSW	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	1	0	0	0
+CAN	0	0	0	0	0	1	0	0	0	0	0	0	0	0	1	0	1	0	0	0
+CCQ	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+CW	0	0	0	1	0	0	1	0	0	0	0	0	1	1	1	1	1	0	0	0
+CYSR	0	0	0	1	0	1	0	0	0	0	0	0	0	1	1	1	1	0	0	0
+CSWJ	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	1	1	0	0	0
+FR	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0
+IJSW	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+JGSW	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0
+JSP	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0
+JSWE	0	1	0	0	0	0	0	0	0	0	0	0	0	0	1	1	1	0	1	1
+PW	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+SCW	0	1	0	1	0	1	0	1	1	0	1	0	1	0	0	1	1	1	1	1
+SSR	0	1	0	0	0	1	0	0	0	0	0	0	1	0	1	0	1	0	0	1
+SW	0	1	0	0	0	1	0	0	1	0	0	0	1	1	1	1	0	1	1	1
+SWG	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	1	1	0	1	0
+SWHC	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0
+SWRA	0	0	0	0	0	1	0	0	0	0	0	0	1	0	1	1	1	0	0	0
+> bb = dichotomize(name = baker_original, condition = ge, threshold = 10, truevalue = keep, falsevalue = 0)
+Stored structure 'bb' (Matrix)
+> bb
+Name:bb	Datatype:Matrix	Size:20;20
+Actorset:baker_original_actors
+	AMH	ASW	BJSW	CAN	CCQ	CW	CYSR	CSWJ	FR	IJSW	JGSW	JSP	JSWE	PW	SCW	SSR	SW	SWG	SWHC	SWRA
+AMH	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+ASW	0	0	0	0	0	0	0	0	0	0	0	0	18	13	0	21	73	0	0	0
+BJSW	0	0	0	0	0	0	0	0	0	0	0	0	13	0	0	0	19	0	0	0
+CAN	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+CCQ	0	0	0	0	0	12	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+CW	0	0	0	0	0	0	0	0	0	0	0	0	11	0	32	10	58	0	0	0
+CYSR	0	0	0	12	0	70	0	0	0	0	0	0	0	0	0	14	28	0	0	0
+CSWJ	0	0	0	0	0	0	0	0	0	0	0	0	0	0	47	20	45	0	0	0
+FR	0	0	0	0	0	0	0	0	0	0	0	0	0	0	18	0	0	0	0	0
+IJSW	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+JGSW	0	0	0	0	0	0	0	0	0	0	0	0	0	0	16	0	18	0	0	0
+JSP	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+JSWE	0	0	0	0	0	0	0	0	0	0	0	0	0	0	18	16	58	0	0	16
+PW	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+SCW	0	0	0	0	0	17	0	0	0	0	0	0	21	0	0	36	124	0	0	18
+SSR	0	0	0	0	0	17	0	0	0	0	0	0	0	0	30	0	106	0	0	25
+SW	0	15	0	0	0	52	0	0	0	0	0	0	33	19	58	53	0	15	43	0
+SWG	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	40	0	0	0
+SWHC	0	0	0	0	0	0	0	0	0	0	0	0	0	0	20	0	26	0	0	0
+SWRA	0	0	0	0	0	0	0	0	0	0	0	0	24	0	0	39	44	0	0	0
+> sy = symmetrize(llti, max)
+Stored structure 'sy' (Matrix)
+> sy
+Name:sy	Datatype:Matrix	Size:13;13
+Actorset:llti_actors
+	Ron__1	Tom__2	Frank_3	Boyd_4	Tim__5	John_6	Jeff_7	Jay__8	Sandy_9	Jerry_10	Darrin_11	Ben_12	Arnie_13
+Ron__1	0	1	1	1	1	0	0	0	0	1	1	1	0
+Tom__2	1	0	1	1	0	0	1	1	1	0	1	0	0
+Frank_3	1	1	0	1	1	0	0	0	0	0	1	0	0
+Boyd_4	1	1	1	0	1	0	0	0	0	0	0	0	0
+Tim__5	1	0	1	1	0	1	0	0	0	0	0	0	1
+John_6	0	0	0	0	1	0	0	0	0	1	0	1	1
+Jeff_7	0	1	0	0	0	0	0	1	1	0	0	0	0
+Jay__8	0	1	0	0	0	0	1	0	1	0	0	0	0
+Sandy_9	0	1	0	0	0	0	1	1	0	0	0	0	0
+Jerry_10	1	0	0	0	0	1	0	0	0	0	1	1	0
+Darrin_11	1	1	1	0	0	0	0	0	0	1	0	0	0
+Ben_12	1	0	0	0	0	1	0	0	0	1	0	0	0
+Arnie_13	0	0	0	0	1	1	0	0	0	0	0	0	0
+> sy2 = symmetrize(baker_original, average)
+Stored structure 'sy2' (Matrix)
+> sy2
+Name:sy2	Datatype:Matrix	Size:20;20
+Actorset:baker_original_actors
+	AMH	ASW	BJSW	CAN	CCQ	CW	CYSR	CSWJ	FR	IJSW	JGSW	JSP	JSWE	PW	SCW	SSR	SW	SWG	SWHC	SWRA
+AMH	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1.5	0	0	0
+ASW	0	0	0	0	0	0	0	0	0	0	0	0	13.5	6.5	4	14	44	0	0	3.5
+BJSW	0	0	0	0	0	0	0	0	0	0	0	0	6.5	0	0	0	9.5	1	0	0
+CAN	0	0	0	0	0	8	6	0	0	0	0	0	0	3.5	6	0	4	0	0	0
+CCQ	0	0	0	0	0	6	2.5	0	0	0	0	0	0	0	1.5	0	0	0	0	0
+CW	0	0	0	8	6	0	38	0	0	0	0	0	5.5	5.5	24.5	13.5	55	0	0	4
+CYSR	0	0	0	6	2.5	38	0	0	2	0	0	0	0	3	4	7	14	0	0	2.5
+CSWJ	0	0	0	0	0	0	0	0	0	0	0	0	0	0	27.5	10	22.5	0	0	0
+FR	0	0	0	0	0	0	2	0	0	0	0	0	0	0	12	0	9	0	0	0
+IJSW	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1.5	0	0	0
+JGSW	0	0	0	0	0	0	0	0	0	0	0	0	0	0	11	0	9	0	0	0
+JSP	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	3.5	0	0	0	0
+JSWE	0	13.5	6.5	0	0	5.5	0	0	0	0	0	0	0	0	19.5	12.5	45.5	4.5	3.5	20
+PW	0	6.5	0	3.5	0	5.5	3	0	0	0	0	0	0	0	0	0	9.5	0	0	0
+SCW	0	4	0	6	1.5	24.5	4	27.5	12	0	11	0	19.5	0	0	33	91	8.5	13	13
+SSR	0	14	0	0	0	13.5	7	10	0	0	0	3.5	12.5	0	33	0	79.5	3.5	0	32
+SW	1.5	44	9.5	4	0	55	14	22.5	9	1.5	9	0	45.5	9.5	91	79.5	0	27.5	34.5	26
+SWG	0	0	1	0	0	0	0	0	0	0	0	0	4.5	0	8.5	3.5	27.5	0	4.5	0
+SWHC	0	0	0	0	0	0	0	0	0	0	0	0	3.5	0	13	0	34.5	4.5	0	0
+SWRA	0	3.5	0	0	0	4	2.5	0	0	0	0	0	20	0	13	32	26	0	0	0
+> rs = rescale(baker_original, min=0, max=1)
+Min value: 0, max:1
+Stored structure 'rs' (Matrix)
+> rs
+Name:rs	Datatype:Matrix	Size:20;20
+Actorset:baker_original_actors
+	AMH	ASW	BJSW	CAN	CCQ	CW	CYSR	CSWJ	FR	IJSW	JGSW	JSP	JSWE	PW	SCW	SSR	SW	SWG	SWHC	SWRA
+AMH	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.024193548387096774	0	0	0
+ASW	0	0	0	0	0	0	0	0	0	0	0	0	0.14516129032258066	0.10483870967741936	0	0.1693548387096774	0.5887096774193549	0	0	0.056451612903225805
+BJSW	0	0	0	0	0	0	0	0	0	0	0	0	0.10483870967741936	0	0	0	0.1532258064516129	0	0	0
+CAN	0	0	0	0	0	0.07258064516129033	0	0	0	0	0	0	0	0	0.04838709677419355	0	0.06451612903225806	0	0	0
+CCQ	0	0	0	0	0	0.0967741935483871	0	0	0	0	0	0	0	0	0.024193548387096774	0	0	0	0	0
+CW	0	0	0	0.056451612903225805	0	0	0.04838709677419355	0	0	0	0	0	0.08870967741935484	0.056451612903225805	0.25806451612903225	0.08064516129032258	0.46774193548387094	0	0	0
+CYSR	0	0	0	0.0967741935483871	0.04032258064516129	0.5645161290322581	0	0	0.03225806451612903	0	0	0	0	0.04838709677419355	0.06451612903225806	0.11290322580645161	0.22580645161290322	0	0	0.04032258064516129
+CSWJ	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.3790322580645161	0.16129032258064516	0.3629032258064516	0	0	0
+FR	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.14516129032258066	0	0.07258064516129033	0	0	0
+IJSW	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.024193548387096774	0	0	0
+JGSW	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.12903225806451613	0	0.14516129032258066	0	0	0
+JSP	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.056451612903225805	0	0	0	0
+JSWE	0	0.07258064516129033	0	0	0	0	0	0	0	0	0	0	0	0	0.14516129032258066	0.12903225806451613	0.46774193548387094	0	0.056451612903225805	0.12903225806451613
+PW	0	0	0	0.056451612903225805	0	0.03225806451612903	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+SCW	0	0.06451612903225806	0	0.04838709677419355	0	0.13709677419354838	0	0.06451612903225806	0.04838709677419355	0	0.04838709677419355	0	0.1693548387096774	0	0	0.2903225806451613	1	0.06451612903225806	0.04838709677419355	0.14516129032258066
+SSR	0	0.056451612903225805	0	0	0	0.13709677419354838	0	0	0	0	0	0	0.07258064516129033	0	0.24193548387096775	0	0.8548387096774194	0	0	0.20161290322580644
+SW	0	0.12096774193548387	0	0	0	0.41935483870967744	0	0	0.07258064516129033	0	0	0	0.2661290322580645	0.1532258064516129	0.46774193548387094	0.4274193548387097	0	0.12096774193548387	0.3467741935483871	0.06451612903225806
+SWG	0	0	0.016129032258064516	0	0	0	0	0	0	0	0	0	0.07258064516129033	0	0.07258064516129033	0.056451612903225805	0.3225806451612903	0	0.07258064516129033	0
+SWHC	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.16129032258064516	0	0.20967741935483872	0	0	0
+SWRA	0	0	0	0	0	0.06451612903225806	0	0	0	0	0	0	0.1935483870967742	0	0.06451612903225806	0.31451612903225806	0.3548387096774194	0	0	0
+> rs2 = rescale(baker_original)
+Min value: NaN, max:NaN
+Stored structure 'rs2' (Matrix)
+> partb = partition(actorset = baker_original_actors, nbrclusters = 2, partarray = 0;0;0;0;0;0;1;1;1;1;1;1;1;1;1;1;1;1;1;1)
+Stored structure 'partb' (Partition)
+> bic = blockimage(size = 2, content = pco(0.75)|cfn|rfn|nul)
+Stored structure 'bic' (BlockImage)
+> bm7 = bmtest(rs, bic, partb, nordlund)
+Stored structure 'bm7' (BlockModel)
+> bmview(bm7, ideal = y)
+Blockmodel:
++---------------------+
+|\     |              |	0_AMH
+| \    |          X   |	0_ASW
+|  \   |              |	0_BJSW
+|   \  |              |	0_CAN
+|    \ |              |	0_CCQ
+|     \|              |	0_CW
++---------------------+
+|     X|\             |	1_CYSR
+|      | \            |	1_CSWJ
+|      |  \           |	1_FR
+|      |   \          |	1_IJSW
+|      |    \         |	1_JGSW
+|      |     \        |	1_JSP
+|      |      \       |	1_JSWE
+|      |       \      |	1_PW
+|      |        \ X   |	1_SCW
+|      |         \X   |	1_SSR
+|      |          \   |	1_SW
+|      |           \  |	1_SWG
+|      |            \ |	1_SWHC
+|      |             \|	1_SWRA
++---------------------+
+Ideal blockmodel:
++---------------------+
+|\11111|00000000000000|	0_AMH
+|1\1111|00000011011001|	0_ASW
+|11\110|00000000000000|	0_BJSW
+|111\11|00000000000000|	0_CAN
+|1110\1|00000000000000|	0_CCQ
+|11110\|10000000100000|	0_CW
++---------------------+
+|000001|\0000000000000|	1_CYSR
+|000000|0\000000000000|	1_CSWJ
+|000000|00\00000000000|	1_FR
+|000000|000\0000000000|	1_IJSW
+|000000|0000\000000000|	1_JGSW
+|000000|00000\00000000|	1_JSP
+|010000|000000\0000000|	1_JSWE
+|000100|0000000\000000|	1_PW
+|000001|00000000\00000|	1_SCW
+|000001|000000000\0000|	1_SSR
+|000001|0000000000\000|	1_SW
+|001000|00000000000\00|	1_SWG
+|000000|000000000000\0|	1_SWHC
+|000001|0000000000000\|	1_SWRA
++---------------------+
+Blockimage:
+	P0	P1
+P0	pco(0.75)	cfn
+P1	rfn	nul
+Goodness-of-fit: -0.0746 (nordlund)
+> bm8 = bmtest(baker_original, bic, partb, nordlund)
+Stored structure 'bm8' (BlockModel)
+> bmview(bm8, ideal = y)
+Blockmodel:
++---------------------+
+|\     |          X   |	0_AMH
+| \    |      XX XX  X|	0_ASW
+|  \   |      X   X   |	0_BJSW
+|   \ X|        X X   |	0_CAN
+|    \X|        X     |	0_CCQ
+|   X \|X     XXXXX   |	0_CW
++---------------------+
+|   XXX|\ X    XXXX  X|	1_CYSR
+|      | \      XXX   |	1_CSWJ
+|      |  \     X X   |	1_FR
+|      |   \      X   |	1_IJSW
+|      |    \   X X   |	1_JGSW
+|      |     \   X    |	1_JSP
+| X    |      \ XXX XX|	1_JSWE
+|   X X|       \      |	1_PW
+| X X X| XX X X \XXXXX|	1_SCW
+| X   X|      X X\X  X|	1_SSR
+| X   X|  X   XXXX\XXX|	1_SW
+|  X   |      X XXX\X |	1_SWG
+|      |        X X \ |	1_SWHC
+|     X|      X XXX  \|	1_SWRA
++---------------------+
+Ideal blockmodel:
++---------------------+
+|\11111|00000000000000|	0_AMH
+|1\1111|00000011011001|	0_ASW
+|11\110|00000000000000|	0_BJSW
+|111\11|00000000000000|	0_CAN
+|1110\1|00000000000000|	0_CCQ
+|11110\|10000000100000|	0_CW
++---------------------+
+|000001|\0000000000000|	1_CYSR
+|000000|0\000000000000|	1_CSWJ
+|000000|00\00000000000|	1_FR
+|000000|000\0000000000|	1_IJSW
+|000000|0000\000000000|	1_JGSW
+|000000|00000\00000000|	1_JSP
+|010000|000000\0000000|	1_JSWE
+|000100|0000000\000000|	1_PW
+|000001|00000000\00000|	1_SCW
+|000001|000000000\0000|	1_SSR
+|000001|0000000000\000|	1_SW
+|001000|00000000000\00|	1_SWG
+|000000|000000000000\0|	1_SWHC
+|000001|0000000000000\|	1_SWRA
++---------------------+
+Blockimage:
+	P0	P1
+P0	pco(0.75)	cfn
+P1	rfn	nul
+Goodness-of-fit: -0.0746 (nordlund)
+> bi4re = biextend(blockimage = bi3, pattern = nul;reg)
+Updated structure 'bi4re' (BlockImage)
+> bi4re
+Name:bi4re	Datatype:BlockImage	Size:4x4
+	P0	P1	P2	P3
+P0	[nul;reg]	[nul;reg]	[nul;reg]	[nul;reg]
+P1	[nul;reg]	[nul;reg]	[nul;reg]	[nul;reg]
+P2	[nul;reg]	[nul;reg]	[nul;reg]	[nul;reg]
+P3	[nul;reg]	[nul;reg]	[nul;reg]	[nul;reg]
+Multiblocked: True
+> rename(bi4re, bi4new)
+Renamed structure 'bi4re' (BlockImage) to 'bi4new'
+> delete(llti_actors)
+!Error: Can't delete actorset 'llti_actors', used by other data structures
+> delete(bm1)
+Deleted structure 'bm1' (BlockModel)
+> bmview
+!Error: Found several BlockModel objects - specify which with 'blockmodel' parameter
+> structures
+Name	Type	Size
+========	====	====
+llti_actors	Actorset	13
+llti	Matrix	13;13
+hlebec_actors	Actorset	13
+hlebec	Matrix	13;13
+baker_original_actors	Actorset	20
+baker_original	Matrix	20;20
+myactors	Actorset	4
+mymatrix	Matrix	4;4
+bi	BlockImage	2x2
+cpx	BlockImage	2x2
+bi4new	BlockImage	4x4
+p	Partition	2 clusters;4 actors
+part1	Partition	3 clusters;13 actors
+bi3	BlockImage	3x3
+bm_llti_bi3_part1_actors	Actorset	13
+bm_llti_bi3_part1_matrix	Matrix	13;13
+bm_llti_bi3_part1_idealmatrix	Matrix	13;13
+bi3se	BlockImage	3x3
+bm2	BlockModel	[Blockmodel size]
+bi3s	BlockImage	3x3
+bm3	BlockModel	[Blockmodel size]
+bm4	BlockModel	[Blockmodel size]
+bi3n	BlockImage	3x3
+bm5	BlockModel	[Blockmodel size]
+llti_densities_actorset	Actorset	3
+llti_densities	Matrix	3;3
+bb	Matrix	20;20
+sy	Matrix	13;13
+sy2	Matrix	20;20
+rs	Matrix	20;20
+rs2	Matrix	20;20
+partb	Partition	2 clusters;20 actors
+bic	BlockImage	2x2
+bm7	BlockModel	[Blockmodel size]
+bm8	BlockModel	[Blockmodel size]
+> save(name = llti, file = golden_llti.txt)
+Matrix 'llti' saved: golden_llti.txt
+> save(name = part1, file = golden_part1.txt)
+Partition 'part1' saved: golden_part1.txt
+> save(name = bi3s, file = golden_bi3s.txt)
+Blockimage 'bi3s' saved: golden_bi3s.txt
+> save(name = myactors, file = golden_myactors.txt)
+Actorset 'myactors' saved: golden_myactors.txt
+> loadpartition(file = golden_part1.txt, name = part1b)
+Stored structure 'part1b' (Partition)
+Loading data structure: OK
+> part1b
+Name:part1b	Datatype:Partition	Size:3 clusters;13 actors
+Actorset:llti_actors
+Cluster 0: P0
+Ron__1	(0)
+Tom__2	(1)
+Jeff_7	(6)
+Jerry_10	(9)
+Cluster 1: P1
+Frank_3	(2)
+Tim__5	(4)
+John_6	(5)
+Ben_12	(11)
+Arnie_13	(12)
+Cluster 2: P2
+Boyd_4	(3)
+Jay__8	(7)
+Sandy_9	(8)
+Darrin_11	(10)
+> loadblockimage(file = golden_bi3s.txt, name = bi3sb)
+Stored structure 'bi3sb' (BlockImage)
+Loading data structure: OK
+> bi3sb
+Name:bi3sb	Datatype:BlockImage	Size:3x3
+	P0	P1	P2
+P0	[com]	[nul]	[rfn]
+P1	[cfn]	[reg]	[den(0.3)]
+P2	[denmin(0.4)]	[rre]	[cre]
+Multiblocked: False
+> loadactorset(file = golden_myactors.txt, name = myactors2)
+Stored structure 'myactors2' (Actorset)
+Loading data structure: OK
+> myactors2
+Name:myactors2	Datatype:Actorset	Size:4
+index	label
+0	Ronny
+1	Tom_2
+2	Frank_3
+3	Boyd_4
+> load(file = golden_llti.txt, type = table, name = lltitable)
+Stored structure 'lltitable' (Table)
+Loading data structure: OK
+> lltitable
+Name:lltitable	Datatype:Table	Size:13;13
+Actorsets: Rows:llti_actors Cols:llti_actors
+_	Ron__1	Tom__2	Frank_3	Boyd_4	Tim__5	John_6	Jeff_7	Jay__8	Sandy_9	Jerry_10	Darrin_11	Ben_12	Arnie_13
+Ron__1	0	0	1	1	1	0	0	0	0	0	0	0	0
+Tom__2	1	0	1	0	0	0	0	0	0	0	1	0	0
+Frank_3	1	0	0	1	0	0	0	0	0	0	1	0	0
+Boyd_4	1	1	1	0	0	0	0	0	0	0	0	0	0
+Tim__5	1	0	1	1	0	0	0	0	0	0	0	0	0
+John_6	0	0	0	0	1	0	0	0	0	0	0	1	1
+Jeff_7	0	1	0	0	0	0	0	1	1	0	0	0	0
+Jay__8	0	1	0	0	0	0	1	0	1	0	0	0	0
+Sandy_9	0	1	0	0	0	0	1	1	0	0	0	0	0
+Jerry_10	1	0	0	0	0	1	0	0	0	0	0	0	0
+Darrin_11	1	1	0	0	0	0	0	0	0	1	0	0	0
+Ben_12	1	0	0	0	0	1	0	0	0	1	0	0	0
+Arnie_13	0	0	0	0	1	1	0	0	0	0	0	0	0
+> nonexisting
+!Error: 'nonexisting' neither function nor structure
+> blockimage(size = 1)
+!Error: Blockimage size must be at least 2
+> bminit(llti, nothing, exhaustive, hamming)
+!Error: Blockimage not found (parameter: blockimage)
+> bminit(llti, bi3n, exhaustive, hamming)
+!Error - Block 'pco' can't be used in method 'hamming' criteria function
+> bmtest(llti, bi, part1, nordlund)
+!Error: Can't do 'bmtest()' with method 'nordlund' and multiblocked 'blockimage'
+> x = help
+HELP SECTION
+============
+Version 1.4 (October 2025)
+See website for documentation:
+https://socnet.se
+ 
+The socnet client is used to do blockmodeling analyses, with some extra functionality for data management.
+You type in commands on the prompt to do various things with data: load, save, transform,  analyze etc.
+Check www.socnet.se for command references, how-to, and quick-start tutorial!
+!Error: Function 'help' returns null, can't be assigned
+> x = llti
+!Error: Use 'rename()' function to rename
+> foo(1,2)
+!Error - Argument index out of range
+> set(name = llti, row = nobody, col = Ron__1, value = 1)
+!Error: Actor(s) not found in actorset 'llti_actors'
+> loadmatrix(file = doesnotexist.txt)
+!Error: File 'doesnotexist.txt' not found
+> deleteall()
+Deleted all structures
+> structures
+Name	Type	Size
+========	====	====
+> Exiting...
