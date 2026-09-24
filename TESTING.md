@@ -1,20 +1,5 @@
 # Socnet.se: Testing
 
-## Automated tests
-The solution contains a test project, `Socnet.Tests`, which is run from the root folder of the repository with:
-```bash
-dotnet test
-```
-The automated tests include:
-- **Equivalence with Socnet.se 1.4**: the ideal block code of version 1.4 is kept unchanged in `Socnet.Tests/Legacy`
-  and used as a reference. For thousands of random networks, partitions and blockimages, the goodness-of-fit values
-  and ideal matrices of all ideal blocks (for both 'hamming' and 'nordlund') must be identical to those of version 1.4.
-- **Incremental evaluation**: the fast incremental evaluation used in searches must always agree with a full evaluation.
-- **Searches**: the exhaustive search must find the true optimum (compared with brute force), the local searches must find
-  the known optima of the test scripts below, and results must be reproducible for a given random seed.
-- **Console compatibility**: `Socnet.Tests/Golden/deterministic_script.txt` runs all non-search commands, and the console
-  output must be identical to the output of version 1.4 (`deterministic_script.v14.out`), apart from a few documented fixes.
-
 ## Test scripts
 The repository also contains 3 Socnet-scripts to test core analytical features in Socnet.se.
 Note that these scripts are Socnet.se scripts, meaning that they are text files containing
