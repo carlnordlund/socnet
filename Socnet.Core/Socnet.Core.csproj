@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- Library Metadata -->
+    <Version>2.0.0</Version>
+    <AssemblyName>Socnet.Core</AssemblyName>
+    <Product>Socnet.se Core Library</Product>
+    <Description>Core library for Socnet.se: data structures, ideal blocks and direct blockmodeling search</Description>
+    <Authors>Carl Nordlund</Authors>
+
+    <!-- Build configuration -->
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Socnet.Tests" />
+  </ItemGroup>
+</Project>

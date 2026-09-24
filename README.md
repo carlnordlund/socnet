@@ -8,13 +8,26 @@ Socnet.se is an open-source, CLI-based client for direct blockmodeling, a set of
 
 Socnet.se is developed in C#/.NET and can be compiled for multiple operating systems and architectures. See [INSTALL.md](INSTALL.md) for information on how to compile Socnet.se from source.
 
+### Version 2.0
+Version 2.0 is a complete rewrite of the Socnet.se client, with the same commands, syntax and output as earlier versions,
+but with a much faster and more memory-efficient blockmodeling engine:
+- Moving an actor between clusters updates the fit incrementally: only the blocks affected by the move are re-evaluated,
+  and most ideal blocks are evaluated in constant time from aggregated block statistics.
+- Searches run in parallel on all processor cores, with reproducible results for a given random seed.
+- The exhaustive search only evaluates each partition once when the blockimage is symmetric.
+- The local searches ('localopt' and 'ljubljana') explore plateaus of equally good partitions in a bounded way,
+  fixing the memory explosion (and crashes) of version 1.4 when many partitions have the same fit.
+
+The code is organized in three projects: `Socnet.Core` (data structures, ideal blocks, searches), `Socnet.CLIconsole`
+(the console application) and `Socnet.Tests` (tests). See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add new ideal blocks.
+
 Precompiled binaries and installation files for Windows, Linux, and MacOS are available on the project website:
 [https://www.socnet.se](https://www.socnet.se)
 
 Please check the `/example_data/` folder for example networks. This folder also contains the script `cli_script.txt` exemplifying how to conduct various kinds of direct blockmodeling analyses.
 
 ### Testing
-The repository provides scripts to test the core functionality of Socnet. Please see [TESTING.md](TESTING.md) for information on how to do these tests.
+The repository provides automated tests (`dotnet test`) and scripts to test the core functionality of Socnet. Please see [TESTING.md](TESTING.md) for information on how to do these tests.
 
 ### Authors and Funding
 Socnet.se is developed and maintained by Carl Nordlund at the Institute for Analytical Sociology, Linköping University, Sweden, with contributions from José Luis Estévez, Kristian Gade Kjelmann,

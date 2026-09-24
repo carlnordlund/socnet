@@ -1,0 +1,103 @@
+# Deterministic commands (no searches): output must be identical to Socnet.se 1.4
+help
+citeinfo()
+loadmatrix(file = little_league_ti.txt, name = llti)
+llti
+view(llti_actors)
+structures
+structures(type = matrix)
+loadmatrix(hlebec.txt)
+loadmatrix(baker_original.txt)
+baker_original
+myactors = actorset(size=4, labelarray=Ron_1;Tom_2;Frank_3;Boyd_4)
+myactors
+actorset(size=3)
+mymatrix = matrix(myactors,data=0;0;1;1;1;0;1;0;1;0;0;1;1;1;1;0)
+mymatrix
+set(name = mymatrix, row = Ron_1, col = Tom_2, value = 0.5)
+mymatrix
+set(name = myactors, row = Ron_1, value = Ronny)
+myactors
+bi = blockimage(size = 2, pattern = com;nul;reg)
+bi
+cpx = blockimage(size = 2, content = reg;pco(0.5)|cre|rre|nul)
+cpx
+bi4re = blockimage(size = 4, type = regular)
+bi4re
+set(name = bi4re, row = P0, col = P1, value = den(0.25);denmin(0.3))
+bi4re
+p = partition(actorset = myactors, nbrclusters = 2, partarray = 0;1;1;0)
+p
+set(name = p, row = Tom_2, value = 0)
+p
+part1 = partition(actorset = llti_actors, nbrclusters = 3, partarray = 0;0;1;2;1;1;0;2;2;0;2;1;1)
+bi3 = blockimage(size = 3, type = regular)
+bm1 = bmtest(network = llti, blockimage = bi3, partition = part1, method = hamming)
+bm1
+bmview(blockmodel = bm1, ideal = yes)
+bmextract(blockmodel = bm1, type = gof)
+bmextract(blockmodel = bm1, type = matrix)
+bm1_actors
+bmextract(blockmodel = bm1, type = partition)
+bi3se = blockimage(size = 3, type = structural)
+bm2 = bmtest(llti, bi3se, part1, hamming)
+bmview(bm2, ideal = y)
+bi3s = blockimage(size = 3, content = com|nul|rfn|cfn|reg|den(0.3)|denmin(0.4)|rre|cre)
+bm3 = bmtest(llti, bi3s, part1, hamming)
+bmview(bm3, ideal = y)
+bm4 = bmtest(llti, bi3s, part1, nordlund)
+bmview(bm4, ideal = y)
+bi3n = blockimage(size = 3, content = pco(0.6)|cpdd|pcdd|denuci(0.3)|dnc|nul|com|den(0.4)|denmin(0.2))
+bm5 = bmtest(llti, bi3n, part1, nordlund)
+bmview(bm5, ideal = y)
+bm6 = bmtest(llti, bi3, part1, nordlund)
+bmview(bm6, ideal = y)
+densities(llti, part1)
+llti_densities
+dichotomize(name = baker_original, condition = gt, threshold = 5)
+bb = dichotomize(name = baker_original, condition = ge, threshold = 10, truevalue = keep, falsevalue = 0)
+bb
+sy = symmetrize(llti, max)
+sy
+sy2 = symmetrize(baker_original, average)
+sy2
+rs = rescale(baker_original, min=0, max=1)
+rs
+rs2 = rescale(baker_original)
+partb = partition(actorset = baker_original_actors, nbrclusters = 2, partarray = 0;0;0;0;0;0;1;1;1;1;1;1;1;1;1;1;1;1;1;1)
+bic = blockimage(size = 2, content = pco(0.75)|cfn|rfn|nul)
+bm7 = bmtest(rs, bic, partb, nordlund)
+bmview(bm7, ideal = y)
+bm8 = bmtest(baker_original, bic, partb, nordlund)
+bmview(bm8, ideal = y)
+bi4re = biextend(blockimage = bi3, pattern = nul;reg)
+bi4re
+rename(bi4re, bi4new)
+delete(llti_actors)
+delete(bm1)
+bmview
+structures
+save(name = llti, file = golden_llti.txt)
+save(name = part1, file = golden_part1.txt)
+save(name = bi3s, file = golden_bi3s.txt)
+save(name = myactors, file = golden_myactors.txt)
+loadpartition(file = golden_part1.txt, name = part1b)
+part1b
+loadblockimage(file = golden_bi3s.txt, name = bi3sb)
+bi3sb
+loadactorset(file = golden_myactors.txt, name = myactors2)
+myactors2
+load(file = golden_llti.txt, type = table, name = lltitable)
+lltitable
+nonexisting
+blockimage(size = 1)
+bminit(llti, nothing, exhaustive, hamming)
+bminit(llti, bi3n, exhaustive, hamming)
+bmtest(llti, bi, part1, nordlund)
+x = help
+x = llti
+foo(1,2)
+set(name = llti, row = nobody, col = Ron__1, value = 1)
+loadmatrix(file = doesnotexist.txt)
+deleteall()
+structures
