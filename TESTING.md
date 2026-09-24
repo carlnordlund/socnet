@@ -133,7 +133,7 @@ All tests should pass. The automated tests cover:
   evaluation of the blockmodel.
 - **Searches**:
   - the exhaustive search must find the true optimum, compared with brute force;
-  - the `localopt` and `ljubljana` searches must find the known optima of the test scripts below;
+  - the `localopt` and `ljubljana` searches must find the known optima of the test scripts above;
   - results must be reproducible for a given random seed, regardless of the number of threads used;
   - blockimage varieties must be non-isomorphic;
   - timeouts must be reported.
