@@ -116,7 +116,7 @@ namespace Socnet.Tests
             SearchResult result = BlockmodelSearch.Run(settings, varieties);
             BlockModel bm = Assert.Single(BlockmodelSearch.CreateBlockModels(settings, result));
             Assert.Equal(0.8813, bm.Gof);
-            Assert.Equal("bm_hlebec_bi3re_19_0", bm.Name);
+            Assert.Equal(CanonicalBlocks(HlebecOptimum()), CanonicalBlocks(bm.BlockImage));
         }
 
         [Fact]
@@ -135,25 +135,34 @@ namespace Socnet.Tests
         }
 
         [Fact]
-        public void Varieties_AreNumberedAsInVersion14()
+        public void Varieties_AreNonTrivialAndNonIsomorphic()
         {
+            // Same numbers of varieties as in Socnet.se 1.4 (which used eigenvalues to detect isomorphism)
             BlockImage bi2 = new("bi2re", 2);
             bi2.SetBlocksByPattern("nul;reg");
             List<BlockImage> v2 = BlockImageVarieties.Generate(bi2);
             Assert.Equal(8, v2.Count);
-            // The variety that was optimal for Hlebec in 1.4: bi2re_3 = [reg nul; reg nul]
-            Assert.Equal("bi2re_3", v2[3].Name);
-            Assert.Equal(["reg", "nul", "reg", "nul"], Blocks(v2[3]));
+            Assert.Equal([.. Enumerable.Range(0, 8).Select(i => "bi2re_" + i)], v2.Select(v => v.Name));
 
             BlockImage bi3 = new("bi3re", 3);
             bi3.SetBlocksByPattern("nul;reg");
             List<BlockImage> v3 = BlockImageVarieties.Generate(bi3);
             Assert.Equal(88, v3.Count);
-            Assert.Equal(["reg", "nul", "nul", "reg", "reg", "nul", "reg", "nul", "nul"], Blocks(v3[19]));
+            // The optimal variety for Hlebec is among them
+            BlockImage best = Assert.Single(v3, v => CanonicalBlocks(v).SequenceEqual(CanonicalBlocks(HlebecOptimum())));
 
             // Extended blockimage from the tutorial script: 122 varieties
-            BlockImage bi4 = v3[19].Extend("nul;reg");
-            Assert.Equal(122, BlockImageVarieties.Generate(bi4).Count);
+            Assert.Equal(122, BlockImageVarieties.Generate(best.Extend("nul;reg")).Count);
+
+            // All varieties are mutually non-isomorphic: brute force over all position permutations
+            int[][] perms = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]];
+            HashSet<string> forms = [];
+            foreach (BlockImage v in v3)
+            {
+                string[] blocks = Blocks(v);
+                string min = perms.Select(p => string.Join(",", Enumerable.Range(0, 9).Select(i => blocks[p[i / 3] * 3 + p[i % 3]]))).Min(StringComparer.Ordinal)!;
+                Assert.True(forms.Add(min));
+            }
         }
 
         [Fact]
@@ -187,6 +196,23 @@ namespace Socnet.Tests
             SearchResult result = BlockmodelSearch.Run(settings, [bi]);
             Assert.True(result.TimedOut);
             Assert.Empty(result.Solutions);
+        }
+
+        /// <summary>
+        /// The optimal 3-positional regular blockimage for Hlebec (from TESTING.md).
+        /// </summary>
+        private static BlockImage HlebecOptimum()
+            => TestData.CreateBlockImage([["reg"], ["nul"], ["nul"], ["reg"], ["reg"], ["nul"], ["reg"], ["nul"], ["nul"]], 3);
+
+        /// <summary>
+        /// The blocks of a 3x3 blockimage in the canonical (lexicographically smallest) ordering of its positions.
+        /// </summary>
+        private static string[] CanonicalBlocks(BlockImage bi)
+        {
+            int[][] perms = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]];
+            string[] blocks = Blocks(bi);
+            return perms.Select(p => Enumerable.Range(0, 9).Select(i => blocks[p[i / 3] * 3 + p[i % 3]]).ToArray())
+                .OrderBy(b => string.Join(",", b), StringComparer.Ordinal).First();
         }
 
         private static string[] Blocks(BlockImage bi)

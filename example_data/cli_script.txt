@@ -146,17 +146,19 @@ bi3re = blockimage(3, pattern = nul;reg)
 # prepare the exhaustive search using weighted correlation coefficients:
 bminit(hlebec, bi3re, ljubljana, nordlund)
 
-# Run the search
-bmstart()
+# Run the search, naming the resulting blockmodel(s) bm3re_0, bm3re_1, ...
+# (Without 'outname', the name would include the name of the optimal single-blocked
+# variety of the multi-blocked blockimage, e.g. bm_hlebec_bi3re_36_0)
+bmstart(outname = bm3re)
 
 # View the resulting blockmodel:
-bmview(bm_hlebec_bi3re_19_0)
+bmview(bm3re_0)
 
-# Extract the single-blocked blockimage from this result:
-bmextract(bm_hlebec_bi3re_19_0, blockimage)
+# Extract the single-blocked blockimage from this result, naming it bi3re_best:
+bmextract(bm3re_0, blockimage, outname = bi3re_best)
 
 # Create an extended version of this with new reg/nul blocks:
-bi4re = biextend(blockimage = bi3re_19, pattern = nul;reg)
+bi4re = biextend(blockimage = bi3re_best, pattern = nul;reg)
 
 # Inspect this:
 bi4re
@@ -165,10 +167,10 @@ bi4re
 bminit(hlebec, bi4re, ljubljana, nordlund)
 
 # Start the search
-bmstart()
+bmstart(outname = bm4re)
 
 # Check out the resulting solution:
-bmview(bm_hlebec_bi4re_0_0)
+bmview(bm4re_0)
 
 
 # Example 3: Core-periphery identification using Baker data

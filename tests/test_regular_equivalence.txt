@@ -19,7 +19,7 @@ bminit(network = hlebec, blockimage = bi3re, searchtype = ljubljana, method = no
 bmstart()
 
 # Display the blockmodel (should yield a single one)
-bmview(blockmodel = bm_hlebec_bi3re_19_0)
+bmview()
 
 # The optimal partition should be:
 # (4,8,9)

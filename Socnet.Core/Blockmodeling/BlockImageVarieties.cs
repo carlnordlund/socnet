@@ -1,14 +1,19 @@
-using Socnet.Core.Blocks;
 using Socnet.Core.Model;
-using Socnet.Core.Numerics;
 using System.Text;
 
 namespace Socnet.Core.Blockmodeling
 {
     /// <summary>
     /// Generates the single-blocked 'varieties' of a multi-blocked blockimage: all combinations of its ideal blocks
-    /// that are non-trivial (no two positions are structurally equivalent) and mutually non-isomorphic.
-    /// The varieties are generated and named (blockimagename_index) in the same order as in Socnet.se 1.4.
+    /// that are non-trivial (no two positions are structurally equivalent) and mutually non-isomorphic (not identical
+    /// under any permutation of the positions). Varieties are named [blockimagename]_[index], numbered in the order
+    /// they are generated.
+    ///
+    /// Isomorphism is detected exactly by computing a canonical form of each combination: positions are first
+    /// ordered by an isomorphism-invariant signature (their own ideal block and the multisets of ideal blocks in
+    /// their row and column), and the canonical form is the lexicographically smallest matrix of ideal block types
+    /// over all orderings consistent with the signatures. Two combinations are isomorphic if and only if their
+    /// canonical forms are equal.
     /// </summary>
     public static class BlockImageVarieties
     {
@@ -18,81 +23,49 @@ namespace Socnet.Core.Blockmodeling
         public static List<BlockImage> Generate(BlockImage template)
         {
             int k = template.NbrPositions;
-            int[,] maxIndices = new int[k, k], indices = new int[k, k];
-            double[,] isoMatrix = new double[k, k];
-            for (int r = 0; r < k; r++)
-                for (int c = 0; c < k; c++)
-                {
-                    maxIndices[r, c] = template.Blocks(r, c).Count;
-                    isoMatrix[r, c] = template.GetBlock(r, c, 0).IsoIndex;
-                }
-
-            // Candidates grouped by the key of their (rounded, real) eigenvalues, in order of first appearance
-            Dictionary<string, List<int[,]>> groups = [];
-            List<string> groupOrder = [];
-
-            while (true)
+            int[] maxIndices = new int[k * k], indices = new int[k * k], iso = new int[k * k];
+            for (int i = 0; i < k * k; i++)
             {
-                if (!HasStructurallyEquivalentPositions(isoMatrix, k))
-                {
-                    string key = EigenvalueKey(isoMatrix);
-                    int[,] current = new int[k, k];
-                    for (int r = 0; r < k; r++)
-                        for (int c = 0; c < k; c++)
-                            current[r, c] = indices[r, c];
-                    if (!groups.TryGetValue(key, out var group))
-                    {
-                        groups[key] = [current];
-                        groupOrder.Add(key);
-                    }
-                    else if (!group.Any(existing => AreIsomorphic(template, existing, current, k)))
-                        group.Add(current);
-                }
-
-                // Increment to the next combination of ideal blocks
-                bool increased = false;
-                for (int r = 0; r < k && !increased; r++)
-                    for (int c = 0; c < k && !increased; c++)
-                    {
-                        if (maxIndices[r, c] <= 1)
-                            continue;
-                        indices[r, c]++;
-                        if (indices[r, c] < maxIndices[r, c])
-                            increased = true;
-                        else
-                            indices[r, c] = 0;
-                        isoMatrix[r, c] = template.GetBlock(r, c, indices[r, c]).IsoIndex;
-                    }
-                if (!increased)
-                    break;
+                maxIndices[i] = template.Blocks(i / k, i % k).Count;
+                iso[i] = template.GetBlock(i / k, i % k, 0).IsoIndex;
             }
 
             List<BlockImage> varieties = [];
-            int index = 0;
-            foreach (string key in groupOrder)
-                foreach (int[,] combination in groups[key])
+            HashSet<string> seen = [];
+            while (true)
+            {
+                if (!HasStructurallyEquivalentPositions(iso, k) && seen.Add(CanonicalForm(iso, k)))
+                    varieties.Add(template.CreateSingleBlocked(template.Name + "_" + varieties.Count, (int[])indices.Clone()));
+
+                // Next combination of ideal blocks (odometer over the block positions with several ideal blocks)
+                int pos = 0;
+                for (; pos < indices.Length; pos++)
                 {
-                    int[] flat = new int[k * k];
-                    for (int r = 0; r < k; r++)
-                        for (int c = 0; c < k; c++)
-                            flat[r * k + c] = combination[r, c];
-                    varieties.Add(template.CreateSingleBlocked(template.Name + "_" + index, flat));
-                    index++;
+                    if (maxIndices[pos] <= 1)
+                        continue;
+                    indices[pos] = (indices[pos] + 1) % maxIndices[pos];
+                    iso[pos] = template.GetBlock(pos / k, pos % k, indices[pos]).IsoIndex;
+                    if (indices[pos] != 0)
+                        break;
                 }
+                if (pos == indices.Length)
+                    break;
+            }
             return varieties;
         }
 
         /// <summary>
-        /// True if two positions have identical rows and columns in the matrix of ideal block indices.
+        /// True if two positions have identical rows and columns in the matrix of ideal block types,
+        /// i.e. the blockimage could be reduced to fewer positions.
         /// </summary>
-        private static bool HasStructurallyEquivalentPositions(double[,] m, int k)
+        private static bool HasStructurallyEquivalentPositions(int[] m, int k)
         {
             for (int a1 = 0; a1 < k; a1++)
                 for (int a2 = a1 + 1; a2 < k; a2++)
                 {
                     bool equivalent = true;
                     for (int i = 0; i < k && equivalent; i++)
-                        if (m[a1, i] != m[a2, i] || m[i, a1] != m[i, a2])
+                        if (m[a1 * k + i] != m[a2 * k + i] || m[i * k + a1] != m[i * k + a2])
                             equivalent = false;
                     if (equivalent)
                         return true;
@@ -101,54 +74,76 @@ namespace Socnet.Core.Blockmodeling
         }
 
         /// <summary>
-        /// Key from the real parts of the eigenvalues, sorted descending and rounded to 4 decimals.
+        /// Returns a canonical form of a k x k matrix of ideal block types: equal for two matrices if and only if
+        /// one is a permutation (of rows and columns simultaneously) of the other.
         /// </summary>
-        private static string EigenvalueKey(double[,] m)
+        internal static string CanonicalForm(int[] m, int k)
         {
-            double[] eigenvalues = (double[])new EigenvalueDecomposition(m).RealEigenvalues.Clone();
-            Array.Sort(eigenvalues);
-            Array.Reverse(eigenvalues);
-            StringBuilder sb = new();
-            foreach (double ev in eigenvalues)
+            // Order positions by an isomorphism-invariant signature; only permutations within groups of equal
+            // signatures then have to be tried
+            string[] signatures = new string[k];
+            for (int p = 0; p < k; p++)
             {
-                double v = Math.Round(ev, 4);
-                if (v == 0)
-                    v = 0;
-                sb.Append(Utilities.Fmt.D(v)).Append(';');
+                int[] row = new int[k], col = new int[k];
+                for (int i = 0; i < k; i++)
+                {
+                    row[i] = m[p * k + i];
+                    col[i] = m[i * k + p];
+                }
+                Array.Sort(row);
+                Array.Sort(col);
+                signatures[p] = $"{m[p * k + p]}|{string.Join(",", row)}|{string.Join(",", col)}";
             }
+            int[] order = [.. Enumerable.Range(0, k).OrderBy(p => signatures[p], StringComparer.Ordinal)];
+            List<(int start, int end)> groups = [];
+            for (int start = 0; start < k;)
+            {
+                int end = start + 1;
+                while (end < k && signatures[order[end]] == signatures[order[start]])
+                    end++;
+                groups.Add((start, end));
+                start = end;
+            }
+
+            int[]? best = null;
+            int[] candidate = new int[k * k];
+            void Visit(int group)
+            {
+                if (group == groups.Count)
+                {
+                    for (int r = 0; r < k; r++)
+                        for (int c = 0; c < k; c++)
+                            candidate[r * k + c] = m[order[r] * k + order[c]];
+                    if (best == null || candidate.AsSpan().SequenceCompareTo(best) < 0)
+                        best = (int[])candidate.Clone();
+                    return;
+                }
+                PermuteGroup(order, groups[group].start, groups[group].start, groups[group].end, () => Visit(group + 1));
+            }
+            Visit(0);
+
+            StringBuilder sb = new();
+            foreach (int v in best!)
+                sb.Append(v).Append(',');
             return sb.ToString();
         }
 
         /// <summary>
-        /// True if the two block combinations are identical under some permutation of the positions.
+        /// Calls 'action' for every permutation of order[start..end).
         /// </summary>
-        private static bool AreIsomorphic(BlockImage template, int[,] existing, int[,] current, int k)
+        private static void PermuteGroup(int[] order, int pos, int start, int end, Action action)
         {
-            int[] perm = new int[k];
-            for (int i = 0; i < k; i++)
-                perm[i] = i;
-            return Permute(perm, 0, template, existing, current, k);
-        }
-
-        private static bool Permute(int[] perm, int pos, BlockImage template, int[,] existing, int[,] current, int k)
-        {
-            if (pos == k - 1 || k == 1)
+            if (pos >= end - 1)
             {
-                for (int r = 0; r < k; r++)
-                    for (int c = 0; c < k; c++)
-                        if (template.GetBlock(r, c, existing[r, c]).IsoIndex != template.GetBlock(perm[r], perm[c], current[perm[r], perm[c]]).IsoIndex)
-                            return false;
-                return true;
+                action();
+                return;
             }
-            for (int i = pos; i < k; i++)
+            for (int i = pos; i < end; i++)
             {
-                (perm[pos], perm[i]) = (perm[i], perm[pos]);
-                bool found = Permute(perm, pos + 1, template, existing, current, k);
-                (perm[pos], perm[i]) = (perm[i], perm[pos]);
-                if (found)
-                    return true;
+                (order[pos], order[i]) = (order[i], order[pos]);
+                PermuteGroup(order, pos + 1, start, end, action);
+                (order[pos], order[i]) = (order[i], order[pos]);
             }
-            return false;
         }
     }
 }
