@@ -55,8 +55,7 @@ namespace Socnet.Core.Blockmodeling
             for (int i = 0; i < Math.Max(1, _s.NbrRandomStart); i++)
             {
                 int[] labels = RandomPartition();
-                _state.SetPartition(labels);
-                double fitness = _state.Fitness();
+                double fitness = _state.EvaluatePartition(labels);
                 _collector.NbrTested++;
                 if (start == null || SolutionCollector.IsBetter(fitness, startFitness))
                 {
@@ -194,7 +193,7 @@ namespace Socnet.Core.Blockmodeling
             {
                 _token.ThrowIfCancellationRequested();
                 int[] labels = queue.Dequeue();
-                _state.SetPartition(labels);
+                _state.MoveTo(labels);
                 _state.Fitness();
                 iterations++;
                 ulong hash = Hash(labels);

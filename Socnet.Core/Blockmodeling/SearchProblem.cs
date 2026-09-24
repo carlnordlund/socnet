@@ -39,7 +39,37 @@ namespace Socnet.Core.Blockmodeling
                 for (int c = 0; c < K && symmetric; c++)
                     symmetric = CellKey(r, c) == (r == c ? diag : offDiag);
             IsFullySymmetric = symmetric;
+
+            // Properties deciding which fast evaluation paths can be used
+            bool simple = true, hasNaN = false;
+            for (int i = 0; i < N; i++)
+                for (int j = 0; j < N; j++)
+                {
+                    double x = X[i * N + j];
+                    hasNaN |= double.IsNaN(x);
+                    simple &= i == j ? x == 0 : x >= 0;
+                }
+            SimpleValues = simple;
+            // Maxima are not tracked for networks with missing (NaN) values, where the full evaluation must be used
+            NeedsMaxStats = !hasNaN && method == GofMethod.Nordlund && Cells.Any(cell => cell.Any(b => b.UsesMaxStats && b.HasFastNordlund(simple)));
+            AllCellsFast = Cells.All(cell => cell.All(b => b.HasFastPath(method, simple) && !(hasNaN && b.UsesMaxStats)));
         }
+
+        /// <summary>
+        /// True if all network values are non-negative (not NaN) and the diagonal is zero.
+        /// </summary>
+        public bool SimpleValues { get; }
+
+        /// <summary>
+        /// True if some ideal block needs row/column maxima for its fast evaluation.
+        /// </summary>
+        public bool NeedsMaxStats { get; }
+
+        /// <summary>
+        /// True if all ideal blocks can be evaluated from aggregated statistics, so that moves can be evaluated
+        /// without changing the search state.
+        /// </summary>
+        public bool AllCellsFast { get; }
 
         private string CellKey(int r, int c) => string.Join(";", Cells[r * K + c].Select(b => b.ToString()));
 

@@ -36,6 +36,7 @@ namespace Socnet.Core.Blocks
         public override bool SupportsHamming => true;
         public override bool SupportsNordlund => true;
         public override IdealBlock Clone() => new DenBlock { Parameter = Parameter };
+        public override bool HasFastHamming => true;
 
         public override double Hamming(in BlockRegion b) => Math.Abs(CountPositive(b) - (int)Math.Round((double)b.NbrCells * Parameter));
 
@@ -101,6 +102,7 @@ namespace Socnet.Core.Blocks
         public override bool SupportsHamming => true;
         public override bool SupportsNordlund => true;
         public override IdealBlock Clone() => new DenminBlock { Parameter = Parameter };
+        public override bool HasFastHamming => true;
 
         public override double Hamming(in BlockRegion b)
         {
@@ -178,6 +180,7 @@ namespace Socnet.Core.Blocks
         public override bool SupportsHamming => false;
         public override bool SupportsNordlund => true;
         public override IdealBlock Clone() => new DenuciBlock { Parameter = Parameter };
+        public override bool HasFastNordlund(bool simpleValues) => true;
 
         public override void Nordlund(in BlockRegion b, TripleSink sink)
         {

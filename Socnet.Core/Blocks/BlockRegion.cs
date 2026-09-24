@@ -68,6 +68,14 @@ namespace Socnet.Core.Blocks
         public int Pc;
         /// <summary>Sum of values, and sum of squared values.</summary>
         public double Sum, SumSq;
+        /// <summary>True if the maxima below are available.</summary>
+        public bool HasMax;
+        /// <summary>True if all network values are non-negative and the diagonal is zero.</summary>
+        public bool SimpleValues;
+        /// <summary>Sum (and sum of squares) over rows of the maximum value in the row (excluding the diagonal).</summary>
+        public double SumRowMax, SumRowMaxSq;
+        /// <summary>Sum (and sum of squares) over columns of the maximum value in the column (excluding the diagonal).</summary>
+        public double SumColMax, SumColMaxSq;
 
         /// <summary>Number of cells in the block (excluding the diagonal for diagonal blocks).</summary>
         public readonly int NbrCells => Nr * Nc - (Diagonal ? Nr : 0);

@@ -10,6 +10,8 @@ namespace Socnet.Core.Blocks
         public override bool SupportsHamming => true;
         public override bool SupportsNordlund => true;
         public override IdealBlock Clone() => new DncBlock();
+        public override bool HasFastHamming => true;
+        public override bool HasFastNordlund(bool simpleValues) => true;
 
         public override bool TryHamming(in BlockStats s, out double penalty)
         {
@@ -34,6 +36,8 @@ namespace Socnet.Core.Blocks
         public override bool SupportsHamming => true;
         public override bool SupportsNordlund => true;
         public override IdealBlock Clone() => new NulBlock();
+        public override bool HasFastHamming => true;
+        public override bool HasFastNordlund(bool simpleValues) => true;
 
         public override double Hamming(in BlockRegion b) => CountPositive(b);
 
@@ -74,6 +78,8 @@ namespace Socnet.Core.Blocks
         public override bool SupportsHamming => true;
         public override bool SupportsNordlund => true;
         public override IdealBlock Clone() => new ComBlock();
+        public override bool HasFastHamming => true;
+        public override bool HasFastNordlund(bool simpleValues) => true;
 
         public override double Hamming(in BlockRegion b)
         {

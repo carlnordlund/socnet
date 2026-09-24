@@ -10,6 +10,20 @@ namespace Socnet.Core.Blocks
         public override bool SupportsHamming => true;
         public override bool SupportsNordlund => true;
         public override IdealBlock Clone() => new RegBlock();
+        public override bool HasFastHamming => true;
+        public override bool HasFastNordlund(bool simpleValues) => true;
+        public override bool UsesMaxStats => true;
+
+        public override bool TryNordlund(in BlockStats s, ref CorrSums sums)
+        {
+            if (!CanUseMax(s))
+                return false;
+            if (s.Diagonal && s.Nr == 1)
+                return true;
+            double w = (double)(s.Nr * s.Nc - (s.Diagonal ? s.Nr : 0)) / (s.Nr + s.Nc);
+            AddIdealOnes(ref sums, w, s.Nr + s.Nc, s.SumRowMax + s.SumColMax, s.SumRowMaxSq + s.SumColMaxSq);
+            return true;
+        }
 
         public override double Hamming(in BlockRegion b)
         {
@@ -76,6 +90,19 @@ namespace Socnet.Core.Blocks
         public override bool SupportsHamming => true;
         public override bool SupportsNordlund => true;
         public override IdealBlock Clone() => new RreBlock();
+        public override bool HasFastHamming => true;
+        public override bool HasFastNordlund(bool simpleValues) => true;
+        public override bool UsesMaxStats => true;
+
+        public override bool TryNordlund(in BlockStats s, ref CorrSums sums)
+        {
+            if (!CanUseMax(s))
+                return false;
+            if (s.Diagonal && s.Nr == 1)
+                return true;
+            AddIdealOnes(ref sums, s.Nc - (s.Diagonal ? 1 : 0), s.Nr, s.SumRowMax, s.SumRowMaxSq);
+            return true;
+        }
 
         public override double Hamming(in BlockRegion b) => (double)(b.Nr - CountNonNullRows(b)) * b.Nc;
 
@@ -122,6 +149,19 @@ namespace Socnet.Core.Blocks
         public override bool SupportsHamming => true;
         public override bool SupportsNordlund => true;
         public override IdealBlock Clone() => new CreBlock();
+        public override bool HasFastHamming => true;
+        public override bool HasFastNordlund(bool simpleValues) => true;
+        public override bool UsesMaxStats => true;
+
+        public override bool TryNordlund(in BlockStats s, ref CorrSums sums)
+        {
+            if (!CanUseMax(s))
+                return false;
+            if (s.Diagonal && s.Nr == 1)
+                return true;
+            AddIdealOnes(ref sums, s.Nr - (s.Diagonal ? 1 : 0), s.Nc, s.SumColMax, s.SumColMaxSq);
+            return true;
+        }
 
         public override double Hamming(in BlockRegion b) => (double)(b.Nc - CountNonNullCols(b)) * b.Nr;
 
@@ -168,6 +208,19 @@ namespace Socnet.Core.Blocks
         public override bool SupportsHamming => true;
         public override bool SupportsNordlund => true;
         public override IdealBlock Clone() => new RfnBlock();
+        public override bool HasFastHamming => true;
+        public override bool HasFastNordlund(bool simpleValues) => simpleValues;
+        public override bool UsesMaxStats => true;
+
+        public override bool TryNordlund(in BlockStats s, ref CorrSums sums)
+        {
+            if (!CanUseMax(s) || !s.SimpleValues)
+                return false;
+            if (s.Diagonal && s.Nr == 1)
+                return true;
+            AddRowFunctional(s, ref sums, 1);
+            return true;
+        }
 
         public override double Hamming(in BlockRegion b)
         {
@@ -230,6 +283,19 @@ namespace Socnet.Core.Blocks
         public override bool SupportsHamming => true;
         public override bool SupportsNordlund => true;
         public override IdealBlock Clone() => new CfnBlock();
+        public override bool HasFastHamming => true;
+        public override bool HasFastNordlund(bool simpleValues) => simpleValues;
+        public override bool UsesMaxStats => true;
+
+        public override bool TryNordlund(in BlockStats s, ref CorrSums sums)
+        {
+            if (!CanUseMax(s) || !s.SimpleValues)
+                return false;
+            if (s.Diagonal && s.Nr == 1)
+                return true;
+            AddColFunctional(s, ref sums, 1);
+            return true;
+        }
 
         public override double Hamming(in BlockRegion b)
         {

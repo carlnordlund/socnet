@@ -82,6 +82,22 @@ namespace Socnet.Core.Blocks
         public virtual bool TryNordlund(in BlockStats s, ref CorrSums sums) => false;
 
         /// <summary>
+        /// True if <see cref="TryHamming"/> is implemented (for non-empty blocks).
+        /// </summary>
+        public virtual bool HasFastHamming => false;
+
+        /// <summary>
+        /// True if <see cref="TryNordlund"/> is implemented (for non-empty blocks), given whether the network
+        /// has only non-negative values and a zero diagonal.
+        /// </summary>
+        public virtual bool HasFastNordlund(bool simpleValues) => false;
+
+        /// <summary>
+        /// True if <see cref="TryNordlund"/> needs the row/column maxima in <see cref="BlockStats"/>.
+        /// </summary>
+        public virtual bool UsesMaxStats => false;
+
+        /// <summary>
         /// Writes the ideal pattern of this block (for the 'hamming' measure) into an n*n row-major array.
         /// </summary>
         public virtual void WriteIdealHamming(in BlockRegion b, double[] ideal) { }
@@ -90,6 +106,61 @@ namespace Socnet.Core.Blocks
         /// Writes the ideal pattern of this block (for the 'nordlund' measure) into an n*n row-major array.
         /// </summary>
         public virtual void WriteIdealNordlund(in BlockRegion b, double[] ideal) { }
+
+        /// <summary>
+        /// True if the fast (statistics-based) evaluation is available for the given method.
+        /// </summary>
+        public bool HasFastPath(GofMethod method, bool simpleValues) => method == GofMethod.Hamming ? HasFastHamming : HasFastNordlund(simpleValues);
+
+        /// <summary>
+        /// Adds the sums of 'count' triplets (x, 1, w) where the x values sum to 'sumX' and their squares to 'sumXX'.
+        /// </summary>
+        protected static void AddIdealOnes(ref CorrSums sums, double w, double count, double sumX, double sumXX)
+        {
+            sums.W += w * count;
+            sums.X += w * sumX;
+            sums.XX += w * sumXX;
+            sums.Y += w * count;
+            sums.YY += w * count;
+            sums.XY += w * sumX;
+        }
+
+        /// <summary>
+        /// Row-functional sums (see RfnBlock.AddRowFunctional) from block statistics, with the given weight.
+        /// Requires non-negative values and a zero diagonal: then a row without positive values has only zeros,
+        /// and the sums over the rows with ties equal the sums over all rows.
+        /// </summary>
+        protected static void AddRowFunctional(in BlockStats s, ref CorrSums sums, double weight)
+        {
+            int diag = s.Diagonal ? 1 : 0;
+            double zeroRows = s.Nr - s.Pr;
+            sums.W += weight * (s.Pr * (double)s.Nc + zeroRows * (s.Nc - diag));
+            sums.Y += weight * (s.Pr + zeroRows * (s.Nc - diag));
+            sums.YY += weight * (s.Pr + zeroRows * (s.Nc - diag));
+            sums.X += weight * s.Sum;
+            sums.XX += weight * s.SumSq;
+            sums.XY += weight * s.SumRowMax;
+        }
+
+        /// <summary>
+        /// Column-functional sums from block statistics (see <see cref="AddRowFunctional"/>).
+        /// </summary>
+        protected static void AddColFunctional(in BlockStats s, ref CorrSums sums, double weight)
+        {
+            int diag = s.Diagonal ? 1 : 0;
+            double zeroCols = s.Nc - s.Pc;
+            sums.W += weight * (s.Pc * (double)s.Nr + zeroCols * (s.Nr - diag));
+            sums.Y += weight * (s.Pc + zeroCols * (s.Nr - diag));
+            sums.YY += weight * (s.Pc + zeroCols * (s.Nr - diag));
+            sums.X += weight * s.Sum;
+            sums.XX += weight * s.SumSq;
+            sums.XY += weight * s.SumColMax;
+        }
+
+        /// <summary>
+        /// Returns true if the block statistics allow a max-based fast evaluation (maxima available, block non-empty).
+        /// </summary>
+        protected static bool CanUseMax(in BlockStats s) => s.HasMax && s.Nr > 0 && s.Nc > 0;
 
         /// <summary>
         /// Returns true if the block supports the given goodness-of-fit method.

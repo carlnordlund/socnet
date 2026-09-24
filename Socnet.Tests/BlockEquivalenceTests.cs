@@ -56,6 +56,12 @@ namespace Socnet.Tests
             }
         }
 
+        /// <summary>
+        /// The ideal blocks that can be evaluated from block statistics under 'nordlund' (some only for networks
+        /// with non-negative values and a zero diagonal).
+        /// </summary>
+        private static readonly string[] FastNordlundBlocks = ["dnc", "nul", "com", "denuci(0.3)", "reg", "rre", "cre", "rfn", "cfn", "pcdd", "cpdd"];
+
         [Theory]
         [MemberData(nameof(Seeds))]
         public void IncrementalState_MatchesFullEvaluation(int seed)
@@ -63,13 +69,38 @@ namespace Socnet.Tests
             Random rng = new(2000 + seed);
             foreach (GofMethod method in new[] { GofMethod.Hamming, GofMethod.Nordlund })
             {
+                string[] blocks = method == GofMethod.Hamming ? TestData.HammingBlocks : TestData.NordlundBlocks;
+                RunIncrementalStateTest(rng, method, blocks, method == GofMethod.Hamming ? 3 : 1, zeroDiagonal: seed % 2 == 0, expectAllFast: null);
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(Seeds))]
+        public void IncrementalState_FastNordlundBlocks_MatchFullEvaluation(int seed)
+        {
+            // Only blocks with constant-time evaluation: exercises the evaluation of trial moves without applying them
+            Random rng = new(3000 + seed);
+            bool zeroDiagonal = seed % 4 != 0;
+            RunIncrementalStateTest(rng, GofMethod.Nordlund, FastNordlundBlocks, 1, zeroDiagonal, expectAllFast: zeroDiagonal);
+            RunIncrementalStateTest(rng, GofMethod.Hamming, TestData.HammingBlocks, 3, zeroDiagonal, expectAllFast: true);
+        }
+
+        private static void RunIncrementalStateTest(Random rng, GofMethod method, string[] blocks, int maxPerCell, bool zeroDiagonal, bool? expectAllFast)
+        {
+            {
                 int n = rng.Next(3, 16), k = rng.Next(2, Math.Min(n, 5) + 1);
-                Matrix m = TestData.RandomNetwork(rng, n, rng.Next(3));
-                string[][] cells = method == GofMethod.Hamming
-                    ? TestData.RandomCells(rng, k, TestData.HammingBlocks, 3)
-                    : TestData.RandomCells(rng, k, TestData.NordlundBlocks, 1);
+                Matrix m = TestData.RandomNetwork(rng, n, rng.Next(3), zeroDiagonal);
+                string[][] cells = TestData.RandomCells(rng, k, blocks, maxPerCell);
+                if (expectAllFast == false)
+                {
+                    // Make sure that some block needs simple values (so that the fast path is not available)
+                    cells[0] = ["rfn"];
+                }
                 BlockImage bi = TestData.CreateBlockImage(cells, k);
-                SearchState state = new(new SearchProblem(m, bi, method, 1));
+                SearchProblem problem = new(m, bi, method, 1);
+                if (expectAllFast != null)
+                    Assert.Equal(expectAllFast.Value, problem.AllCellsFast);
+                SearchState state = new(problem);
                 int[] labels = TestData.RandomPartition(rng, n, k);
                 state.SetPartition(labels);
                 AssertFitness(m, bi, method, state);
@@ -78,13 +109,37 @@ namespace Socnet.Tests
                 for (int step = 0; step < 60; step++)
                 {
                     int v = rng.Next(n), b = rng.Next(k);
-                    switch (rng.Next(4))
+                    switch (rng.Next(6))
                     {
+                        case 2:
+                            // Evaluating a whole partition must agree with a full evaluation
+                            int[] other = TestData.RandomPartition(rng, n, k);
+                            AssertFitness(m, bi, method, other, state.EvaluatePartition(other));
+                            break;
+                        case 3:
+                            // Moving to a partition differing in a few actors (or many)
+                            int[] target = state.GetLabels();
+                            if (target.Contains(-1))
+                                break;
+                            int changes = rng.Next(2) == 0 ? 1 : n;
+                            for (int c = 0; c < changes; c++)
+                                target[rng.Next(n)] = rng.Next(k);
+                            state.MoveTo(target);
+                            Assert.Equal(target, state.GetLabels());
+                            break;
                         case 0:
-                            state.TryMove(v, b);
+                            // The fitness of a trial move must equal that of the partition after the move
+                            double tried = state.TryMove(v, b);
+                            int[] moved = state.GetLabels();
+                            moved[v] = b;
+                            AssertFitness(m, bi, method, moved, tried);
                             break;
                         case 1:
-                            state.TrySwap(v, rng.Next(n));
+                            int u = rng.Next(n);
+                            double swapped = state.TrySwap(v, u);
+                            int[] afterSwap = state.GetLabels();
+                            (afterSwap[v], afterSwap[u]) = (afterSwap[u], afterSwap[v]);
+                            AssertFitness(m, bi, method, afterSwap, swapped);
                             break;
                         default:
                             state.Move(v, b);
@@ -96,17 +151,15 @@ namespace Socnet.Tests
         }
 
         private static void AssertFitness(Matrix m, BlockImage bi, GofMethod method, SearchState state)
+            => AssertFitness(m, bi, method, state.GetLabels(), state.Fitness());
+
+        private static void AssertFitness(Matrix m, BlockImage bi, GofMethod method, int[] labels, double fitness)
         {
-            int[] labels = state.GetLabels();
             // Skip partitions with empty clusters (not used in searches)
             for (int c = 0; c < bi.NbrPositions; c++)
                 if (!labels.Contains(c))
-                {
-                    state.Fitness();
                     return;
-                }
             double expected = BlockmodelEvaluator.Evaluate(m, bi, labels, method).Gof;
-            double fitness = state.Fitness();
             if (method == GofMethod.Hamming)
                 Assert.Equal(-expected, fitness);
             else if (double.IsNaN(expected))

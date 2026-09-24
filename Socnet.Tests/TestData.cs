@@ -14,9 +14,10 @@ namespace Socnet.Tests
         public static readonly string[] NordlundBlocks = [.. HammingBlocks, "denuci(0.4)", "pco(0.5)", "pco(0.75)", "pcdd", "cpdd"];
 
         /// <summary>
-        /// A random network: binary, small integer-valued (with ties), or continuous; diagonal values may be non-zero.
+        /// A random network: binary, small integer-valued (with ties), or continuous; diagonal values may be non-zero
+        /// unless zeroDiagonal is set.
         /// </summary>
-        public static Matrix RandomNetwork(Random rng, int n, int kind)
+        public static Matrix RandomNetwork(Random rng, int n, int kind, bool zeroDiagonal = false)
         {
             Actorset actorset = Actorset.Create("actors", [.. Enumerable.Range(0, n).Select(i => "a" + i)])!;
             Matrix m = new(actorset, "net");
@@ -32,6 +33,9 @@ namespace Socnet.Tests
                     _ => Math.Round(rng.NextDouble() * 3, 2)
                 };
             }
+            if (zeroDiagonal)
+                for (int i = 0; i < n; i++)
+                    m[i, i] = 0;
             return m;
         }
 

@@ -92,6 +92,19 @@ namespace Socnet.Core.Blocks
         public override bool SupportsHamming => false;
         public override bool SupportsNordlund => true;
         public override IdealBlock Clone() => new PcddBlock();
+        public override bool HasFastNordlund(bool simpleValues) => simpleValues;
+        public override bool UsesMaxStats => true;
+
+        public override bool TryNordlund(in BlockStats s, ref CorrSums sums)
+        {
+            if (!CanUseMax(s) || !s.SimpleValues)
+                return false;
+            if (s.Diagonal && s.Nr == 1)
+                return true;
+            AddRowFunctional(s, ref sums, 0.5);
+            AddIdealOnes(ref sums, 0.5 * (s.Nr - (s.Diagonal ? 1 : 0)), s.Nc, s.SumColMax, s.SumColMaxSq);
+            return true;
+        }
 
         public override void Nordlund(in BlockRegion b, TripleSink sink)
         {
@@ -131,6 +144,19 @@ namespace Socnet.Core.Blocks
         public override bool SupportsHamming => false;
         public override bool SupportsNordlund => true;
         public override IdealBlock Clone() => new CpddBlock();
+        public override bool HasFastNordlund(bool simpleValues) => simpleValues;
+        public override bool UsesMaxStats => true;
+
+        public override bool TryNordlund(in BlockStats s, ref CorrSums sums)
+        {
+            if (!CanUseMax(s) || !s.SimpleValues)
+                return false;
+            if (s.Diagonal && s.Nr == 1)
+                return true;
+            AddColFunctional(s, ref sums, 0.5);
+            AddIdealOnes(ref sums, 0.5 * (s.Nc - (s.Diagonal ? 1 : 0)), s.Nr, s.SumRowMax, s.SumRowMaxSq);
+            return true;
+        }
 
         public override void Nordlund(in BlockRegion b, TripleSink sink)
         {
