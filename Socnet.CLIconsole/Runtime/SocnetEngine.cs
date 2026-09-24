@@ -21,7 +21,7 @@ namespace Socnet.CLIconsole.Runtime
 
         private static readonly char[] TrimChars = [' ', '"', '\''];
 
-        [GeneratedRegex(@"^(([\w]+)\s*?=\s*?)?(\w+)(\((.*?)\))?$")]
+        [GeneratedRegex(@"^(([\w]+)\s*?=\s*?)?(\w+)\s*(\((.*?)\))?$")]
         private static partial Regex CommandRegex();
 
         public SocnetEngine()
@@ -45,11 +45,17 @@ namespace Socnet.CLIconsole.Runtime
             if (command.Length > 0 && command[0] == '#')
                 return response;
 
+            command = NormalizeWhitespace(command);
+            if (command.Count(c => c == '(') != command.Count(c => c == ')'))
+            {
+                response.Add(DescribeSyntaxError(command.Trim()));
+                return response;
+            }
             Match match = CommandRegex().Match(command.Trim());
             if (!match.Success)
             {
                 if (command.Trim().Length > 0)
-                    response.Add("!Error: Syntax error!");
+                    response.Add(DescribeSyntaxError(command.Trim()));
                 return response;
             }
 
@@ -102,6 +108,40 @@ namespace Socnet.CLIconsole.Runtime
             if (returnStructure != null)
                 response.AddRange(returnStructure.View);
             return response;
+        }
+
+        /// <summary>
+        /// Removes invisible characters (zero-width spaces and joiners, byte order marks) and replaces non-breaking and
+        /// other Unicode spaces with ordinary spaces. Such characters easily come along when commands are copied from
+        /// documents or web pages.
+        /// </summary>
+        internal static string NormalizeWhitespace(string command)
+        {
+            System.Text.StringBuilder sb = new(command.Length);
+            foreach (char ch in command)
+            {
+                if (ch is '\u200B' or '\u200C' or '\u200D' or '\u2060' or '\uFEFF')
+                    continue;
+                sb.Append(ch != '\t' && char.IsWhiteSpace(ch) ? ' ' : ch);
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Returns an error message describing why a command could not be parsed.
+        /// </summary>
+        internal static string DescribeSyntaxError(string command)
+        {
+            int opening = command.Count(c => c == '('), closing = command.Count(c => c == ')');
+            if (opening != closing)
+                return $"!Error: Syntax error - unbalanced brackets ({opening} opening, {closing} closing)";
+            int last = command.LastIndexOf(')');
+            if (last >= 0 && last < command.Length - 1)
+                return $"!Error: Syntax error - unexpected text after the closing bracket: '{command[(last + 1)..]}'";
+            foreach (char ch in command)
+                if (ch > 127)
+                    return $"!Error: Syntax error - the command contains the unexpected character '{ch}' (U+{(int)ch:X4})";
+            return "!Error: Syntax error!";
         }
 
         /// <summary>

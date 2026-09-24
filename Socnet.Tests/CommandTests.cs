@@ -30,5 +30,31 @@ namespace Socnet.Tests
             }
             Assert.Equal(results(""), results(", threads = 1"));
         }
+    
+        [Theory]
+        [InlineData("coreperi(bb, ljubljana,intercat=denuci(0.5))")]
+        [InlineData("coreperi (bb, ljubljana, intercat = denuci(0.5))")]
+        [InlineData("coreperi(bb,\u00a0ljubljana,intercat=denuci(0.5))\u00a0")]
+        [InlineData("coreperi(bb, ljubljana,intercat=denuci(0.5))\u200b")]
+        [InlineData("\ufeffcoreperi(bb, ljubljana,intercat=denuci(0.5))")]
+        public void Parser_AcceptsNestedBracketsAndIgnoresInvisibleCharacters(string command)
+        {
+            SocnetEngine engine = new();
+            Run(engine, $"loadmatrix(file = {Path.Combine(TestData.ExampleDataPath, "baker_original.txt")})");
+            Run(engine, "bb = dichotomize(name = baker_original, condition = gt, threshold = 0)");
+            List<string> response = Run(engine, command);
+            Assert.DoesNotContain(response, l => l.StartsWith('!'));
+            Assert.Contains(response, l => l.StartsWith("Goodness-of-fit (1st BlockModel): "));
+        }
+
+        [Theory]
+        [InlineData("coreperi(bb, ljubljana, intercat=denuci(0.5)", "!Error: Syntax error - unbalanced brackets (2 opening, 1 closing)")]
+        [InlineData("coreperi(bb, ljubljana) x", "!Error: Syntax error - unexpected text after the closing bracket: ' x'")]
+        [InlineData("coreperi\uff08bb, ljubljana\uff09", "!Error: Syntax error - the command contains the unexpected character '\uff08' (U+FF08)")]
+        public void Parser_ExplainsSyntaxErrors(string command, string expected)
+        {
+            SocnetEngine engine = new();
+            Assert.Contains(expected, Run(engine, command));
+        }
     }
 }
