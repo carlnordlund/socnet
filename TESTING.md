@@ -118,3 +118,33 @@ Make sure that the goodness-of-fit for the found solution is:
 ```bash
 0.5071 (nordlund)
 ```
+
+## Automated tests
+The repository contains a test project, `Socnet.Tests`, with automated unit tests. It requires the .NET 10 SDK and is run from the root folder of the repository with:
+```bash
+dotnet test
+```
+All tests should pass. The automated tests cover:
+
+- **Equivalence with Socnet.se 1.4**: the ideal block code of version 1.4 is kept unchanged in `Socnet.Tests/Legacy/` and used as a reference.
+  For thousands of random networks, partitions and blockimages, the goodness-of-fit values and ideal matrices of all ideal blocks
+  (for both `hamming` and `nordlund`) must be identical to those of version 1.4.
+- **Incremental evaluation**: the fast incremental evaluation used during searches must always give the same goodness-of-fit as a full
+  evaluation of the blockmodel.
+- **Searches**:
+  - the exhaustive search must find the true optimum, compared with brute force;
+  - the `localopt` and `ljubljana` searches must find the known optima of the test scripts below;
+  - results must be reproducible for a given random seed, regardless of the number of threads used;
+  - blockimage varieties must be non-isomorphic;
+  - timeouts must be reported.
+- **Console compatibility**: `Socnet.Tests/Golden/deterministic_script.txt` runs all non-search commands. Its console output must be
+  identical to the output of version 1.4 (`deterministic_script.v14.out`), apart from a few deliberate differences documented in
+  `ConsoleCompatibilityTests.cs`: the version string, a header-line fix in table views, and the actor order in partitions modified with `set()`.
+- **Commands**:
+  - the command parser, including nested brackets such as `intercat = denuci(0.5)` and the error messages for invalid commands;
+  - the `threads` argument;
+  - the `system()` command.
+
+
+
+
