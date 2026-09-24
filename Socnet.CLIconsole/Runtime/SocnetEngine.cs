@@ -1,6 +1,5 @@
 using Socnet.CLIconsole.Commands;
 using Socnet.Core.Model;
-using System.Text.RegularExpressions;
 
 namespace Socnet.CLIconsole.Runtime
 {
@@ -14,15 +13,12 @@ namespace Socnet.CLIconsole.Runtime
     /// - If 'function' is not a command but the name of a stored structure, that structure is displayed.
     /// - Lines starting with '#' are comments.
     /// </summary>
-    public sealed partial class SocnetEngine
+    public sealed class SocnetEngine
     {
         /// <summary>The version string shown at startup and in help().</summary>
         public const string VersionString = "Version 2.0 (September 2026)";
 
         private static readonly char[] TrimChars = [' ', '"', '\''];
-
-        [GeneratedRegex(@"^(([\w]+)\s*?=\s*?)?(\w+)\s*(\((.*?)\))?$")]
-        private static partial Regex CommandRegex();
 
         public SocnetEngine()
         {
@@ -51,17 +47,12 @@ namespace Socnet.CLIconsole.Runtime
                 response.Add(DescribeSyntaxError(command.Trim()));
                 return response;
             }
-            Match match = CommandRegex().Match(command.Trim());
-            if (!match.Success)
+            if (!TryParseCommand(command.Trim(), out string assigner, out string function, out string argstring))
             {
                 if (command.Trim().Length > 0)
                     response.Add(DescribeSyntaxError(command.Trim()));
                 return response;
             }
-
-            string assigner = match.Groups[2].Value;
-            string function = match.Groups[3].Value;
-            string argstring = match.Groups[5].Value.Trim();
 
             if (!ParseArguments(function, argstring, response))
                 return response;
@@ -109,6 +100,38 @@ namespace Socnet.CLIconsole.Runtime
                 response.AddRange(returnStructure.View);
             return response;
         }
+
+        /// <summary>
+        /// Splits a command of the form [name =] function[(arguments)] into its parts. The arguments are everything
+        /// between the first opening bracket and the final closing bracket (so they may contain brackets themselves,
+        /// e.g. intercat = denuci(0.5)). Names consist of letters, digits and underscores; spaces are allowed around
+        /// '=' and before the opening bracket. This is a plain string parser (earlier versions used a regular
+        /// expression, which failed for nested brackets with some .NET SDK versions).
+        /// </summary>
+        public static bool TryParseCommand(string command, out string assigner, out string function, out string argstring)
+        {
+            assigner = function = argstring = "";
+            int open = command.IndexOf('(');
+            string head = open < 0 ? command : command[..open];
+            if (open >= 0)
+            {
+                if (command[^1] != ')')
+                    return false;
+                argstring = command[(open + 1)..^1].Trim();
+            }
+            int eq = head.IndexOf('=');
+            if (eq >= 0)
+            {
+                assigner = head[..eq].Trim();
+                head = head[(eq + 1)..];
+                if (!IsName(assigner))
+                    return false;
+            }
+            function = head.Trim();
+            return IsName(function);
+        }
+
+        private static bool IsName(string s) => s.Length > 0 && s.All(ch => char.IsLetterOrDigit(ch) || ch == '_');
 
         /// <summary>
         /// Removes invisible characters (zero-width spaces and joiners, byte order marks) and replaces non-breaking and
