@@ -47,6 +47,53 @@ namespace Socnet.CLIconsole.Commands
             ctx.Add(":  https://doi.org/10.1017/CBO9780511584176");
         }
 
+        /// <summary>
+        /// Command 'system()': information about the computer and the Socnet.se process, e.g. to decide on
+        /// the 'threads' argument of bminit/coreperi.
+        /// </summary>
+        public static void SystemInfo(CommandContext ctx)
+        {
+            string priority;
+            try
+            {
+                priority = System.Diagnostics.Process.GetCurrentProcess().PriorityClass switch
+                {
+                    System.Diagnostics.ProcessPriorityClass.BelowNormal => "below normal (start with --normalpriority for normal priority)",
+                    System.Diagnostics.ProcessPriorityClass.Normal => "normal",
+                    var other => other.ToString()
+                };
+            }
+            catch (Exception)
+            {
+                priority = "unknown";
+            }
+            long availableMemory = GC.GetGCMemoryInfo().TotalAvailableMemoryBytes;
+            long usedMemory = Environment.WorkingSet;
+            ctx.Add(":Socnet.se: " + SocnetEngine.VersionString);
+            ctx.Add(":.NET runtime: " + System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription);
+            ctx.Add(":Operating system: " + System.Runtime.InteropServices.RuntimeInformation.OSDescription);
+            ctx.Add(":Architecture: " + System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower());
+            ctx.Add(":Processor cores (logical): " + Environment.ProcessorCount);
+            ctx.Add(":Cores used by searches: all, unless limited with the 'threads' argument of bminit/coreperi");
+            ctx.Add(":Process priority: " + priority);
+            ctx.Add(":Memory available: " + FormatBytes(availableMemory));
+            ctx.Add(":Memory used by Socnet.se: " + FormatBytes(usedMemory));
+            ctx.Add(":Working directory: " + Directory.GetCurrentDirectory());
+        }
+
+        private static string FormatBytes(long bytes)
+        {
+            string[] units = ["bytes", "KB", "MB", "GB", "TB"];
+            double value = bytes;
+            int unit = 0;
+            while (value >= 1024 && unit < units.Length - 1)
+            {
+                value /= 1024;
+                unit++;
+            }
+            return unit == 0 ? $"{bytes} bytes" : $"{value.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)} {units[unit]}";
+        }
+
         public static void GetWd(CommandContext ctx) => ctx.Add(":" + Directory.GetCurrentDirectory());
 
         public static void RandomSeed(CommandContext ctx)

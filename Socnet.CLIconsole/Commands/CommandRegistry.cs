@@ -27,6 +27,7 @@ namespace Socnet.CLIconsole.Commands
             Add("help", [], GeneralCommands.Help);
             Add("citeinfo", [], GeneralCommands.CiteInfo);
             Add("randomseed", ["seed"], GeneralCommands.RandomSeed);
+            Add("system", [], GeneralCommands.SystemInfo);
             Add("getwd", [], GeneralCommands.GetWd);
             Add("setwd", ["dir"], GeneralCommands.SetWd);
             Add("dir", [], GeneralCommands.Dir);

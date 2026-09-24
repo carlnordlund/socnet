@@ -81,5 +81,14 @@ namespace Socnet.Tests
         {
             Assert.False(SocnetEngine.TryParseCommand(command, out _, out _, out _));
         }
+    
+        [Fact]
+        public void System_ReportsCoresAndVersion()
+        {
+            List<string> response = Run(new SocnetEngine(), "system");
+            Assert.Contains($":Socnet.se: {SocnetEngine.VersionString}", response);
+            Assert.Contains($":Processor cores (logical): {Environment.ProcessorCount}", response);
+            Assert.All(response, line => Assert.StartsWith(":", line));
+        }
     }
 }

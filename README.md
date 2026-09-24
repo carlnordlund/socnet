@@ -16,6 +16,7 @@ but with a much faster and more memory-efficient blockmodeling engine:
 - Searches run in parallel on all processor cores, with reproducible results for a given random seed (independent
   of the number of cores). The number of cores can be limited with the `threads` argument of `bminit` and `coreperi`,
   e.g. `bminit(net, bi, ljubljana, nordlund, threads = 2)`.
+- The new command `system` shows information about the computer, e.g. the number of available processor cores.
 - Socnet.se runs at below-normal priority, so that searches using all cores give way to other programs on the computer.
   Start the client with `--normalpriority` (or `-n`) to run at normal priority.
 - The exhaustive search only evaluates each partition once when the blockimage is symmetric.
