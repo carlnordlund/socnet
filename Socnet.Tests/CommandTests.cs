@@ -58,5 +58,28 @@ namespace Socnet.Tests
             SocnetEngine engine = new();
             Assert.Contains(expected, Run(engine, command));
         }
+    
+        [Theory]
+        [InlineData("coreperi(baker_binary, ljubljana, intercat = denuci(0.5))", "", "coreperi", "baker_binary, ljubljana, intercat = denuci(0.5)")]
+        [InlineData("cpx = blockimage(size = 2, content = reg;pco(0.5)|cre|rre|nul)", "cpx", "blockimage", "size = 2, content = reg;pco(0.5)|cre|rre|nul")]
+        [InlineData("bi3 = blockimage (3, content = den(0.1)|den(0.2)|(x)|a|b|c|d|e|f)", "bi3", "blockimage", "3, content = den(0.1)|den(0.2)|(x)|a|b|c|d|e|f")]
+        [InlineData("x=help", "x", "help", "")]
+        [InlineData("bmview", "", "bmview", "")]
+        [InlineData("bmstart()", "", "bmstart", "")]
+        public void Parser_SplitsCommands(string command, string assigner, string function, string args)
+        {
+            Assert.True(SocnetEngine.TryParseCommand(command, out string a, out string f, out string g));
+            Assert.Equal((assigner, function, args), (a, f, g));
+        }
+
+        [Theory]
+        [InlineData("a = b = c(1)")]
+        [InlineData("core peri(1)")]
+        [InlineData("f(1) x")]
+        [InlineData("= f(1)")]
+        public void Parser_RejectsInvalidCommands(string command)
+        {
+            Assert.False(SocnetEngine.TryParseCommand(command, out _, out _, out _));
+        }
     }
 }
