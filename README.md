@@ -32,7 +32,7 @@ Precompiled binaries and installation files for Windows, Linux, and MacOS are av
 Please check the `/example_data/` folder for example networks. This folder also contains the script `cli_script.txt` exemplifying how to conduct various kinds of direct blockmodeling analyses.
 
 ### Testing
-The repository provides automated tests (`dotnet test`) and scripts to test the core functionality of Socnet. Please see [TESTING.md](TESTING.md) for information on how to do these tests.
+The repository provides automated tests and scripts to test the core functionality of Socnet. Please see [TESTING.md](TESTING.md) for information on how to do these scripted tests. The automated tests are best done through your IDE.
 
 ### Authors and Funding
 Socnet.se is developed and maintained by Carl Nordlund at the Institute for Analytical Sociology, Linköping University, Sweden, with contributions from José Luis Estévez, Kristian Gade Kjelmann,
