@@ -139,9 +139,24 @@ namespace Socnet.CLIconsole.Runtime
             if (last >= 0 && last < command.Length - 1)
                 return $"!Error: Syntax error - unexpected text after the closing bracket: '{command[(last + 1)..]}'";
             foreach (char ch in command)
+            {
+                if (char.IsControl(ch))
+                    return $"!Error: Syntax error - the command contains the invisible control character U+{(int)ch:X4} (e.g. from editing keys): '{Escape(command)}'";
                 if (ch > 127)
                     return $"!Error: Syntax error - the command contains the unexpected character '{ch}' (U+{(int)ch:X4})";
-            return "!Error: Syntax error!";
+            }
+            return $"!Error: Syntax error - expected '[name =] command(arguments)', got: '{Escape(command)}'";
+        }
+
+        /// <summary>
+        /// Shows control characters as \uXXXX, so that they are visible in error messages.
+        /// </summary>
+        private static string Escape(string text)
+        {
+            System.Text.StringBuilder sb = new(text.Length);
+            foreach (char ch in text)
+                sb.Append(char.IsControl(ch) ? $"\\u{(int)ch:X4}" : ch.ToString());
+            return sb.ToString();
         }
 
         /// <summary>
