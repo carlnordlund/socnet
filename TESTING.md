@@ -1,7 +1,7 @@
 # Socnet.se: Testing
 
 ## Test scripts
-The repository also contains 3 Socnet-scripts to test core analytical features in Socnet.se.
+The repository contains 3 Socnet-scripts to test core analytical features in Socnet.se.
 Note that these scripts are Socnet.se scripts, meaning that they are text files containing
 a sequence of Socnet.se-specific CLI commands that can be entered into the Socnet.se CLI console.
 
