@@ -97,6 +97,15 @@ namespace Socnet.CLIconsole.Runtime
             long? maxMilliseconds = maxtime == 0 ? DefaultMaxMilliseconds : maxtime < 0 ? null : 1000L * maxtime;
             log.Add(maxMilliseconds is long ms ? $"maxtime: {ms}ms (timeout active)" : "maxtime: (timeout inactive)");
 
+            // threads: maximum number of processor cores used (not given or <= 0: all cores)
+            int threads = ctx.GetInt("threads");
+            int? maxDegreeOfParallelism = null;
+            if (threads > 0)
+            {
+                maxDegreeOfParallelism = Math.Min(threads, Environment.ProcessorCount);
+                log.Add($"threads: {maxDegreeOfParallelism} (of {Environment.ProcessorCount} available)");
+            }
+
             _blockimages = blockimages;
             _settings = new SearchSettings
             {
@@ -110,7 +119,8 @@ namespace Socnet.CLIconsole.Runtime
                 NbrRandomStart = nbrRandomStart,
                 MinNbrBetter = minNbrBetter,
                 DoSwitching = doSwitching,
-                MaxMilliseconds = maxMilliseconds
+                MaxMilliseconds = maxMilliseconds,
+                MaxDegreeOfParallelism = maxDegreeOfParallelism
             };
             log.Add("Initialization seems to have gone ok!");
             return "ok";
@@ -139,6 +149,7 @@ namespace Socnet.CLIconsole.Runtime
                 MinNbrBetter = _settings.MinNbrBetter,
                 DoSwitching = _settings.DoSwitching,
                 MaxMilliseconds = _settings.MaxMilliseconds,
+                MaxDegreeOfParallelism = _settings.MaxDegreeOfParallelism,
                 Seed = _random.Next()
             };
             SearchResult result = BlockmodelSearch.Run(settings, _blockimages);

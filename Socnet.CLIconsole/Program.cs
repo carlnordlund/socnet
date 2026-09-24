@@ -11,10 +11,15 @@ catch (Exception)
 {
 }
 
+bool normalPriority = false;
 foreach (string arg in args)
 {
     switch (arg)
     {
+        case "-n":
+        case "--normalpriority":
+            normalPriority = true;
+            break;
         case "-s":
         case "--silent":
             ConsoleOutput.Verbose = false;
@@ -23,6 +28,20 @@ foreach (string arg in args)
         case "--endmarker":
             ConsoleOutput.EndMarker = true;
             break;
+    }
+}
+
+// Run at below-normal priority, so that searches (which use all processor cores) give way to other programs.
+// This is done at startup, before the threads doing the searches are created: on Linux, thread priorities are
+// inherited from the creating thread, and an ordinary user can not raise the priority again afterwards.
+if (!normalPriority)
+{
+    try
+    {
+        System.Diagnostics.Process.GetCurrentProcess().PriorityClass = System.Diagnostics.ProcessPriorityClass.BelowNormal;
+    }
+    catch (Exception)
+    {
     }
 }
 

@@ -13,7 +13,11 @@ Version 2.0 is a complete rewrite of the Socnet.se client, with the same command
 but with a much faster and more memory-efficient blockmodeling engine:
 - Moving an actor between clusters updates the fit incrementally: only the blocks affected by the move are re-evaluated,
   and most ideal blocks are evaluated in constant time from aggregated block statistics.
-- Searches run in parallel on all processor cores, with reproducible results for a given random seed.
+- Searches run in parallel on all processor cores, with reproducible results for a given random seed (independent
+  of the number of cores). The number of cores can be limited with the `threads` argument of `bminit` and `coreperi`,
+  e.g. `bminit(net, bi, ljubljana, nordlund, threads = 2)`.
+- Socnet.se runs at below-normal priority, so that searches using all cores give way to other programs on the computer.
+  Start the client with `--normalpriority` (or `-n`) to run at normal priority.
 - The exhaustive search only evaluates each partition once when the blockimage is symmetric.
 - The local searches ('localopt' and 'ljubljana') explore plateaus of equally good partitions in a bounded way,
   fixing the memory explosion (and crashes) of version 1.4 when many partitions have the same fit.
