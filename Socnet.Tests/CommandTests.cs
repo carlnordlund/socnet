@@ -51,6 +51,8 @@ namespace Socnet.Tests
         [InlineData("coreperi(bb, ljubljana, intercat=denuci(0.5)", "!Error: Syntax error - unbalanced brackets (2 opening, 1 closing)")]
         [InlineData("coreperi(bb, ljubljana) x", "!Error: Syntax error - unexpected text after the closing bracket: ' x'")]
         [InlineData("coreperi\uff08bb, ljubljana\uff09", "!Error: Syntax error - the command contains the unexpected character '\uff08' (U+FF08)")]
+        [InlineData("core\u001b[Dperi(bb, ljubljana)", "!Error: Syntax error - the command contains the invisible control character U+001B (e.g. from editing keys): 'core\\u001B[Dperi(bb, ljubljana)'")]
+        [InlineData("core-peri(bb, ljubljana)", "!Error: Syntax error - expected '[name =] command(arguments)', got: 'core-peri(bb, ljubljana)'")]
         public void Parser_ExplainsSyntaxErrors(string command, string expected)
         {
             SocnetEngine engine = new();
