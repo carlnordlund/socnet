@@ -41,18 +41,18 @@ goodness-of-fit. Note that the order of the positions (P0, P1, ...) can differ b
 the solutions are the same up to this ordering.
 Make sure that the partitions are:
 ```bash
-0: {Ron, Frank, Boyd, Tim}
+0: {Jeff, Jay, Sandy}
 1: {John, Jerry, Darrin, Ben, Arnie}
 2: {Tom}
-3: {Jeff, Jay, Sandy}
+3: {Ron, Frank, Boyd, Tim}
 ```
 Make sure that the optimal blockimage is:
 ```bash
     P0  P1  P2  P3
-P0  com nul nul nul
+P0  com nul com nul
 P1  nul nul nul nul
 P2  nul nul nul nul
-P3  nul nul com com
+P3  nul nul nul com
 ```
 Make sure that the goodness-of-fit for the found solution is:
 ```bash
